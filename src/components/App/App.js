@@ -1,5 +1,7 @@
 import {Button} from "antd";
 
+import httpx from "../../utils/httpx";
+
 import logo from '../../logo.svg';
 import './App.css';
 
@@ -11,9 +13,6 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          <Button onClick={()=>console.log("lzrnb")}>
-            猜猜我是谁，lzrup
-          </Button>
           给李兆荣一拳！
         </p>
         <a
