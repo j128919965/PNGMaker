@@ -1,7 +1,3 @@
-import {Button} from "antd";
-
-import httpx from "../../utils/httpx";
-
 import logo from '../../logo.svg';
 import './App.css';
 
