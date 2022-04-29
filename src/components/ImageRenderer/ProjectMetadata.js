@@ -1,3 +1,5 @@
+import errors from "../../utils/errors";
+
 export class ProjectMetadata {
   /**
    * 项目ID
@@ -14,9 +16,22 @@ export class ProjectMetadata {
    * @type {RedPoint[]}
    */
   points
+
+  static default(id) {
+    return ProjectMetadata.fromObj({id})
+  }
+
+  static fromObj(obj) {
+    let proj = new ProjectMetadata();
+    proj.id = obj?.id ?? errors.throw("id 不能为空")
+    proj.name = obj?.name ?? `项目 ${proj.id}`
+    proj.points = []
+    obj.points?.forEach(p => proj.points.push(RedPoint.fromObj(p)))
+    return proj
+  }
 }
 
-class RedPoint{
+export class RedPoint {
   /**
    * 小红点标号
    * @type {number}
@@ -38,14 +53,61 @@ class RedPoint{
    * @type {Pattern}
    */
   pattern
+
+  /**
+   * 创建默认小红点，必须传入ID
+   * @param id
+   * @returns {RedPoint}
+   */
+  static default(id) {
+    return RedPoint.fromObj({id})
+  }
+
+  /**
+   * 从JSON.parse返回的对象，创建一个当前类的实例
+   * @param obj
+   * @returns {RedPoint}
+   */
+  static fromObj(obj) {
+    let point = new RedPoint()
+    point.id = obj?.id ?? errors.throw("红点ID不能为空")
+    point.position = Position.fromObj(obj?.position)
+    point.type = obj?.type ?? 1
+    if (point.type === 1) {
+      point.pattern = FontPattern.fromObj(obj?.pattern)
+    } else if (point.type === 2) {
+      point.pattern = PicturePattern.fromObj(obj?.pattern)
+    } else {
+      errors.throw("小红点类型必须是1或2中的一个！")
+    }
+    return point
+  }
 }
 
-class Position{
+export class Position {
   x = 0
   y = 0
+
+
+  static default() {
+    return Position.fromObj(null)
+  }
+
+  /**
+   * 从JSON.parse返回的对象，创建一个当前类的实例
+   * @param obj
+   * @returns {Position}
+   */
+  static fromObj(obj) {
+    let position = new Position()
+    position.x = obj?.x ?? 0
+    position.y = obj?.y ?? 0
+    return position
+  }
+
 }
 
-class Pattern{
+export class Pattern {
   /**
    * 对齐方式
    * 1：以小红点左上角为输入左上角
@@ -58,16 +120,78 @@ class Pattern{
    * @type {number}
    */
   align = 1
+
+  setCanvasProperties(canvas) {
+    errors.throw("implement me !")
+  }
+
+  static checkAlign = (align)=>{
+    if (align > 5 || align < 1){
+      errors.throw("对齐方式错误！")
+    }
+  }
 }
 
-class FontPattern extends Pattern {
-  fontType = "宋体"
-  fontSize = 16
-  bold = false
-  italic = false
+export class FontPattern extends Pattern {
+  fontType
+  fontSize
+  bold
+  italic
+
+  setCanvasProperties(canvas) {
+    let context = canvas.getContext("2d");
+    context.font = this.fontType
+  }
+
+  static default() {
+    return FontPattern.fromObj(null)
+  }
+
+  /**
+   * 从JSON.parse返回的对象，创建一个当前类的实例
+   * @param obj
+   * @returns {FontPattern}
+   */
+  static fromObj(obj) {
+    let pattern = new FontPattern()
+    Pattern.checkAlign(obj?.align)
+    pattern.align = parseInt(obj?.align ?? 1)
+    pattern.bold = obj?.bold ?? false
+    pattern.italic = obj?.italic ?? false
+    pattern.fontSize = obj?.fontSize ?? 16
+    pattern.fontType = obj?.fontType ?? '宋体'
+    return pattern
+  }
+
 }
 
-class PicturePattern extends Pattern{
+export class PicturePattern extends Pattern {
   width
   height
+
+  /**
+   *
+   * @param canvas {HTMLCanvasElement}
+   */
+  setCanvasProperties(canvas) {
+    // TODO
+  }
+
+  static default() {
+    return PicturePattern.fromObj(null)
+  }
+
+  /**
+   * 从JSON.parse返回的对象，创建一个当前类的实例
+   * @param obj
+   * @returns {PicturePattern}
+   */
+  static fromObj(obj) {
+    let pattern = new PicturePattern()
+    Pattern.checkAlign(obj?.align)
+    pattern.align = parseInt(obj?.align ?? 1)
+    pattern.height = obj?.height ?? 100
+    pattern.width = obj?.width ?? 100
+    return pattern
+  }
 }
