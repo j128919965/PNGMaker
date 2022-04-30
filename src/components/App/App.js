@@ -6,6 +6,7 @@ import {useRef, useState} from "react";
 import ProjectEditor from "../ProjectEditor/ProjectEditor";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import ProjectStore from "../../data/projects";
+import files from "../../utils/files"
 
 import './App.css';
 
@@ -22,10 +23,10 @@ const App = () => {
    */
   const pe = useRef();
 
-  const updateProject = (proj) => {
+  const updateProject = (proj , ignorePe) => {
     imageRenderer.load(proj)
     setProject(proj)
-    pe.current.resetProj(proj)
+    !ignorePe && pe.current.resetProj(proj)
   }
 
   const imageRenderer = new ImageRenderer()
@@ -82,7 +83,11 @@ const App = () => {
           children: [
             {
               key: "tool-bg-open",
-              label: "上传背景"
+              label: "上传背景",
+              onClick: async ()=>{
+                project.background = await files.readFile();
+                updateProject(project)
+              }
             },
             {
               key: "tool-bg-rem",
@@ -105,43 +110,48 @@ const App = () => {
 
 
   return (
-    <div className="g-page">
-      <Menu mode="horizontal" items={items}/>
-      {
-        project &&
-        <div className="m-menu-proj-name">
-          <EdiText saveButtonClassName="m-menu-proj-name-btn"
-                   saveButtonContent="✓"
-                   cancelButtonClassName="m-menu-proj-name-btn"
-                   cancelButtonContent="✕"
-                   editButtonClassName="m-menu-proj-name-btn"
-                   editButtonContent={<EditOutlined/>}
-                   value={project.name}
-                   onSave={v => {
-                     project.name = v;
-                     setProject(project)
-                   }}/>
-        </div>
-      }
+    <div>
+      {/*添加一个全局的文件上传器，不用在每个地方都重新写*/}
+      <input type="file" id="upload-block-real-input"   style={{display:'none'}} accept="image/gif,image/jpeg,image/jpg,image/png"/>
+      <div className="g-page">
+        <Menu mode="horizontal" items={items}/>
+        {
+          project &&
+          <div className="m-menu-proj-name">
+            <EdiText saveButtonClassName="m-menu-proj-name-btn"
+                     saveButtonContent="✓"
+                     cancelButtonClassName="m-menu-proj-name-btn"
+                     cancelButtonContent="✕"
+                     editButtonClassName="m-menu-proj-name-btn"
+                     editButtonContent={<EditOutlined/>}
+                     value={project.name}
+                     onSave={v => {
+                       project.name = v;
+                       setProject(project)
+                     }}/>
+          </div>
+        }
 
-      <div className="m-main">
-        <div className="m-main-left">
-          <ProjectEditor ref={pe}/>
+        <div className="m-main">
+          <div className="m-main-left">
+            <ProjectEditor ref={pe} onProjectUpdate={(proj)=>updateProject(proj,true)}/>
+          </div>
+          <div className="m-main-right">
+            {
+              !project &&
+              <div className="m-main-hint">
+                <Empty description=""/>
+                请打开或新建项目
+              </div>
+            }
+          </div>
         </div>
-        <div className="m-main-right">
-          {
-            !project &&
-            <div className="m-main-hint">
-              <Empty description=""/>
-              请打开或新建项目
-            </div>
-          }
-        </div>
+
+
+
       </div>
-
-
-
     </div>
+
   );
 }
 ;

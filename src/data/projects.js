@@ -14,7 +14,7 @@ const ProjectStore = {
   async createNewProject() {
     // TODO 调接口
     let nextId = await getNextProjectId()
-    return ProjectMetadata.default(nextId)
+    return ProjectMetadata.fromObj({id:nextId,background:"https://s2.loli.net/2022/04/30/x8ZALg4NSRpcqU2.jpg"})
   },
   /**
    * 保存

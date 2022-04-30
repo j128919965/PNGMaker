@@ -17,6 +17,12 @@ export class ProjectMetadata {
    */
   points
 
+  /**
+   * 背景图片
+   * @type {string}
+   */
+  background
+
   static default(id) {
     return ProjectMetadata.fromObj({id})
   }
@@ -25,6 +31,7 @@ export class ProjectMetadata {
     let proj = new ProjectMetadata();
     proj.id = obj?.id ?? errors.throw("id 不能为空")
     proj.name = obj?.name ?? `项目 ${proj.id}`
+    proj.background = obj?.background
     proj.points = []
     obj.points?.forEach(p => proj.points.push(RedPoint.fromObj(p)))
     return proj
