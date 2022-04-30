@@ -1,4 +1,4 @@
-import {ProjectMetadata} from "../components/ImageRenderer/ProjectMetadata";
+import {ProjectMetadata} from "./ProjectMetadata";
 
 const getNextProjectId = async () => {
   // TODO 调接口

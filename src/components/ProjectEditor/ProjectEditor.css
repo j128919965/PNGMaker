@@ -1,0 +1,7 @@
+.m-pe-container{
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 2.0rem;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, .12);
+    background: white;
+}

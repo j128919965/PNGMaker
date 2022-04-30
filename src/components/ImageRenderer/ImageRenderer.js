@@ -1,6 +1,3 @@
-import {InputData} from "./InputData";
-import {ProjectMetadata} from "./ProjectMetadata"
-
 export default class ImageRenderer{
 
   /**
@@ -16,7 +13,7 @@ export default class ImageRenderer{
   backGroundCanvas = document.createElement("canvas")
 
 
-  constructor(project) {
+  load(project) {
     this.project = project
   }
 

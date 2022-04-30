@@ -1,15 +1,34 @@
 import EdiText from "react-editext";
 import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined} from "@ant-design/icons";
-import {Menu , Modal} from "antd";
-import {useState} from "react";
+import {Empty, Menu, Modal} from "antd";
+import {useRef, useState} from "react";
 
 import ProjectEditor from "../ProjectEditor/ProjectEditor";
+import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import ProjectStore from "../../data/projects";
 
 import './App.css';
 
 const App = () => {
+
+  /**
+   * 用于保存和设置当前打开的项目
+   */
   const [project, setProject] = useState(null)
+
+  /**
+   * 项目编辑器
+   * @type {React.MutableRefObject<ProjectEditor>}
+   */
+  const pe = useRef();
+
+  const updateProject = (proj) => {
+    imageRenderer.load(proj)
+    setProject(proj)
+    pe.current.resetProj(proj)
+  }
+
+  const imageRenderer = new ImageRenderer()
 
   const items = [
     {
@@ -20,7 +39,10 @@ const App = () => {
         {
           key: "proj-create",
           label: '新建项目',
-          onClick: async () => setProject(await ProjectStore.createNewProject())
+          onClick: async () => {
+            let proj = await ProjectStore.createNewProject()
+            updateProject(proj)
+          }
         },
         {
           key: "proj-open",
@@ -43,8 +65,6 @@ const App = () => {
               okText: '确认',
               cancelText: '取消',
               onOk: () => ProjectStore.delete(project)
-
-
             })
           }
         }
@@ -104,9 +124,26 @@ const App = () => {
         </div>
       }
 
-      <ProjectEditor/>
+      <div className="m-main">
+        <div className="m-main-left">
+          <ProjectEditor ref={pe}/>
+        </div>
+        <div className="m-main-right">
+          {
+            !project &&
+            <div className="m-main-hint">
+              <Empty description=""/>
+              请打开或新建项目
+            </div>
+          }
+        </div>
+      </div>
+
+
+
     </div>
   );
 }
+;
 
 export default App;
