@@ -95,6 +95,11 @@ export class Position {
   x = 0
   y = 0
 
+  constructor(x,y) {
+    this.x = x
+    this.y = y
+  }
+
 
   static default() {
     return Position.fromObj(null)
@@ -106,10 +111,7 @@ export class Position {
    * @returns {Position}
    */
   static fromObj(obj) {
-    let position = new Position()
-    position.x = obj?.x ?? 0
-    position.y = obj?.y ?? 0
-    return position
+    return new Position(obj?.x ?? 0, obj?.y ?? 0)
   }
 
 }
