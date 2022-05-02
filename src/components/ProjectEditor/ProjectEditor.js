@@ -107,7 +107,7 @@ export default class ProjectEditor extends Component {
         let newPos = canvasx.getMousePosition(ev, canvas)
         chosenRedPoint.moveTo(newPos)
         this.redraw()
-        // TODO 通知上层
+        this.props.onProjectUpdate(this.project)
       }
 
     }
@@ -116,8 +116,8 @@ export default class ProjectEditor extends Component {
       let position = canvasx.getMousePosition(e, canvas);
       let point = RedPoint.fromObj({id: this.project.points.length + 1, position})
       this.project.points.push(point)
-      this.resetProj(this.project)
-      // TODO 通知上层
+      this.redraw()
+      this.props.onProjectUpdate(this.project)
     }
   }
 
@@ -138,7 +138,6 @@ export default class ProjectEditor extends Component {
       <div className="m-pe-container">
         <canvas id="pe-editor" style={{display: ready ? 'block' : 'none'}} width={EditorWidth}
                 height={EditorHeight}/>
-
         {
           !ready &&
           <div style={{width: EditorWidth, height: EditorHeight}} className="m-pe-empty">

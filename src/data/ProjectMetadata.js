@@ -63,7 +63,7 @@ export class RedPoint {
 
   /**
    * 移动
-   * @param pos {}
+   * @param pos {Position}
    */
   moveTo(pos){
     this.position = pos
