@@ -62,6 +62,14 @@ export class RedPoint {
   pattern
 
   /**
+   * 移动
+   * @param pos {}
+   */
+  moveTo(pos){
+    this.position = pos
+  }
+
+  /**
    * 创建默认小红点，必须传入ID
    * @param id
    * @returns {RedPoint}
