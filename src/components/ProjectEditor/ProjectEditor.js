@@ -1,10 +1,11 @@
-import {Component} from "react";
+import {Component , createRef} from "react";
 
 import "./ProjectEditor.css"
 import ImageLoader from "../../utils/imageLoader";
 import canvasx from '../../utils/canvasx'
 import {EditorHeight, EditorWidth} from "../../data/constants";
 import {RedPoint} from "../../data/ProjectMetadata";
+import RedPointEditor from "./RedPointEditor/RedPointEditor";
 
 export default class ProjectEditor extends Component {
   /**
@@ -21,8 +22,10 @@ export default class ProjectEditor extends Component {
   constructor(props) {
     super(props)
     this.props = props
+    this.rpEditor = createRef();
     this.state = {
-      ready: false
+      ready: false,
+      editing: false
     }
   }
 
@@ -74,7 +77,7 @@ export default class ProjectEditor extends Component {
     this.canvas = canvas
     // TODO: 编辑小红点属性
     canvas.onclick = (e) => {
-      if (canvas.isClicking){
+      if (canvas.isClicking) {
         if (this.project.points.length === 0) {
           return
         }
@@ -97,9 +100,9 @@ export default class ProjectEditor extends Component {
       canvas.onmouseup = (ev) => {
         canvas.onmouseup = null
         canvas.onmousemove = null
-        if (canvasx.calcDistance(position , canvasx.getMousePosition(ev,canvas)) <= 2){
+        if (canvasx.calcDistance(position, canvasx.getMousePosition(ev, canvas)) <= 2) {
           canvas.isClicking = true
-        }else {
+        } else {
           canvas.isClicking = false
         }
       }
@@ -127,21 +130,75 @@ export default class ProjectEditor extends Component {
     }
   }
 
-
   showRedPointEdit(redPoint) {
-    alert(redPoint.id)
+    this.setState({editing: true} , ()=>{
+      this.rpEditor.current.setRedPoint(redPoint)
+    })
+  }
+
+  /**
+   * 红点编辑器更新红点属性
+   * @param p {RedPoint}
+   */
+  onRedPointEditorUpdateProject(p){
+    // 这个地方，红点编辑器不会影响到
+    const {points} = this.project
+    for (let i in points) {
+      if (p.id === points[i].id){
+        points[i] = p
+        break
+      }
+    }
+    this.props.onProjectUpdate(this.project)
+  }
+
+  /**
+   * 红点编辑器删除红点属性
+   * @param id {number}
+   */
+  onRedPointEditorDeleteProject(id){
+    let flag = false
+    const {points} = this.project
+    let nps = []
+    for (let point of points) {
+      if (flag){
+        point.id--
+      }else {
+        if (id === point.id){
+          flag = true
+          continue
+        }
+      }
+      nps.push(point)
+    }
+    this.project.points = nps
+    this.reDraw()
+    this.props.onProjectUpdate(this.project)
+    this.setState({editing:false})
   }
 
   render() {
-    const {ready} = this.state
+    const {ready, editing} = this.state
     return (
-      <div className="m-pe-container">
-        <canvas id="pe-editor" style={{display: ready ? 'block' : 'none'}} width={EditorWidth}
+      <div className="m-pe-container" style={{width: EditorWidth, height: EditorHeight}}>
+        <canvas id="pe-editor"
+                style={{display: ready ? 'block' : 'none', position: "absolute"}}
+                width={EditorWidth}
                 height={EditorHeight}/>
         {
           !ready &&
-          <div style={{width: EditorWidth, height: EditorHeight}} className="m-pe-empty">
+          <div style={{width: EditorWidth, height: EditorHeight}}
+               className="m-pe-empty">
             请打开或新建项目
+          </div>
+        }
+        {
+          editing &&
+          <div className="m-pe-gray">
+            <div className="m-pe-gray-left" onClick={() => { this.setState({editing: false})}}>>
+
+            </div>
+            <RedPointEditor className="m-pe-gray-right" ref={this.rpEditor} onUpdate={this.onRedPointEditorUpdateProject.bind(this)} onDelete={this.onRedPointEditorDeleteProject.bind(this)}/>
           </div>
         }
       </div>

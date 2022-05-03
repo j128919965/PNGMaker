@@ -1,0 +1,13 @@
+.m-re-pt-container{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.m-re-pt-block {
+    width: 50%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}

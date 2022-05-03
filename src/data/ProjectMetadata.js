@@ -62,6 +62,12 @@ export class RedPoint {
   pattern
 
   /**
+   * 备注
+   * @type {string}
+   */
+  label = ""
+
+  /**
    * 移动
    * @param pos {Position}
    */
@@ -88,6 +94,7 @@ export class RedPoint {
     point.id = obj?.id ?? errors.throw("红点ID不能为空")
     point.position = Position.fromObj(obj?.position)
     point.type = obj?.type ?? 1
+    point.label = obj?.label ?? ''
     if (point.type === 1) {
       point.pattern = FontPattern.fromObj(obj?.pattern)
     } else if (point.type === 2) {
@@ -147,6 +154,13 @@ export class Pattern {
       errors.throw("对齐方式错误！")
     }
   }
+
+  /**
+   * @return {Pattern}
+   */
+  clone(){
+    errors.throw("implement me !")
+  }
 }
 
 export class FontPattern extends Pattern {
@@ -180,6 +194,10 @@ export class FontPattern extends Pattern {
     return pattern
   }
 
+  clone() {
+    return FontPattern.fromObj(this)
+  }
+
 }
 
 export class PicturePattern extends Pattern {
@@ -210,5 +228,9 @@ export class PicturePattern extends Pattern {
     pattern.height = obj?.height ?? 100
     pattern.width = obj?.width ?? 100
     return pattern
+  }
+
+  clone() {
+    return PicturePattern.fromObj(this)
   }
 }

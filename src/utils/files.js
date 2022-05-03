@@ -7,7 +7,7 @@ const files = {
     return new Promise((res,rej)=>{
       const reader = document.getElementById('upload-block-real-input')
       reader.onchange = async ()=>{
-        let file = this.reader.files[0]
+        let file = reader.files[0]
         if (file.size > 1024*1024*10){
           rej("文件大小不能大于10m")
         }
