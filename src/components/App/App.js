@@ -4,6 +4,7 @@ import {Empty, Menu, Modal} from "antd";
 import {useRef, useState} from "react";
 
 import ProjectEditor from "../ProjectEditor/ProjectEditor";
+import ProjectForm from "../ProjectForm/ProjectForm";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import ProjectStore from "../../data/projects";
 import files from "../../utils/files"
@@ -23,10 +24,17 @@ const App = () => {
    */
   const pe = useRef();
 
+    /**
+     *
+     * @type {React.MutableRefObject<ProjectForm>}
+     */
+  const pf = useRef();
+
   const updateProject = (proj , ignorePe) => {
     imageRenderer.load(proj)
     setProject(proj)
     !ignorePe && pe.current.resetProj(proj)
+    pf.current.updateProject(proj)
   }
 
   const imageRenderer = new ImageRenderer()
@@ -143,6 +151,10 @@ const App = () => {
                 <Empty description=""/>
                 请打开或新建项目
               </div>
+            }
+            {
+              project &&
+              <ProjectForm ref={pf} />
             }
           </div>
         </div>
