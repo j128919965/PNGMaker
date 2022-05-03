@@ -27,9 +27,11 @@ function getItem(label, key, icon, children, onClick) {
 
 const RedPointEditor = forwardRef((props, ref) => {
   const [redPoint, setRedPoint] = useState(RedPoint.default(-1))
-
   const [isWord, setIsWord] = useState(redPoint.type === 1)
-  useImperativeHandle(ref, () => ({setRedPoint}))
+
+  useImperativeHandle(ref, () => ({
+    setRedPoint:(p)=>{setRedPoint(p);setIsWord(p.type === 1)}
+  }))
 
   const updatePoint = () => {
     setRedPoint(redPoint)
@@ -37,13 +39,13 @@ const RedPointEditor = forwardRef((props, ref) => {
   }
 
   const items = [
-    getItem('格式', 'pe-sub1', <FontColorsOutlined/>, undefined,  () => {
+    getItem('格式', 'pe-sub1', <FontColorsOutlined/>, undefined, () => {
       if (redPoint.type === 1) {
         // 这个地方要进行一次深copy，否则会污染
         setTempFont(redPoint.pattern.clone())
         setIsFontModalVisible(true)
-      }else {
-// 这个地方要进行一次深copy，否则会污染
+      } else {
+        // 这个地方要进行一次深copy，否则会污染
         setTempPicture(redPoint.pattern.clone())
         setIsPictureModalVisible(true)
       }
@@ -100,9 +102,9 @@ const RedPointEditor = forwardRef((props, ref) => {
         setIsWord(type === 1)
         redPoint.type = type
         if (type === 1) {
-          redPoint.pattern = FontPattern.fromObj({align:redPoint.pattern.align})
+          redPoint.pattern = FontPattern.fromObj({align: redPoint.pattern.align})
         } else {
-          redPoint.pattern = PicturePattern.fromObj({align:redPoint.pattern.align})
+          redPoint.pattern = PicturePattern.fromObj({align: redPoint.pattern.align})
         }
         updatePoint()
       }
@@ -210,7 +212,7 @@ const RedPointEditor = forwardRef((props, ref) => {
                       setTempFont(tempFont)
                     }}/>
           </div>
-          <div className="m-re-pt-block" style={{width:'100%'}}>
+          <div className="m-re-pt-block" style={{width: '100%'}}>
             对齐方式
             <Select defaultValue={tempFont.align} style={{width: 300}} onChange={(v) => {
               tempFont.align = v;
@@ -263,7 +265,7 @@ const RedPointEditor = forwardRef((props, ref) => {
                    }}
             />
           </div>
-          <div className="m-re-pt-block" style={{width:'100%'}}>
+          <div className="m-re-pt-block" style={{width: '100%'}}>
             对齐方式
             <Select defaultValue={tempPicture.align} style={{width: 300}} onChange={(v) => {
               tempPicture.align = v;
