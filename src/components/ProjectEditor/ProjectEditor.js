@@ -43,11 +43,11 @@ export default class ProjectEditor extends Component {
     }
     this.project = proj
 
-    await this.redraw()
+    await this.reDraw()
     this.setState({ready: true})
   }
 
-  async redraw() {
+  async reDraw() {
     let proj = this.project
     // 先绘制背景图片
     /**
@@ -106,7 +106,7 @@ export default class ProjectEditor extends Component {
       canvas.onmousemove = (ev) => {
         let newPos = canvasx.getMousePosition(ev, canvas)
         chosenRedPoint.moveTo(newPos)
-        this.redraw()
+        this.reDraw()
         this.props.onProjectUpdate(this.project)
       }
 
@@ -116,7 +116,7 @@ export default class ProjectEditor extends Component {
       let position = canvasx.getMousePosition(e, canvas);
       let point = RedPoint.fromObj({id: this.project.points.length + 1, position})
       this.project.points.push(point)
-      this.redraw()
+      this.reDraw()
       this.props.onProjectUpdate(this.project)
     }
   }
