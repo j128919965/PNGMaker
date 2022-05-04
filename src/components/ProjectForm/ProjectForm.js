@@ -1,65 +1,50 @@
-import {FormWidth, FormMaxHeight} from "../../data/constants.js";
 import React from "react";
 
 import "./ProjectForm.css"
-import {Empty} from "antd";
-
-/**
- *
- * @param props
- * @return {JSX.Element}
- * @constructor
- */
-function TypeOfText (props){
-  return (<div className="m-typeOfText">
-      <div className="p-red-point">{props.point.id}</div>
-      <div>
-        <label className="m-text">
-          请设置备注
-          <input type="text"/>
-        </label>
-      </div>
-  </div>
-  )
-}
+import {Empty, Input} from "antd";
 
 
-export default class ProjectForm extends React.Component{
+export default class ProjectForm extends React.Component {
 
   constructor(props) {
     super(props);
     this.props = props
     this.state = {
-      project:null
+      project: null
     }
   }
 
-  updateProject(project){
+  updateProject(project) {
     this.setState({project})
   }
 
 
-  formList(){
+  formList() {
     /**
      * @type {ProjectMetadata}
      */
-    const project= this.state.project
-    if (!project){
+    const project = this.state.project
+    if (!project) {
       return
     }
-    const {points} = project
-    let list = []
-    for (let i = 0; i <points.length; i++){
-      list.push(<TypeOfText point = {this.props.points[i]}/>)
-    }
-    return list
+    return project.points.map(point =>
+      <div className="m-pf-line">
+        <div className="m-pf-p-icon">
+          {point.id}
+        </div>
+        <div >
+          <label className="m-pf-p-label">
+            {point.label?.length > 0 ? point.label : '请设置备注'}
+            <Input />
+          </label>
+        </div>
+      </div>
+    )
   }
-
 
 
   render() {
     const {project} = this.state
-    console.log(project)
     return (
       <>
         {
@@ -73,8 +58,11 @@ export default class ProjectForm extends React.Component{
         {
 
           project &&
-          <div className="pf-editor">
-            {this.formList()}
+          <div className="m-pf-container">
+            <div className="m-pf-lines">
+              {this.formList()}
+            </div>
+
           </div>
         }
       </>

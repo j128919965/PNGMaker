@@ -1,27 +1,36 @@
-.pf-editor {
+.m-pf-container {
     border: 1px solid #ddd;
+    width: 100%;
     max-height: 473px;
     height: auto;
     border-radius: 6px;
     display: flex;
+    flex-direction: column;
 }
 
-.p-red-point {
-    width: 14px;
-    height: 14px;
+.m-pf-lines{
+    width: 80%;
+}
+
+.m-pf-line{
+    display: flex;
+    width: 100%;
+}
+
+.m-pf-p-icon{
+    width: 18px;
+    height: 18px;
     border-radius: 100%;
     display: flex;
     text-align: center;
     justify-content: center;
     color: white;
     background: red;
-}
-
-.m-typeOfText{
-    display: flex;
-}
-
-.m-text {
     font-size: xx-small;
-    font-weight: bolder;
+    user-select: none;
+    margin: 10px;
+}
+
+.m-pf-p-label{
+    font-size: 12px;
 }
