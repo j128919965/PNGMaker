@@ -11,15 +11,33 @@ import {Empty} from "antd";
  * @constructor
  */
 function TypeOfText (props){
-  return (<div className="m-typeOfText">
-      <div className="p-red-point">{props.point.id}</div>
+  return (<div className="m-pf-text">
+      <div className="p-point">{props.point.id}</div>
       <div>
-        <label className="m-text">
+        <label className="m-pf-text-label">
           请设置备注
+          <br/>
           <input type="text"/>
         </label>
       </div>
   </div>
+  )
+}
+
+function TypeOfImage (props){
+  return (
+    <div className="m-pf-image">
+      <div className="p-point">{props.point.id}</div>
+      <div>
+        <label className="m-pf-image">
+          请设置备注
+          <input type="image" accept="image/gif,image/jpeg,image/jpg,image/png" alt='404'/>
+          {
+
+          }
+        </label>
+      </div>
+    </div>
   )
 }
 
@@ -50,7 +68,7 @@ export default class ProjectForm extends React.Component{
     const {points} = project
     let list = []
     for (let i = 0; i <points.length; i++){
-      list.push(<TypeOfText point = {this.props.points[i]}/>)
+      list.push(<TypeOfText point = {points[i]}/>)
     }
     return list
   }

@@ -4,24 +4,33 @@
     height: auto;
     border-radius: 6px;
     display: flex;
+    flex-direction: column;
+    overflow: auto;
 }
 
-.p-red-point {
-    width: 14px;
-    height: 14px;
+.p-point {
+    width: 18px;
+    height: 18px;
     border-radius: 100%;
     display: flex;
     text-align: center;
+    align-items: center;
     justify-content: center;
     color: white;
     background: red;
+    margin: 7px;
 }
 
-.m-typeOfText{
+.m-pf-text{
     display: flex;
+    align-items: center;
 }
 
-.m-text {
+.m-pf-text-label {
     font-size: xx-small;
     font-weight: bolder;
+}
+
+.m-pf-text-label>input{
+    border: 1px solid #aaaaaa;
 }
