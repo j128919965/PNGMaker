@@ -10,6 +10,11 @@ export class InputData{
    * @type {string}
    */
   data
+
+  constructor(pointId , data) {
+    this.pointId = pointId
+    this.data = data
+  }
 }
 
 export class InputDataLoadResult {
