@@ -117,8 +117,7 @@ export default class ProjectEditor extends Component {
 
     canvas.ondblclick = (e) => {
       let position = canvasx.getMousePosition(e, canvas);
-      let point = RedPoint.fromObj({id: this.project.points.length + 1, position})
-      this.project.points.push(point)
+      this.project.createNextPoint(position)
       this.reDraw()
       this.props.onProjectUpdate(this.project)
     }
@@ -157,17 +156,11 @@ export default class ProjectEditor extends Component {
    * @param id {number}
    */
   onRedPointEditorDeleteProject(id){
-    let flag = false
     const {points} = this.project
     let nps = []
     for (let point of points) {
-      if (flag){
-        point.id--
-      }else {
-        if (id === point.id){
-          flag = true
-          continue
-        }
+      if (id === point.id){
+        continue
       }
       nps.push(point)
     }

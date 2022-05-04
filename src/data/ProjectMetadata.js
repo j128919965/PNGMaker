@@ -23,6 +23,8 @@ export class ProjectMetadata {
    */
   background
 
+  latestPointId
+
   static default(id) {
     return ProjectMetadata.fromObj({id})
   }
@@ -34,7 +36,15 @@ export class ProjectMetadata {
     proj.background = obj?.background
     proj.points = []
     obj.points?.forEach(p => proj.points.push(RedPoint.fromObj(p)))
+    proj.latestPointId = obj?.latestPointId ?? 0
     return proj
+  }
+
+  createNextPoint(position){
+    let redPoint = RedPoint.fromObj({id:this.latestPointId + 1 , position:position});
+    this.points.push(redPoint)
+    this.latestPointId++
+    return redPoint
   }
 }
 
