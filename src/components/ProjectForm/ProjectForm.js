@@ -2,13 +2,33 @@ import {FormWidth, FormMaxHeight} from "../../data/constants.js";
 import React from "react";
 
 import "./ProjectForm.css"
+import {Empty} from "antd";
+
+/**
+ *
+ * @param props
+ * @return {JSX.Element}
+ * @constructor
+ */
+function TypeOfText (props){
+  return (<div className="m-typeOfText">
+      <div className="p-red-point">{props.point.id}</div>
+      <div>
+        <label className="m-text">
+          请设置备注
+          <input type="text"/>
+        </label>
+      </div>
+  </div>
+  )
+}
 
 
 export default class ProjectForm extends React.Component{
 
   constructor(props) {
     super(props);
-    this.props = props=
+    this.props = props
     this.state = {
       project:null
     }
@@ -18,9 +38,6 @@ export default class ProjectForm extends React.Component{
     this.setState({project})
   }
 
-  // componentWillReceiveProps(nextProps){
-  //   this.render()
-  // }
 
   formList(){
     /**
@@ -31,18 +48,37 @@ export default class ProjectForm extends React.Component{
       return
     }
     const {points} = project
-
-    return points.map(p=> <div>{p.id}</div>
-    )
+    let list = []
+    for (let i = 0; i <points.length; i++){
+      list.push(<TypeOfText point = {this.props.points[i]}/>)
+    }
+    return list
   }
 
 
 
   render() {
+    const {project} = this.state
+    console.log(project)
     return (
-        <div className="pf-editor">
-          {this.formList()}
-        </div>
+      <>
+        {
+          !project &&
+          <div className="m-main-hint">
+            <Empty description=""/>
+            请打开或新建项目
+          </div>
+        }
+
+        {
+
+          project &&
+          <div className="pf-editor">
+            {this.formList()}
+          </div>
+        }
+      </>
+
     )
   }
 }
