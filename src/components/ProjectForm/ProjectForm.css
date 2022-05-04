@@ -1,14 +1,18 @@
 .pf-editor {
     border: 1px solid #ddd;
-    max-height: 473px;
+    min-height: 200px;
     height: auto;
     border-radius: 6px;
+    display: flex;
+    flex-direction: row;
+}
+.pf-editor>div{
     display: flex;
     flex-direction: column;
     overflow: auto;
 }
 
-.p-point {
+.u-point {
     width: 18px;
     height: 18px;
     border-radius: 100%;
@@ -21,16 +25,39 @@
     margin: 7px;
 }
 
-.m-pf-text{
+.m-pf-text, .m-pf-image{
     display: flex;
     align-items: center;
+    margin-bottom: 10px;
 }
 
-.m-pf-text-label {
+.m-pf-text-label, .m-pf-image-label {
     font-size: xx-small;
     font-weight: bolder;
+    color: #555;
+    letter-spacing: 1px;
 }
 
-.m-pf-text-label>input{
+.m-pf-text-label>Input{
     border: 1px solid #aaaaaa;
+    width: 200px;
+    height: 30px;
+    margin-right: 25px;
+}
+
+.m-pf-image-label>Input{
+    width: 200px;
+}
+
+.pf-editor>div>.u-pf-preview, .pf-editor>div>.u-pf-save{
+    position: relative;
+    margin-top: 30px;
+    margin-left: 18px;
+    border: 0;
+    border-radius: 5px;
+    background: #1890FF;
+    color: white;
+    font-weight: bolder;
+    height: 30px;
+    width: 80px;
 }
