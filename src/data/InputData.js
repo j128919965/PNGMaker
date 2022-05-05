@@ -15,6 +15,10 @@ export class InputData{
     this.pointId = pointId
     this.data = data
   }
+
+  static fromObj(obj){
+    return new InputData(obj.pointId , obj.data)
+  }
 }
 
 export class InputDataLoadResult {
@@ -38,6 +42,29 @@ export class InputDataLoadResult {
     let result = new InputDataLoadResult();
     result.success = true
     result.data = data
+    return result
+  }
+
+  /**
+   * 创建一个数据列表对象
+   * @param map {Object} 在线编辑数据后得到的
+   * @return {InputDataLoadResult}
+   */
+  static fromMap(map){
+    let result = new InputDataLoadResult();
+    result.success = true
+    result.data =  Object.keys(map).map(key => new InputData(key,map[key]))
+    return result
+  }
+
+  /**
+   * 调接口获取对象
+   * @param obj
+   */
+  static fromObj(obj){
+    let result = new InputDataLoadResult();
+    result.success = obj.success
+    result.data =  obj.data.map(d=>InputData.fromObj(d))
     return result
   }
 }
