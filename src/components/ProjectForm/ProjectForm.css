@@ -1,6 +1,6 @@
 .m-pf-editor {
     border: 1px solid #ddd;
-    min-height: 200px;
+    min-height: 150px;
     height: auto;
     border-radius: 6px;
     display: flex;
@@ -38,15 +38,11 @@
     letter-spacing: 1px;
 }
 
-.m-pf-text-label>Input{
+.m-pf-editor-text>div>label>Input{
     border: 1px solid #aaaaaa;
-    width: 200px;
+    width: 210px;
     height: 30px;
     margin-right: 25px;
-}
-
-.m-pf-image-label>Input{
-    width: 200px;
 }
 
 .u-pf-btn{
@@ -66,9 +62,27 @@
     background: rgba(24,144,255,0.8);
 }
 
+.u-pf-editor-upload{
+    border: 1px solid #1890FF;
+    border-radius: 5px;
+    color: #1890FF;
+}
+
+.u-pf-editor-upload:hover{
+
+}
+
 .m-pf-preview-container{
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.m-pf-editor-list{
+    width: 270px;
+}
+
+.ant-upload-list-item{
+    width: 200px;
 }

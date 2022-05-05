@@ -1,10 +1,10 @@
 import React from "react";
 
 import "./ProjectForm.css"
-import {Empty, Input, Upload, Button, Modal} from "antd";
+import {Empty, Input, Button, Modal} from "antd";
 import {UploadOutlined} from '@ant-design/icons';
 import {InputData} from "../../data/InputData";
-
+// import ImageLoader from "../../utils/imageLoader";
 
 import {EditorHeight, EditorWidth} from '../../data/constants'
 
@@ -30,14 +30,18 @@ function TypeOfText(props) {
 }
 
 function TypeOfImage(props) {
+  const {point} = props
   return (
     <div className="m-pf-editor-image">
       <div className="u-point">{props.point.id}</div>
       <div>
-        <label>请设置备注<br/>
-          <Upload {...props}>
-            <Button icon={<UploadOutlined/>}>Click to Upload</Button>
-          </Upload>
+        <label>{point.label?.length > 0 ? point.label : "请设置备注"}<br/>
+          <Button
+            className='u-pf-editor-upload'
+            icon={<UploadOutlined/>}
+          >
+            Click to Upload
+          </Button>
         </label>
       </div>
     </div>
@@ -128,7 +132,11 @@ export default class ProjectForm extends React.Component {
           />
         )
       } else if (points[i].type === 2) {
-        list.push(<TypeOfImage key={points[i].id} point={points[i]}/>)
+        list.push(
+          <TypeOfImage key={points[i].id}
+                       point={points[i]}
+                       oninput={e => this.updateStateData(e.target.value, points[i].id)}
+          />)
       }
     }
     return list
@@ -148,7 +156,7 @@ export default class ProjectForm extends React.Component {
         {
           project &&
           <div className="m-pf-editor">
-            <div>
+            <div className="m-pf-editor-list">
               {this.formList()}
             </div>
             <div>
@@ -167,14 +175,14 @@ export default class ProjectForm extends React.Component {
                  this.setState({isModalVisible: false})
                }}
         >
-          <div className='m-pf-preview-container' style={{width: '100%',display: 'flex', }}>
+          <div className='m-pf-preview-container' style={{width: '100%', display: 'flex',}}>
             <canvas
               width={EditorWidth * 0.8}
               height={EditorHeight * 0.8}
               id='preview' style={{border: '1px solid black'}}>
               no canvas
             </canvas>
-            <Button className='u-pf-btn' type={"primary"} style={{marginTop:20}}>ainio</Button>
+            <Button className='u-pf-btn' type={"primary"} style={{marginTop: 20}}>shit</Button>
           </div>
 
         </Modal>

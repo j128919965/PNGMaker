@@ -1,6 +1,6 @@
 import EdiText from "react-editext";
 import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined} from "@ant-design/icons";
-import {Empty, Menu, Modal} from "antd";
+import { Menu, Modal} from "antd";
 import {useRef, useState} from "react";
 
 import ProjectEditor from "../ProjectEditor/ProjectEditor";
