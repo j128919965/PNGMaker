@@ -4,7 +4,6 @@ import "./ProjectEditor.css"
 import ImageLoader from "../../utils/imageLoader";
 import canvasx from '../../utils/canvasx'
 import {EditorHeight, EditorWidth} from "../../data/constants";
-import {RedPoint} from "../../data/ProjectMetadata";
 import RedPointEditor from "./RedPointEditor/RedPointEditor";
 
 export default class ProjectEditor extends Component {

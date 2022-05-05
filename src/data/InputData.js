@@ -45,6 +45,13 @@ export class InputDataLoadResult {
     return result
   }
 
+  static failure(message){
+    let result = new InputDataLoadResult();
+    result.success = false
+    result.message = message
+    return result
+  }
+
   /**
    * 创建一个数据列表对象
    * @param map {Object} 在线编辑数据后得到的

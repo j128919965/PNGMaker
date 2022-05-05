@@ -13,3 +13,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.u-warning{
+  color: #fa8c16;
+}
+
+.u-success{
+  color: #a0d911;
+}

@@ -1,15 +1,16 @@
 import EdiText from "react-editext";
 import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined} from "@ant-design/icons";
-import {Empty, Menu, Modal} from "antd";
+import {Menu, Modal} from "antd";
 import {useRef, useState} from "react";
 
 import ProjectEditor from "../ProjectEditor/ProjectEditor";
 import ProjectForm from "../ProjectForm/ProjectForm";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
-import ProjectStore from "../../data/projects";
+import ProjectStore from "../../data/ProjectStore";
 import files from "../../utils/files"
 
 import './App.css';
+import BatchLoadFromExcel from "../BatchLoadFromExcel/BatchLoadFromExcel";
 
 const App = () => {
 
@@ -17,6 +18,8 @@ const App = () => {
      * 用于保存和设置当前打开的项目
      */
     const [project, setProject] = useState(null)
+
+    const [batchModalVisible , setBatchModalVisible] = useState(false)
 
     /**
      * 项目编辑器
@@ -105,7 +108,10 @@ const App = () => {
           },
           {
             key: "tool-excel",
-            label: '批量生成'
+            label: '批量生成',
+            onClick:()=>{
+              setBatchModalVisible(true)
+            }
           },
           {
             key: "tool-cloud",
@@ -149,9 +155,9 @@ const App = () => {
               <ProjectForm ref={pf} project={project}/>
             </div>
           </div>
-
-
         </div>
+
+        {batchModalVisible && <BatchLoadFromExcel project={project} close={()=>setBatchModalVisible(false)}/>}
       </div>
 
     );
