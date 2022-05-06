@@ -13,6 +13,7 @@
 }
 
 .u-point {
+    user-select: none;
     width: 18px;
     height: 18px;
     border-radius: 100%;

@@ -3,12 +3,11 @@ import React from "react";
 import "./ProjectForm.css"
 import {Empty, Input, Button, Modal} from "antd";
 import {UploadOutlined} from '@ant-design/icons';
-import {InputData} from "../../data/InputData";
-
 
 import {EditorHeight, EditorWidth} from '../../data/constants'
 import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
+import {InputDataLoadResult} from "../../data/InputData";
 
 /**
  *
@@ -37,17 +36,17 @@ function TypeOfImage(props) {
     <div className="m-pf-editor-image">
       <div className="u-point">{props.point.id}</div>
       <div>
-        <label>{(point.label?.length > 0 ? point.label : "请设置备注") + data[point.id]}<br/>
+        <div>{(point.label?.length > 0 ? point.label : "请设置备注")}<br/>
           <Button
             className='u-pf-editor-upload'
             icon={<UploadOutlined/>}
             onClick={onclick}
           >
-            Click to Upload
+            上传图片
           </Button>
           <br/>
-          {/*=== undefined ? '未选择文件' : data[point.id].match(/[a-z]{1,}\.[a-z]{1,}/)*/}
-        </label>
+          {data[point.id]? data[point.id].substring(data[point.id].indexOf("/file/")+6) : '未选择文件'}
+        </div>
       </div>
     </div>
   )
@@ -108,10 +107,7 @@ export default class ProjectForm extends React.Component {
       }
       // no break
       newData[newPoint] = null
-
     }
-
-
     this.setState({project, data: newData})
   }
 
@@ -132,23 +128,22 @@ export default class ProjectForm extends React.Component {
 
     const {points} = project
     let list = []
-    for (let i = 0; i < points.length; i++) {
-      if (points[i].type === 1) {
+    for (let point of points) {
+      if (point.type === 1) {
         list.push(
-          <TypeOfText key={points[i].id}
-                      point={points[i]}
-                      oninput={e => this.updateStateData(e.target.value, points[i].id)}
+          <TypeOfText key={point.id}
+                      point={point}
+                      oninput={e => this.updateStateData(e.target.value, point.id)}
                       data={this.state.data}
           />
         )
-      } else if (points[i].type === 2) {
+      } else if (point.type === 2) {
         list.push(
-          <TypeOfImage key={points[i].id}
-                       point={points[i]}
+          <TypeOfImage key={point.id}
+                       point={point}
                        onclick={async (e) => {
-                         let imageData = await files.readFile()
-                         console.log(imageData)
-                         this.updateStateData(imageData, points[i].id)
+                         let imageData = await files.readFile(undefined)
+                         this.updateStateData(imageData, point.id)
                        }}
                        data={this.state.data}
           />)
@@ -181,7 +176,7 @@ export default class ProjectForm extends React.Component {
                           let pfImageRenderer = new ImageRenderer()
                           pfImageRenderer.load(project)
                           let pfReviewCanvas = document.getElementById('pfPreviewCanvas')
-                          await pfImageRenderer.showPreview(pfReviewCanvas, this.state.data)
+                          await pfImageRenderer.showPreview(pfReviewCanvas, InputDataLoadResult.fromMap(this.state.data , project.id))
                         })
                       }}
               >

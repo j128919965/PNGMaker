@@ -74,6 +74,7 @@ export class InputDataLoadResult {
    */
   static fromMap(map,projectId){
     let result = new InputDataLoadResult();
+    result.projectId = projectId
     result.success = true
     result.data =  Object.keys(map).map(key => new InputData(key,map[key]))
     return result

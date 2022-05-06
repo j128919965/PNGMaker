@@ -2,7 +2,7 @@ import {A4Height, A4Width, EditorHeight, EditorWidth} from "../../data/constants
 import ImageLoader from "../../utils/imageLoader";
 import {Position} from "../../data/ProjectMetadata";
 
-export default class ImageRenderer{
+export default class ImageRenderer {
 
   /**
    * 项目元数据，需要手动设置，否则默认位空
@@ -39,25 +39,35 @@ export default class ImageRenderer{
    * @param canvas {HTMLCanvasElement} 用于显示预览的canvas
    * @param inputDataLoadResult {InputDataLoadResult} 数据列表
    */
-  async showPreview(canvas,inputDataLoadResult){
-    if (!canvas){
+  async showPreview(canvas, inputDataLoadResult) {
+    if (!canvas) {
       throw new Error("未设置预览canvas！")
     }
 
     // 先渲染
-    await this.render(inputDataLoadResult)
+    await this.render(inputDataLoadResult.data)
 
     // 在已设置的 previewCanvas 上展示
     // 自动缩放
-    canvas.getContext('2d').drawImage(this.backGroundCanvas , 0 , 0 , canvas.width , canvas.height)
+    canvas.getContext('2d').drawImage(this.backGroundCanvas, 0, 0, canvas.width, canvas.height)
   }
 
   /**
    * 渲染图片，将图片暂存到backGroundCanvas上
    * <br/><strong>异步函数！</strong>
-   * @param data
+   * @param data {InputData[]}
    */
-  async render(data){
+  async render(data) {
+    console.log(data)
+    const getData = (id) => {
+      for (let datum of data) {
+        if (datum.pointId == id) {
+          return datum.data
+        }
+      }
+      throw new Error(`ID为${id}的输入项为空！`)
+    }
+
     // 先检查数据是否和本项目对应
     this.checkData(data)
 
@@ -65,54 +75,59 @@ export default class ImageRenderer{
     // 注意point位置的等比例缩放
     let trulyPos = {}
     const proj = this.project
-    for (let i = 0; i < proj.points.length; i++) {
-      trulyPos[i] = new Position(proj.points[i].position.x * A4Width / EditorWidth,
-        proj.points[i].position.y * A4Height / EditorHeight)
+    for (let p of proj.points) {
+      trulyPos[p.id] = new Position((p.position.x * A4Width) / EditorWidth, (p.position.y * A4Height) / EditorHeight)
     }
+    console.log(trulyPos)
     const canvas = this.backGroundCanvas
     const context = canvas.getContext("2d")
 
-
     // 绘制背景
-    if (proj.background){
+    if (proj.background) {
       let backgroundPicture = await ImageLoader.load(proj.background)
-      context.drawImage(backgroundPicture , 0,0 , A4Width , A4Height)
+      context.drawImage(backgroundPicture, 0, 0, A4Width, A4Height)
     }
 
     // 按照小红点一个一个绘制
-    proj.points.forEach(point => {
-      // TODO
-      if (point.type === 1){
-        //cnm的输入文字
-        context.fillStyle = 'black'
-        switch (point.pattern.align){
-          case 1:context.fillText(data[point.id], point.position.x, point.position.y)
+    for (const point of proj.points) {
+      if (point.type === 1) {
+        context.fillStyle = '#666'
+        //TODO : FontPattern(字体大小三倍)
+        context.font="48px 宋体"
+        switch (point.pattern.align) {
+          case 1:
+            context.fillText(getData(point.id), trulyPos[point.id].x, trulyPos[point.id].y)
             break
-          case 2:context.fillText(data[point.id], point.position.x, point.position.y)
+          case 2:
+            context.fillText(getData(point.id), trulyPos[point.id].x, trulyPos[point.id].y)
             break
-          case 3:context.fillText(data[point.id], point.position.x, point.position.y)
+          case 3:
+            context.fillText(getData(point.id), trulyPos[point.id].x, trulyPos[point.id].y)
             break
-          case 4:context.fillText(data[point.id], point.position.x, point.position.y)
+          case 4:
+            context.fillText(getData(point.id), trulyPos[point.id].x, trulyPos[point.id].y)
             break
-          case 5:context.fillText(data[point.id], point.position.x, point.position.y)
+          case 5:
+            context.fillText(getData(point.id), trulyPos[point.id].x, trulyPos[point.id].y)
             break
           default:
             break
         }
 
-      }else if (point.type === 2){
+      } else if (point.type === 2) {
+        let img = await ImageLoader.load(getData(point.id))
         //cnm的插入图片
-        context.drawImage(data[point.id], point.position.x, point.position.y)
+        context.drawImage(img, trulyPos[point.id].x, trulyPos[point.id].y,point.pattern.width , point.pattern.height)
       }
-    })
+    }
   }
 
   /**
    * 检查传入的数据是否格式正确
    * 主要检查：每一项的类型是否对应、必填项是否填写正常（字符串是否为空、如果是）
-   * @param inputDataLoadResult {InputDataLoadResult}
+   * @param inputDataLoadResult {InputData[]}
    */
-  checkData(inputDataLoadResult){
+  checkData(inputDataLoadResult) {
     // TODO: 一条一条检查是否正常，如果不想检查也可以先放一放
 
   }
@@ -120,7 +135,7 @@ export default class ImageRenderer{
   /**
    * 将已渲染好的图片下载下来
    */
-  download(){
+  download() {
     // TODO: 下载逻辑
   }
 
