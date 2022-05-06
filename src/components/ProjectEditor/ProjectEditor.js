@@ -4,7 +4,6 @@ import "./ProjectEditor.css"
 import ImageLoader from "../../utils/imageLoader";
 import canvasx from '../../utils/canvasx'
 import {EditorHeight, EditorWidth} from "../../data/constants";
-import {RedPoint} from "../../data/ProjectMetadata";
 import RedPointEditor from "./RedPointEditor/RedPointEditor";
 
 export default class ProjectEditor extends Component {
@@ -39,6 +38,7 @@ export default class ProjectEditor extends Component {
       this.setState({ready: false})
       return
     }
+
     this.prepareCanvas()
     if (proj.background) {
       // 提前加载
@@ -46,6 +46,7 @@ export default class ProjectEditor extends Component {
     }
     this.project = proj
 
+    this.canvas.getContext('2d').clearRect(0,0,EditorWidth , EditorHeight)
     await this.reDraw()
     this.setState({ready: true})
   }

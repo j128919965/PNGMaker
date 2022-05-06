@@ -1,15 +1,15 @@
 import EdiText from "react-editext";
 import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined} from "@ant-design/icons";
-import { Menu, Modal} from "antd";
+import {Button, Menu, message, Modal} from "antd";
 import {useRef, useState} from "react";
 
 import ProjectEditor from "../ProjectEditor/ProjectEditor";
 import ProjectForm from "../ProjectForm/ProjectForm";
-import ImageRenderer from "../ImageRenderer/ImageRenderer";
-import ProjectStore from "../../data/projects";
+import ProjectStore from "../../data/ProjectStore";
 import files from "../../utils/files"
 
 import './App.css';
+import BatchLoadFromExcel from "../BatchLoadFromExcel/BatchLoadFromExcel";
 
 const App = () => {
 
@@ -17,6 +17,12 @@ const App = () => {
      * 用于保存和设置当前打开的项目
      */
     const [project, setProject] = useState(null)
+
+    const [batchModalVisible , setBatchModalVisible] = useState(false)
+
+    const [openProjectVisible,setOpenProjectVisible] = useState(false)
+
+    const [projectList , setProjectList] = useState([])
 
     /**
      * 项目编辑器
@@ -31,13 +37,16 @@ const App = () => {
     const pf = useRef();
 
     const updateProject = (proj, ignorePe) => {
-      imageRenderer.load(proj)
       setProject(proj)
       !ignorePe && pe.current.resetProj(proj)
       pf.current.updateProject(proj)
     }
 
-    const imageRenderer = new ImageRenderer()
+    const openProjectById = async (id)=>{
+      let proj = await ProjectStore.getById(id)
+      updateProject(proj)
+      setOpenProjectVisible(false)
+    }
 
     const items = [
       {
@@ -55,12 +64,20 @@ const App = () => {
           },
           {
             key: "proj-open",
-            label: '打开项目'
+            label: '打开项目',
+            onClick : async ()=>{
+              setProjectList(await ProjectStore.getAll())
+              setOpenProjectVisible(true)
+            }
           },
           {
             key: "proj-save",
             label: '保存项目',
-            onClick: async () => ProjectStore.save(project)
+            disabled: !project,
+            onClick: async () => {
+              await ProjectStore.save(project)
+              message.success("保存成功")
+            }
           },
           {
             key: "proj-remove",
@@ -73,7 +90,15 @@ const App = () => {
                 icon: <ExclamationCircleOutlined/>,
                 okText: '确认',
                 cancelText: '取消',
-                onOk: () => ProjectStore.delete(project)
+                onOk: async () => {
+                  let resp = await ProjectStore.delete(project.id)
+                  if(resp){
+                    message.success("删除成功")
+                    setProject(null)
+                  }else {
+                    message.error("删除失败")
+                  }
+                }
               })
             }
           }
@@ -93,24 +118,36 @@ const App = () => {
                 key: "tool-bg-open",
                 label: "上传背景",
                 onClick: async () => {
-                  project.background = await files.readFile();
+                  project.background = await files.readFile(null);
                   updateProject(project)
                 }
               },
               {
                 key: "tool-bg-rem",
-                label: "移除背景"
+                label: "移除背景",
+                onClick:()=>{
+                  project.background = null
+                  updateProject(project)
+                }
               }
             ]
           },
           {
             key: "tool-excel",
-            label: '批量生成'
+            label: '批量生成',
+            onClick:()=>{
+              setBatchModalVisible(true)
+            }
           },
           {
             key: "tool-cloud",
             label: '云端数据',
-            disabled: true
+            onClick: async ()=>{
+              // let results = await InputDataStore.getNotRenderedByProject(project.id)
+              // results.forEach(r=>r.id = undefined)
+              // let resp = await InputDataStore.save(results[0])
+              // console.log(resp)
+            }
           }
         ],
       },
@@ -149,9 +186,51 @@ const App = () => {
               <ProjectForm ref={pf} project={project}/>
             </div>
           </div>
-
-
         </div>
+
+        {batchModalVisible && <BatchLoadFromExcel project={project} close={()=>setBatchModalVisible(false)}/>}
+
+        <Modal title="打开项目"
+               visible={openProjectVisible}
+               onCancel={()=>setOpenProjectVisible(false)}
+               footer={null}
+        >
+          {
+            projectList.map(p=>
+              <div className="m-app-pl-line" key={p.id}>
+                <div className="m-app-pl-line-name">
+                  {p.name}
+                </div>
+                <div className="m-app-pl-line-btns">
+                  <Button size="small" onClick={()=>openProjectById(p.id)}>
+                    打开
+                  </Button>
+                  <Button size="small" onClick={()=>{
+                    Modal.confirm({
+                      title: `删除项目`,
+                      content: `确认删除 ${p.name} 吗`,
+                      icon: <ExclamationCircleOutlined/>,
+                      okText: '确认',
+                      cancelText: '取消',
+                      onOk: async () => {
+                        let resp = await ProjectStore.delete(p.id)
+                        if (resp){
+                          message.success("删除c成功")
+                          setProjectList(await ProjectStore.getAll())
+                        }else {
+                          message.error("删除失败")
+                        }
+
+                      }
+                    })
+                  }}>
+                    删除
+                  </Button>
+                </div>
+              </div>
+            )
+          }
+        </Modal>
       </div>
 
     );

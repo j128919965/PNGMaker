@@ -34,23 +34,45 @@ export class InputDataLoadResult {
   message
 
   /**
+   * 从服务器上获取的InputDataLoadResult会有一个ID
+   * 其他地方获取的没有ID
+   * @type {number}
+   */
+  id
+
+  /**
+   * 项目ID
+   * @type {number}
+   */
+  projectId
+
+  /**
    * @type {InputData[]}
    */
   data
 
-  static success(data){
+  static success(data , projectId){
     let result = new InputDataLoadResult();
     result.success = true
     result.data = data
+    result.projectId = projectId
+    return result
+  }
+
+  static failure(message){
+    let result = new InputDataLoadResult();
+    result.success = false
+    result.message = message
     return result
   }
 
   /**
    * 创建一个数据列表对象
    * @param map {Object} 在线编辑数据后得到的
+   * @param projectId {number}
    * @return {InputDataLoadResult}
    */
-  static fromMap(map){
+  static fromMap(map,projectId){
     let result = new InputDataLoadResult();
     result.success = true
     result.data =  Object.keys(map).map(key => new InputData(key,map[key]))
@@ -63,6 +85,8 @@ export class InputDataLoadResult {
    */
   static fromObj(obj){
     let result = new InputDataLoadResult();
+    result.id = obj.id
+    result.projectId = obj.projectId
     result.success = obj.success
     result.data =  obj.data.map(d=>InputData.fromObj(d))
     return result

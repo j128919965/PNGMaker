@@ -46,6 +46,11 @@ export class ProjectMetadata {
     this.latestPointId++
     return redPoint
   }
+
+  toBackendObj(){
+    let content = JSON.stringify(this)
+    return {id:this.id , name:this.name , content}
+  }
 }
 
 export class RedPoint {

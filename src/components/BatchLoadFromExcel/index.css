@@ -1,0 +1,30 @@
+.m-bl-modal-title{
+    display: flex;
+    width: 300px;
+    justify-content: space-around;
+}
+
+.m-bl-mt-word{
+    font-size: large;
+    margin-right: 30px;
+}
+
+.m-bl-line{
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 20px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.m-bl-line-icon{
+    font-size: 20px;
+}
+
+.m-bl-line-btns {
+    width: 220px;
+    display: flex;
+    justify-content: space-between;
+}
+
