@@ -5,7 +5,6 @@ import {useRef, useState} from "react";
 
 import ProjectEditor from "../ProjectEditor/ProjectEditor";
 import ProjectForm from "../ProjectForm/ProjectForm";
-import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import ProjectStore from "../../data/ProjectStore";
 import files from "../../utils/files"
 
@@ -38,7 +37,6 @@ const App = () => {
     const pf = useRef();
 
     const updateProject = (proj, ignorePe) => {
-      imageRenderer.load(proj)
       setProject(proj)
       !ignorePe && pe.current.resetProj(proj)
       pf.current.updateProject(proj)
@@ -49,8 +47,6 @@ const App = () => {
       updateProject(proj)
       setOpenProjectVisible(false)
     }
-
-    const imageRenderer = new ImageRenderer()
 
     const items = [
       {
@@ -77,6 +73,7 @@ const App = () => {
           {
             key: "proj-save",
             label: '保存项目',
+            disabled: !project,
             onClick: async () => {
               await ProjectStore.save(project)
               message.success("保存成功")
@@ -95,14 +92,12 @@ const App = () => {
                 cancelText: '取消',
                 onOk: async () => {
                   let resp = await ProjectStore.delete(project.id)
-                  if(resp === 1){
+                  if(resp){
                     message.success("删除成功")
                     setProject(null)
                   }else {
                     message.error("删除失败")
                   }
-
-
                 }
               })
             }
@@ -129,7 +124,11 @@ const App = () => {
               },
               {
                 key: "tool-bg-rem",
-                label: "移除背景"
+                label: "移除背景",
+                onClick:()=>{
+                  project.background = null
+                  updateProject(project)
+                }
               }
             ]
           },
@@ -143,7 +142,12 @@ const App = () => {
           {
             key: "tool-cloud",
             label: '云端数据',
-            disabled: true
+            onClick: async ()=>{
+              // let results = await InputDataStore.getNotRenderedByProject(project.id)
+              // results.forEach(r=>r.id = undefined)
+              // let resp = await InputDataStore.save(results[0])
+              // console.log(resp)
+            }
           }
         ],
       },
@@ -210,7 +214,7 @@ const App = () => {
                       cancelText: '取消',
                       onOk: async () => {
                         let resp = await ProjectStore.delete(p.id)
-                        if (resp === 1){
+                        if (resp){
                           message.success("删除c成功")
                           setProjectList(await ProjectStore.getAll())
                         }else {

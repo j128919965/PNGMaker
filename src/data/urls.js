@@ -11,6 +11,13 @@ const urls = {
   },
   files: {
     upload: Server + '/file'
+  },
+  input :{
+    create : Server + '/input/new',
+    getAllByProject: Server + '/input/by-proj',
+    getNotRenderedByProject : Server + '/input/by-proj/no-rendered',
+    del : Server + '/input/delete',
+    setRendered : Server + '/input/set-rendered'
   }
 }
 
