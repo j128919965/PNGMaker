@@ -1,5 +1,6 @@
-import {A4Height, A4Width} from "../../data/constants";
+import {A4Height, A4Width, EditorHeight, EditorWidth} from "../../data/constants";
 import ImageLoader from "../../utils/imageLoader";
+import {Position} from "../../data/ProjectMetadata";
 
 export default class ImageRenderer{
 
@@ -62,9 +63,15 @@ export default class ImageRenderer{
 
     // TODO: 渲染（绘制）
     // 注意point位置的等比例缩放
+    let trulyPos = {}
     const proj = this.project
+    for (let i = 0; i < proj.points.length; i++) {
+      trulyPos[i] = new Position(proj.points[i].position.x * A4Width / EditorWidth,
+        proj.points[i].position.y * A4Height / EditorHeight)
+    }
     const canvas = this.backGroundCanvas
     const context = canvas.getContext("2d")
+
 
     // 绘制背景
     if (proj.background){
@@ -75,6 +82,28 @@ export default class ImageRenderer{
     // 按照小红点一个一个绘制
     proj.points.forEach(point => {
       // TODO
+      if (point.type === 1){
+        //cnm的输入文字
+        context.fillStyle = 'black'
+        switch (point.pattern.align){
+          case 1:context.fillText(data[point.id], point.position.x, point.position.y)
+            break
+          case 2:context.fillText(data[point.id], point.position.x, point.position.y)
+            break
+          case 3:context.fillText(data[point.id], point.position.x, point.position.y)
+            break
+          case 4:context.fillText(data[point.id], point.position.x, point.position.y)
+            break
+          case 5:context.fillText(data[point.id], point.position.x, point.position.y)
+            break
+          default:
+            break
+        }
+
+      }else if (point.type === 2){
+        //cnm的插入图片
+        context.drawImage(data[point.id], point.position.x, point.position.y)
+      }
     })
   }
 

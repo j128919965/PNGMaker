@@ -7,6 +7,8 @@ import {InputData} from "../../data/InputData";
 // import ImageLoader from "../../utils/imageLoader";
 
 import {EditorHeight, EditorWidth} from '../../data/constants'
+import files from "../../utils/files";
+import ImageRenderer from "../ImageRenderer/ImageRenderer";
 
 /**
  *
@@ -30,18 +32,21 @@ function TypeOfText(props) {
 }
 
 function TypeOfImage(props) {
-  const {point} = props
+  const {point, onclick, data} = props
   return (
     <div className="m-pf-editor-image">
       <div className="u-point">{props.point.id}</div>
       <div>
-        <label>{point.label?.length > 0 ? point.label : "请设置备注"}<br/>
+        <label>{(point.label?.length > 0 ? point.label : "请设置备注")+ data[point.id]}<br/>
           <Button
             className='u-pf-editor-upload'
             icon={<UploadOutlined/>}
+            onClick={onclick}
           >
             Click to Upload
           </Button>
+          <br/>
+          {/*=== undefined ? '未选择文件' : data[point.id].match(/[a-z]{1,}\.[a-z]{1,}/)*/}
         </label>
       </div>
     </div>
@@ -49,6 +54,10 @@ function TypeOfImage(props) {
 }
 
 export default class ProjectForm extends React.Component {
+  /**
+   * @type {HTMLCanvasElement}
+   */
+  pfPreviewCanvas
 
   constructor(props) {
     super(props);
@@ -81,7 +90,7 @@ export default class ProjectForm extends React.Component {
 
     /**
      *
-     * @type {{number:InputData}}
+     * @type {{number:string}}
      */
     const newData = {}
 
@@ -92,13 +101,14 @@ export default class ProjectForm extends React.Component {
           if (prevPoint.type === newPoint.type) {
             newData[newPoint.id] = inputData
           } else {
-            newData[newPoint.id] = new InputData(newPoint.id)
+            newData[newPoint.id] = new InputData(newPoint.id).data
           }
           break
         }
       }
       // no break
-      newData[newPoint] = new InputData(newPoint.id)
+      newData[newPoint] = new InputData(newPoint.id).data
+
     }
 
 
@@ -108,7 +118,11 @@ export default class ProjectForm extends React.Component {
   updateStateData = (data, i) => {
     let ds = this.state.data
     ds[i] = data
-    this.state({data: ds})
+    this.setState({data:ds})
+  }
+
+  prepareCanvas = ()=>{
+
   }
 
   formList() {
@@ -135,7 +149,12 @@ export default class ProjectForm extends React.Component {
         list.push(
           <TypeOfImage key={points[i].id}
                        point={points[i]}
-                       oninput={e => this.updateStateData(e.target.value, points[i].id)}
+                       onclick={async (e) => {
+                         let imageData = await files.readFile()
+                         console.log(imageData)
+                         this.updateStateData(imageData, points[i].id)
+                       }}
+                       data={this.state.data}
           />)
       }
     }
@@ -160,10 +179,21 @@ export default class ProjectForm extends React.Component {
               {this.formList()}
             </div>
             <div>
-              <Button type="primary" className="u-pf-btn" onClick={() => {
-                this.setState({isModalVisible: true})
-              }}>预 览</Button>
-              <Button type="primary" className="u-pf-btn" id='pfSave'>保 存</Button>
+              <Button type="primary" className="u-pf-btn"
+                      onClick={() => {
+                          this.setState({isModalVisible: true}, async ()=>{
+                          let pfImageRenderer = new ImageRenderer()
+                          pfImageRenderer.load(project)
+                          let pfReviewCanvas = document.getElementById('pfPreviewCanvas')
+                          await pfImageRenderer.showPreview(pfReviewCanvas, this.state.data)
+                        })
+                      }}
+              >
+                预 览
+              </Button>
+              <Button type="primary" className="u-pf-btn" id='pfSave'>
+                保 存
+              </Button>
             </div>
           </div>
         }
@@ -177,14 +207,14 @@ export default class ProjectForm extends React.Component {
         >
           <div className='m-pf-preview-container' style={{width: '100%', display: 'flex',}}>
             <canvas
+              id='pfPreviewCanvas'
               width={EditorWidth * 0.8}
               height={EditorHeight * 0.8}
-              id='preview' style={{border: '1px solid black'}}>
+              style={{border: '1px solid black'}}>
               no canvas
             </canvas>
             <Button className='u-pf-btn' type={"primary"} style={{marginTop: 20}}>shit</Button>
           </div>
-
         </Modal>
       </>
     )
