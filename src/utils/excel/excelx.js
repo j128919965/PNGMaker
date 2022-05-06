@@ -22,7 +22,9 @@ const openFile = (project , onSubmitOpen) => {
 
   return new Promise(resolve => {
     fileInput.onchange = () => {
-      onSubmitOpen()
+      if (onSubmitOpen){
+        onSubmitOpen()
+      }
       let file = fileInput.files[0]
       let reader = new FileReader();
       reader.onload = async (e) => {

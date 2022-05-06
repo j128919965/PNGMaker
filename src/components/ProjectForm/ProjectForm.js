@@ -104,7 +104,7 @@ export default class ProjectForm extends React.Component {
   updateStateData = (data, i) => {
     let ds = this.state.data
     ds[i] = data
-    this.state({data: ds})
+    this.setState({data: ds})
   }
 
   formList() {

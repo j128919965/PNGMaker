@@ -57,3 +57,18 @@ body{
   font-size: 24px;
   color: #aaa;
 }
+
+
+.m-app-pl-line{
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 20px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.m-app-pl-line-name {
+  font-size: 18px;
+}

@@ -1,20 +1,24 @@
 import {ProjectMetadata} from "./ProjectMetadata";
-
-const getNextProjectId = async () => {
-  // TODO 调接口
-  return 1
-}
+import {get, post} from "../utils/httpx";
+import urls from "./urls";
 
 const ProjectStore = {
+  async getAll(){
+    return get(urls.projects.getAll)
+  },
   async getById(id) {
-    // TODO 调接口
-    let obj = {id}
-    return ProjectMetadata.fromObj(obj)
+    let resp = await get(urls.projects.getById , {id})
+    return ProjectMetadata.fromObj(JSON.parse(resp.content))
   },
   async createNewProject() {
-    // TODO 调接口
-    let nextId = await getNextProjectId()
-    return ProjectMetadata.fromObj({id:nextId,background:"https://s2.loli.net/2022/04/30/x8ZALg4NSRpcqU2.jpg"})
+    let proj = ProjectMetadata.default(1)
+    let resp = await post(urls.projects.create, {content : JSON.stringify(proj)})
+    proj = JSON.parse(resp.content)
+    proj.id = resp.id
+    proj.name = resp.name
+    proj = ProjectMetadata.fromObj(proj)
+    this.save(proj)
+    return proj
   },
   /**
    * 保存
@@ -22,17 +26,15 @@ const ProjectStore = {
    * @return {Promise<void>}
    */
   async save(proj) {
-    // TODO 调接口
+    await post(urls.projects.save , proj.toBackendObj())
   },
   /**
    * 删除
-   * @param proj {ProjectMetadata}
    * @return {Promise<void>}
    */
-  async delete(proj){
-    // TODO 调接口
-    console.log(`delete proj {${proj}`)
-  }
+  async delete(id){
+    return post(urls.projects.del+'?id='+id )
+  },
 }
 
 export default ProjectStore
