@@ -70,8 +70,7 @@ const App = () => {
             key: "proj-open",
             label: '打开项目',
             onClick : async ()=>{
-              let projectList = await ProjectStore.getAll()
-              setProjectList(projectList)
+              setProjectList(await ProjectStore.getAll())
               setOpenProjectVisible(true)
             }
           },
@@ -96,8 +95,14 @@ const App = () => {
                 cancelText: '取消',
                 onOk: async () => {
                   let resp = await ProjectStore.delete(project.id)
-                  message.success("删除成功")
-                  setProject(null)
+                  if(resp === 1){
+                    message.success("删除成功")
+                    setProject(null)
+                  }else {
+                    message.error("删除失败")
+                  }
+
+
                 }
               })
             }
@@ -118,7 +123,7 @@ const App = () => {
                 key: "tool-bg-open",
                 label: "上传背景",
                 onClick: async () => {
-                  project.background = await files.readFile();
+                  project.background = await files.readFile(null);
                   updateProject(project)
                 }
               },
@@ -192,7 +197,7 @@ const App = () => {
                 <div className="m-app-pl-line-name">
                   {p.name}
                 </div>
-                <div className="m-app-pl-line-openbtn">
+                <div className="m-app-pl-line-btns">
                   <Button size="small" onClick={()=>openProjectById(p.id)}>
                     打开
                   </Button>
@@ -205,9 +210,13 @@ const App = () => {
                       cancelText: '取消',
                       onOk: async () => {
                         let resp = await ProjectStore.delete(p.id)
-                        message.success("删除c成功")
-                        let projectList = await ProjectStore.getAll()
-                        setProjectList(projectList)
+                        if (resp === 1){
+                          message.success("删除c成功")
+                          setProjectList(await ProjectStore.getAll())
+                        }else {
+                          message.error("删除失败")
+                        }
+
                       }
                     })
                   }}>

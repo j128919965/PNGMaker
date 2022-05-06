@@ -72,3 +72,9 @@ body{
 .m-app-pl-line-name {
   font-size: 18px;
 }
+
+.m-app-pl-line-btns{
+  width: 110px;
+  display: flex;
+  justify-content: space-between;
+}

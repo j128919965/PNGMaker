@@ -32,7 +32,6 @@ const files = {
   readFile(onSubmitOpen) {
     return new Promise((res, rej) => {
       const reader = document.getElementById('upload-block-real-input')
-      reader.on
       reader.onchange = async () => {
         if (onSubmitOpen){
           onSubmitOpen()

@@ -30,7 +30,7 @@ const ProjectStore = {
   },
   /**
    * 删除
-   * @return {Promise<void>}
+   * @return {Promise<number>}
    */
   async delete(id){
     return post(urls.projects.del+'?id='+id )
