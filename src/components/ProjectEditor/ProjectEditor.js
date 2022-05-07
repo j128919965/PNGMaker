@@ -53,6 +53,7 @@ export default class ProjectEditor extends Component {
 
   async reDraw() {
     let proj = this.project
+
     // 先绘制背景图片
     /**
      *
@@ -66,6 +67,13 @@ export default class ProjectEditor extends Component {
       ctx.clearRect(0, 0, EditorWidth, EditorHeight)
     }
 
+    // 没有小红点
+    if (proj.points?.length < 1){
+      ctx.font="48px 宋体"
+      ctx.fillStyle = "#666"
+      let x = EditorWidth / 2 - ctx.measureText("双击此处创建输入项").width / 2
+      ctx.fillText("双击此处创建输入项" , x , 250)
+    }
     for (let point of proj.points) {
       canvasx.drawPoint(ctx, point)
     }
@@ -76,11 +84,12 @@ export default class ProjectEditor extends Component {
      *
      * @type {HTMLCanvasElement}
      */
-    let canvas = document.getElementById("pe-editor")
+    const canvas = document.getElementById("pe-editor")
     this.canvas = canvas
-    // TODO: 编辑小红点属性
+
+    let isClicking = false
     canvas.onclick = (e) => {
-      if (canvas.isClicking) {
+      if (isClicking) {
         if (this.project.points.length === 0) {
           return
         }
@@ -103,11 +112,7 @@ export default class ProjectEditor extends Component {
       canvas.onmouseup = (ev) => {
         canvas.onmouseup = null
         canvas.onmousemove = null
-        if (canvasx.calcDistance(position, canvasx.getMousePosition(ev, canvas)) <= 2) {
-          canvas.isClicking = true
-        } else {
-          canvas.isClicking = false
-        }
+        isClicking = canvasx.calcDistance(position, canvasx.getMousePosition(ev, canvas)) <= 2
       }
       canvas.onmousemove = (ev) => {
         let newPos = canvasx.getMousePosition(ev, canvas)

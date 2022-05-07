@@ -59,10 +59,8 @@ export default class ImageRenderer {
    */
   async render(data) {
     const getData = (id) => {
-      console.log(data)
       for (let datum of data) {
-        console.log(datum)
-        if (datum.pointId == id) {
+        if (datum.pointId === id) {
           return datum.data
         }
       }

@@ -23,10 +23,10 @@ const ProjectStore = {
   /**
    * 保存
    * @param proj {ProjectMetadata}
-   * @return {Promise<void>}
+   * @return {Promise<Boolean>}
    */
   async save(proj) {
-    await post(urls.projects.save , proj.toBackendObj())
+    return post(urls.projects.save , proj.toBackendObj())
   },
   /**
    * 删除

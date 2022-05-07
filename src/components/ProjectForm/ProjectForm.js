@@ -171,7 +171,7 @@ export default class ProjectForm extends React.Component {
               <div>
                 <div className="m-pf-main-hint">
                   <Empty description=""/>
-                  请双击添加小红点
+                  双击左侧创建输入项
                 </div>
                 <div>
                   <Button type="primary" className="u-pf-btn" disabled="none">预 览</Button>
