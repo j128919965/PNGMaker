@@ -141,7 +141,7 @@ export default class ProjectForm extends React.Component {
         list.push(
           <TypeOfImage key={point.id}
                        point={point}
-                       onclick={async (e) => {
+                       onclick={async () => {
                          let imageData = await files.readFile(undefined)
                          this.updateStateData(imageData, point.id)
                        }}
@@ -166,26 +166,46 @@ export default class ProjectForm extends React.Component {
         {
           project &&
           <div className="m-pf-editor">
-            <div className="m-pf-editor-list">
-              {this.formList()}
-            </div>
-            <div>
-              <Button type="primary" className="u-pf-btn"
-                      onClick={() => {
-                        this.setState({isModalVisible: true}, async () => {
-                          let pfImageRenderer = new ImageRenderer()
-                          pfImageRenderer.load(project)
-                          let pfReviewCanvas = document.getElementById('pfPreviewCanvas')
-                          await pfImageRenderer.showPreview(pfReviewCanvas, InputDataLoadResult.fromMap(this.state.data , project.id))
-                        })
-                      }}
-              >
-                预 览
-              </Button>
-              <Button type="primary" className="u-pf-btn" id='pfSave'>
-                导 出
-              </Button>
-            </div>
+            {
+              project.points.length === 0 &&
+              <div>
+                <div className="m-pf-main-hint">
+                  <Empty description=""/>
+                  请双击添加小红点
+                </div>
+                <div>
+                  <Button type="primary" className="u-pf-btn" disabled="none">预 览</Button>
+                  <Button type="primary" className="u-pf-btn" disabled="none">导 出</Button>
+                </div>
+              </div>
+            }
+            {
+              project.points.length !== 0 &&
+              <div>
+                <div className="m-pf-editor-list">
+                  {this.formList()}
+                </div>
+                <div>
+                  <Button type="primary" className="u-pf-btn"
+                          onClick={() => {
+                            this.setState({isModalVisible: true}, async () => {
+                              let pfImageRenderer = new ImageRenderer()
+                              pfImageRenderer.load(project)
+                              let pfReviewCanvas = document.getElementById('pfPreviewCanvas')
+                              pfReviewCanvas.getContext('2d').clearRect(0, 0, pfReviewCanvas.width, pfReviewCanvas.height)
+                              await pfImageRenderer.showPreview(pfReviewCanvas, InputDataLoadResult.fromMap(this.state.data , project.id))
+                            })
+                          }}
+                  >
+                    预 览
+                  </Button>
+                  <Button type="primary" className="u-pf-btn" id='pfSave'>
+                    导 出
+                  </Button>
+                </div>
+              </div>
+            }
+
           </div>
         }
         <Modal title='图片预览'
@@ -196,12 +216,12 @@ export default class ProjectForm extends React.Component {
                  this.setState({isModalVisible: false})
                }}
         >
-          <div className='m-pf-preview-container' style={{width: '100%', display: 'flex',}}>
+          <div className='m-pf-preview-container' style={{width: '100%', display: 'flex'}}>
             <canvas
               id='pfPreviewCanvas'
               width={EditorWidth * 0.8}
               height={EditorHeight * 0.8}
-              style={{border: '1px solid black'}}>
+              style={{border: '1px solid #ccc', borderRadius: '5px'}}>
               no canvas
             </canvas>
             <Button className='u-pf-btn' type={"primary"} style={{marginTop: 20}}>导 出</Button>

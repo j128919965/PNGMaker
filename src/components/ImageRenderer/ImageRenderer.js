@@ -58,9 +58,10 @@ export default class ImageRenderer {
    * @param data {InputData[]}
    */
   async render(data) {
-    console.log(data)
     const getData = (id) => {
+      console.log(data)
       for (let datum of data) {
+        console.log(datum)
         if (datum.pointId == id) {
           return datum.data
         }
@@ -86,6 +87,8 @@ export default class ImageRenderer {
     if (proj.background) {
       let backgroundPicture = await ImageLoader.load(proj.background)
       context.drawImage(backgroundPicture, 0, 0, A4Width, A4Height)
+    }else {
+      context.clearRect(0, 0, A4Width, A4Height)
     }
 
     // 按照小红点一个一个绘制
@@ -93,7 +96,8 @@ export default class ImageRenderer {
       if (point.type === 1) {
         context.fillStyle = '#666'
         //TODO : FontPattern(字体大小三倍)
-        context.font="48px 宋体"
+        let fontPattern = point.pattern.fontSize * 3 + "px " + point.pattern.fontType
+        context.font=fontPattern
         switch (point.pattern.align) {
           case 1:
             context.fillText(getData(point.id), trulyPos[point.id].x, trulyPos[point.id].y)

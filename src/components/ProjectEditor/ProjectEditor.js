@@ -62,6 +62,8 @@ export default class ProjectEditor extends Component {
     if (proj.background != null) {
       let img = await ImageLoader.load(proj.background)
       ctx.drawImage(img, 0, 0, EditorWidth, EditorHeight)
+    }else {
+      ctx.clearRect(0, 0, EditorWidth, EditorHeight)
     }
 
     for (let point of proj.points) {
