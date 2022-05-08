@@ -76,7 +76,7 @@ export class InputDataLoadResult {
     let result = new InputDataLoadResult();
     result.projectId = projectId
     result.success = true
-    result.data =  Object.keys(map).map(key => new InputData(key,map[key]))
+    result.data =  Object.keys(map).map(key => new InputData(parseInt(key),map[key]))
     return result
   }
 

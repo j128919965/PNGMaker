@@ -77,9 +77,13 @@ export default class ProjectForm extends React.Component {
     const prev = this.state.project
     // 新项目
     if (prev === null || prev.id !== project.id) {
+      let initData = {}
+      for (const point of project.points) {
+        initData[point.id] = ""
+      }
       this.setState({
         project: project,
-        data: {}
+        data: initData
       })
       return
     }
@@ -100,13 +104,13 @@ export default class ProjectForm extends React.Component {
           if (prevPoint.type === newPoint.type) {
             newData[newPoint.id] = inputData
           } else {
-            newData[newPoint.id] = null
+            newData[newPoint.id] = ""
           }
           break
         }
       }
       // no break
-      newData[newPoint] = null
+      newData[newPoint] = ""
     }
     this.setState({project, data: newData})
   }

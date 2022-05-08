@@ -1,6 +1,7 @@
-import {A4Height, A4Width, EditorHeight, EditorWidth} from "../../data/constants";
+import {A4Height, A4Width, EditorHeight, EditorWidth, RedPointSize} from "../../data/constants";
 import ImageLoader from "../../utils/imageLoader";
 import {Position} from "../../data/ProjectMetadata";
+import {message} from "antd";
 
 export default class ImageRenderer {
 
@@ -58,11 +59,13 @@ export default class ImageRenderer {
    * @param data {InputData[]}
    */
   async render(data) {
+    message.info("正在加载，请稍候")
     const getData = (id) => {
       console.log(data)
       for (let datum of data) {
         console.log(datum)
-        if (datum.pointId == id) {
+        id = parseInt(id)
+        if (datum.pointId === id) {
           return datum.data
         }
       }
@@ -87,32 +90,40 @@ export default class ImageRenderer {
     if (proj.background) {
       let backgroundPicture = await ImageLoader.load(proj.background)
       context.drawImage(backgroundPicture, 0, 0, A4Width, A4Height)
-    }else {
+    } else {
       context.clearRect(0, 0, A4Width, A4Height)
     }
 
     // 按照小红点一个一个绘制
     for (const point of proj.points) {
+      if (!getData(point.id)) {
+        continue
+      }
       if (point.type === 1) {
         context.fillStyle = '#666'
         //TODO : FontPattern(字体大小三倍)
-        let fontPattern = point.pattern.fontSize * 3 + "px " + point.pattern.fontType
-        context.font=fontPattern
+        context.font = (point.pattern.italic ? "italic " : "normal ") + (point.pattern.bold ? "bolder " : "normal ") + point.pattern.fontSize * 3 + "px " + point.pattern.fontType
+        let textWidth = context.measureText(getData(point.id)).width
         switch (point.pattern.align) {
           case 1:
-            context.fillText(getData(point.id), trulyPos[point.id].x, trulyPos[point.id].y)
+            context.textBaseline = "top"
+            context.fillText(getData(point.id), trulyPos[point.id].x - RedPointSize, trulyPos[point.id].y - RedPointSize)
             break
           case 2:
+            context.textBaseline = "top"
             context.fillText(getData(point.id), trulyPos[point.id].x, trulyPos[point.id].y)
             break
           case 3:
-            context.fillText(getData(point.id), trulyPos[point.id].x, trulyPos[point.id].y)
+            context.textBaseline = "middle"
+            context.fillText(getData(point.id), trulyPos[point.id].x - textWidth / 2, trulyPos[point.id].y)
             break
           case 4:
-            context.fillText(getData(point.id), trulyPos[point.id].x, trulyPos[point.id].y)
+            context.textBaseline = "bottom"
+            context.fillText(getData(point.id), trulyPos[point.id].x - textWidth - RedPointSize, trulyPos[point.id].y + RedPointSize)
             break
           case 5:
-            context.fillText(getData(point.id), trulyPos[point.id].x, trulyPos[point.id].y)
+            context.textBaseline = "bottom"
+            context.fillText(getData(point.id), trulyPos[point.id].x - textWidth - RedPointSize * 2, trulyPos[point.id].y)
             break
           default:
             break
@@ -121,7 +132,25 @@ export default class ImageRenderer {
       } else if (point.type === 2) {
         let img = await ImageLoader.load(getData(point.id))
         //cnm的插入图片
-        context.drawImage(img, trulyPos[point.id].x, trulyPos[point.id].y,point.pattern.width , point.pattern.height)
+        switch (point.pattern.align) {
+          case 1:
+            context.drawImage(img, trulyPos[point.id].x - RedPointSize, trulyPos[point.id].y - RedPointSize, point.pattern.width, point.pattern.height)
+            break
+          case 2:
+            context.drawImage(img, trulyPos[point.id].x, trulyPos[point.id].y, point.pattern.width, point.pattern.height)
+            break
+          case 3:
+            context.drawImage(img, trulyPos[point.id].x - point.pattern.width / 2, trulyPos[point.id].y - point.pattern.height / 2, point.pattern.width, point.pattern.height)
+            break
+          case 4:
+            context.drawImage(img, trulyPos[point.id].x - point.pattern.width + RedPointSize, trulyPos[point.id].y - point.pattern.height + RedPointSize, point.pattern.width, point.pattern.height)
+            break
+          case 5:
+            context.drawImage(img, trulyPos[point.id].x - point.pattern.width, trulyPos[point.id].y - point.pattern.height, point.pattern.width, point.pattern.height)
+            break
+          default:
+            break
+        }
       }
     }
   }

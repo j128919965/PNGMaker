@@ -32,7 +32,7 @@
     margin-bottom: 10px;
 }
 
-.m-pf-editor-text>div>label, .m-pf-editor-image>div>label {
+.m-pf-editor-text>div>label, .m-pf-editor-image>div>div {
     font-size: xx-small;
     font-weight: bolder;
     color: #555;
