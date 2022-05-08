@@ -43,6 +43,7 @@ const App = () => {
     }
 
     const openProjectById = async (id)=>{
+      message.info("正在加载项目，请稍候")
       let proj = await ProjectStore.getById(id)
       updateProject(proj)
       setOpenProjectVisible(false)
@@ -75,8 +76,14 @@ const App = () => {
             label: '保存项目',
             disabled: !project,
             onClick: async () => {
-              await ProjectStore.save(project)
-              message.success("保存成功")
+              let resp = await ProjectStore.save(project)
+              console.log(resp)
+              if (resp){
+                message.success("保存成功")
+              }else {
+                message.warn("保存失败，项目可能已被删除")
+              }
+
             }
           },
           {
@@ -118,7 +125,9 @@ const App = () => {
                 key: "tool-bg-open",
                 label: "上传背景",
                 onClick: async () => {
-                  project.background = await files.readFile(null);
+                  project.background = await files.readFile(()=>{
+                    message.info("图片正在加载中，请稍候")
+                  });
                   updateProject(project)
                 }
               },
@@ -142,6 +151,7 @@ const App = () => {
           {
             key: "tool-cloud",
             label: '云端数据',
+            disabled: true,
             onClick: async ()=>{
               // let results = await InputDataStore.getNotRenderedByProject(project.id)
               // results.forEach(r=>r.id = undefined)

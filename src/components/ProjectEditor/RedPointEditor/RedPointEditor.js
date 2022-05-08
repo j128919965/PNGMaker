@@ -78,7 +78,7 @@ const RedPointEditor = forwardRef((props, ref) => {
     getItem('删除', 'pe-sub4', <CloseCircleOutlined/>, undefined, async () => {
       Modal.confirm({
         title: `删除项目`,
-        content: `确认删除 ${redPoint.id} 吗`,
+        content: <>确认删除 {redPoint.id} 吗？<br/>注意，已保存的云端数据可能会解析出错。</>,
         icon: <ExclamationCircleOutlined/>,
         okText: '确认',
         cancelText: '取消',
@@ -94,7 +94,7 @@ const RedPointEditor = forwardRef((props, ref) => {
   const setPointType = (type) => {
     Modal.confirm({
       title: `修改输入类型`,
-      content: <div>确认将输入类型修改为 {type === 1 ? '文字' : '图片'} 吗？<br/> 已设置过的 {type === 2 ? '文字' : '图片'} 格式将会丢失！</div>,
+      content: <div>确认将输入类型修改为 {type === 1 ? '文字' : '图片'} 吗？<br/> 已设置过的 {type === 2 ? '文字' : '图片'} 格式将会丢失！<br/>同时，已保存的云端数据将解析出错。</div>,
       icon: <ExclamationCircleOutlined/>,
       okText: '确认',
       cancelText: '取消',

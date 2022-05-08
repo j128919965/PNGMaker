@@ -1,3 +1,5 @@
+const cache = {}
+
 const ImageLoader = {
   /**
    * 加载成功图片后再返回
@@ -6,10 +8,14 @@ const ImageLoader = {
    * @return {Promise<HTMLImageElement>}
    */
   load : (url)=>{
+    if (cache[url]) return cache[url]
     const img = new Image()
     img.src = url
     return new Promise((res,rej)=>{
-      img.onload = ()=>res(img)
+      img.onload = ()=>{
+        cache[url] = img
+        res(img)
+      }
       img.onerror = e=>rej(e)
     })
   }

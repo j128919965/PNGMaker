@@ -1,4 +1,4 @@
-import {A4Height, A4Width, EditorHeight, EditorWidth, RedPointSize} from "../../data/constants";
+import {A4Height, A4Width, EditorHeight, EditorWidth} from "../../data/constants";
 import ImageLoader from "../../utils/imageLoader";
 import {Position} from "../../data/ProjectMetadata";
 import {message} from "antd";
@@ -61,10 +61,7 @@ export default class ImageRenderer {
   async render(data) {
     message.info("正在加载，请稍候")
     const getData = (id) => {
-      console.log(data)
       for (let datum of data) {
-        console.log(datum)
-        id = parseInt(id)
         if (datum.pointId === id) {
           return datum.data
         }
@@ -101,7 +98,6 @@ export default class ImageRenderer {
       }
       if (point.type === 1) {
         context.fillStyle = '#666'
-        //TODO : FontPattern(字体大小三倍)
         context.font = (point.pattern.italic ? "italic " : "normal ") + (point.pattern.bold ? "bolder " : "normal ") + point.pattern.fontSize * 3 + "px " + point.pattern.fontType
         let textWidth = context.measureText(getData(point.id)).width
         switch (point.pattern.align) {
@@ -131,7 +127,6 @@ export default class ImageRenderer {
 
       } else if (point.type === 2) {
         let img = await ImageLoader.load(getData(point.id))
-        //cnm的插入图片
         switch (point.pattern.align) {
           case 1:
             context.drawImage(img, trulyPos[point.id].x - RedPointSize, trulyPos[point.id].y - RedPointSize, point.pattern.width, point.pattern.height)
