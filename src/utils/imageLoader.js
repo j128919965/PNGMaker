@@ -10,6 +10,7 @@ const ImageLoader = {
   load : (url)=>{
     if (cache[url]) return cache[url]
     const img = new Image()
+    img.setAttribute('crossOrigin', 'anonymous')
     img.src = url
     return new Promise((res,rej)=>{
       img.onload = ()=>{

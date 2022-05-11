@@ -75,9 +75,9 @@ const onGetWorkBook = async (workbook, project) => {
           }
         }
       }
-      ret.push(InputDataLoadResult.success(data))
+      ret.push(InputDataLoadResult.success(data , project.id))
     } catch (e) {
-      ret.push(InputDataLoadResult.failure(e.message))
+      ret.push(InputDataLoadResult.failure(e.message , project.id))
     }
   }
 

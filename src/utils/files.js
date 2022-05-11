@@ -51,11 +51,11 @@ const files = {
     })
   },
 
-  uploadImage: async (file) => {
-    console.warn("模拟文件上传")
-    return "https://s2.loli.net/2022/04/30/x8ZALg4NSRpcqU2.jpg"
-  }
-  // uploadImage
+  // uploadImage: async (file) => {
+  //   console.warn("模拟文件上传")
+  //   return "https://s2.loli.net/2022/04/30/x8ZALg4NSRpcqU2.jpg"
+  // }
+  uploadImage
 }
 
 

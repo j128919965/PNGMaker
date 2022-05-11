@@ -1,7 +1,9 @@
-import {A4Height, A4Width, EditorHeight, EditorWidth} from "../../data/constants";
+import {A4Height, A4Width, EditorHeight, EditorWidth , RedPointSize} from "../../data/constants";
 import ImageLoader from "../../utils/imageLoader";
 import {Position} from "../../data/ProjectMetadata";
 import {message} from "antd";
+
+const LargerRedPointSize = RedPointSize * A4Width / EditorWidth;
 
 export default class ImageRenderer {
 
@@ -97,13 +99,13 @@ export default class ImageRenderer {
         continue
       }
       if (point.type === 1) {
-        context.fillStyle = '#666'
+        context.fillStyle = '#333 '
         context.font = (point.pattern.italic ? "italic " : "normal ") + (point.pattern.bold ? "bolder " : "normal ") + point.pattern.fontSize * 3 + "px " + point.pattern.fontType
         let textWidth = context.measureText(getData(point.id)).width
         switch (point.pattern.align) {
           case 1:
             context.textBaseline = "top"
-            context.fillText(getData(point.id), trulyPos[point.id].x - RedPointSize, trulyPos[point.id].y - RedPointSize)
+            context.fillText(getData(point.id), trulyPos[point.id].x - LargerRedPointSize, trulyPos[point.id].y - LargerRedPointSize)
             break
           case 2:
             context.textBaseline = "top"
@@ -115,11 +117,11 @@ export default class ImageRenderer {
             break
           case 4:
             context.textBaseline = "bottom"
-            context.fillText(getData(point.id), trulyPos[point.id].x - textWidth - RedPointSize, trulyPos[point.id].y + RedPointSize)
+            context.fillText(getData(point.id), trulyPos[point.id].x - textWidth - LargerRedPointSize, trulyPos[point.id].y + LargerRedPointSize)
             break
           case 5:
             context.textBaseline = "bottom"
-            context.fillText(getData(point.id), trulyPos[point.id].x - textWidth - RedPointSize * 2, trulyPos[point.id].y)
+            context.fillText(getData(point.id), trulyPos[point.id].x - textWidth - LargerRedPointSize * 2, trulyPos[point.id].y)
             break
           default:
             break
@@ -127,21 +129,23 @@ export default class ImageRenderer {
 
       } else if (point.type === 2) {
         let img = await ImageLoader.load(getData(point.id))
+        let imgWidth = point.pattern.width * A4Width / EditorWidth
+        let imgHeight = point.pattern.height * A4Height / EditorHeight
         switch (point.pattern.align) {
           case 1:
-            context.drawImage(img, trulyPos[point.id].x - RedPointSize, trulyPos[point.id].y - RedPointSize, point.pattern.width, point.pattern.height)
+            context.drawImage(img, trulyPos[point.id].x - LargerRedPointSize, trulyPos[point.id].y - LargerRedPointSize, imgWidth, imgHeight)
             break
           case 2:
-            context.drawImage(img, trulyPos[point.id].x, trulyPos[point.id].y, point.pattern.width, point.pattern.height)
+            context.drawImage(img, trulyPos[point.id].x, trulyPos[point.id].y, imgWidth, imgHeight)
             break
           case 3:
-            context.drawImage(img, trulyPos[point.id].x - point.pattern.width / 2, trulyPos[point.id].y - point.pattern.height / 2, point.pattern.width, point.pattern.height)
+            context.drawImage(img, trulyPos[point.id].x - imgWidth / 2, trulyPos[point.id].y - imgHeight / 2, imgWidth, imgHeight)
             break
           case 4:
-            context.drawImage(img, trulyPos[point.id].x - point.pattern.width + RedPointSize, trulyPos[point.id].y - point.pattern.height + RedPointSize, point.pattern.width, point.pattern.height)
+            context.drawImage(img, trulyPos[point.id].x - imgWidth + LargerRedPointSize, trulyPos[point.id].y - imgHeight + LargerRedPointSize, imgWidth, imgHeight)
             break
           case 5:
-            context.drawImage(img, trulyPos[point.id].x - point.pattern.width, trulyPos[point.id].y - point.pattern.height, point.pattern.width, point.pattern.height)
+            context.drawImage(img, trulyPos[point.id].x - imgWidth, trulyPos[point.id].y - imgHeight, imgWidth, imgHeight)
             break
           default:
             break

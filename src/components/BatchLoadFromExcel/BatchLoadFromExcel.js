@@ -1,11 +1,12 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Button, Modal} from "antd";
 import {CheckOutlined, ExclamationOutlined, LoadingOutlined} from "@ant-design/icons";
 
 import excelx from "../../utils/excel/excelx";
 
 import "./index.css"
-import {EditorHeight, EditorWidth} from "../../data/constants";
+import {A4Height, A4Width, EditorHeight, EditorWidth} from "../../data/constants";
+import ImageRenderer from "../ImageRenderer/ImageRenderer";
 
 
 const BatchLoadFromExcel = (props) => {
@@ -15,9 +16,10 @@ const BatchLoadFromExcel = (props) => {
 
   const [loading, setLoading] = useState(false)
 
-  const [previewVisible , setPreviewVisible] = useState(false)
+  const [previewVisible, setPreviewVisible] = useState(false)
 
-  let currentResult = null
+  const [currentResult , setCurrentResult] = useState(null)
+
 
   const removeResult = (res) => {
     let newResults = batchLoadResults.filter(result => result !== res);
@@ -27,13 +29,50 @@ const BatchLoadFromExcel = (props) => {
     setBatchLoadResults(newResults)
   }
 
-  const render = (result)=>{
+  const render = async (result, id) => {
     // TODO: 调用渲染并下载API
+    let canvasElement = document.createElement('canvas')
+    canvasElement.width = A4Width
+    canvasElement.height = A4Height
+    console.log(result)
+    let blImageRenderer = new ImageRenderer()
+    blImageRenderer.load(project)
+    canvasElement.getContext('2d').clearRect(0, 0, canvasElement.width, canvasElement.height)
+
+    await blImageRenderer.showPreview(canvasElement, result)
+
+    const MIME_TYPE = "image/png";
+    const imgURL = canvasElement.toDataURL(MIME_TYPE);
+    const dlLink = document.createElement('a');
+
+    let now = new Date()
+
+    let pngName = project.name + " " + now.getFullYear() + (now.getMonth() + 1 > 10 ? now.getMonth() + 1 : "0" + (now.getMonth() + 1)) + (now.getDate() > 10 ? now.getDate() : "0" + now.getDate())
+    if (id !== null){
+      pngName = pngName + " " + id
+    }
+    dlLink.download = pngName;
+    dlLink.href = imgURL;
+    dlLink.dataset.downloader = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
+
+    document.body.appendChild(dlLink);
+    dlLink.click();
+    document.body.removeChild(dlLink);
   }
 
-  const drawPreView = ()=>{
-    // const previewCanvas = document.getElementById("m-bl-preview")
-    // TODO: 调用渲染预览API
+  useEffect(() => {
+      if (previewVisible) {
+        drawPreView()
+      }
+    }
+    , [previewVisible])
+
+  const drawPreView = async () => {
+    const previewCanvas = document.getElementById("m-bl-preview")
+    previewCanvas.getContext('2d').clearRect(0, 0, previewCanvas.width, previewCanvas.height)
+    let blImageRenderer = new ImageRenderer()
+    blImageRenderer.load(project)
+    await blImageRenderer.showPreview(previewCanvas, currentResult)
   }
 
   return (
@@ -46,7 +85,7 @@ const BatchLoadFromExcel = (props) => {
                     size="small"
                     onClick={
                       async () => {
-                        let result = await excelx.openFile(project , ()=>{
+                        let result = await excelx.openFile(project, () => {
                           setBatchLoadResults(null)
                           setLoading(true)
                         })
@@ -61,6 +100,15 @@ const BatchLoadFromExcel = (props) => {
               batchLoadResults &&
               <Button type="primary"
                       size="small"
+                      onClick={()=>{
+                        let p = 1
+                        for (const res of batchLoadResults) {
+                          if (res.success) {
+                            render(res, p)
+                            p++
+                          }
+                        }
+                      }}
               >
                 <span style={{fontSize: "small"}}>下载全部</span>
               </Button>
@@ -83,43 +131,45 @@ const BatchLoadFromExcel = (props) => {
 
           }
           {batchLoadResults &&
-            batchLoadResults.map(
-              /**
-               * @param index {number}
-               * @param result {InputDataLoadResult}
-               */
-              (result, index) => (
-                <div className="m-bl-line" key={index}>
-                  <div className={`m-bl-line-icon ${result.success ? 'u-success' : 'u-warning'}`}>
-                    {result.success ? <CheckOutlined/> : <ExclamationOutlined/>}
-                  </div>
-                  <div className="m-bl-line-word">
-                    第 {index + 1} 行 {result.success ? '解析成功' : '解析错误：' + result.message}
-                  </div>
-                  <div className="m-bl-line-btns">
-                    {
-                      result.success &&
-                      <>
-                        <Button size={"small"} onClick={()=>{
-                          currentResult = result
-                          setPreviewVisible(true)
-                          drawPreView()
-                        }}>
-                          <span style={{fontSize: "small"}}>查看预览</span>
-                        </Button>
-                        <Button size={"small"}>
-                          <span style={{fontSize: "small"}}>导出图片</span>
-                        </Button>
-                      </>
-
-                    }
-
-                    <Button size={"small"} onClick={() => removeResult(result)}>
-                      <span style={{fontSize: "small"}}>删除数据</span>
-                    </Button>
-                  </div>
+          batchLoadResults.map(
+            /**
+             * @param index {number}
+             * @param result {InputDataLoadResult}
+             */
+            (result, index) => (
+              <div className="m-bl-line" key={index}>
+                <div className={`m-bl-line-icon ${result.success ? 'u-success' : 'u-warning'}`}>
+                  {result.success ? <CheckOutlined/> : <ExclamationOutlined/>}
                 </div>
-              ))
+                <div className="m-bl-line-word">
+                  第 {index + 1} 行 {result.success ? '解析成功' : '解析错误：' + result.message}
+                </div>
+                <div className="m-bl-line-btns">
+                  {
+                    result.success &&
+                    <>
+                      <Button size={"small"} onClick={() => {
+                        setCurrentResult(result)
+                        setPreviewVisible(true)
+                      }}>
+                        <span style={{fontSize: "small"}}>查看预览</span>
+                      </Button>
+                      <Button size={"small"} onClick={()=>{
+                        setCurrentResult(result)
+                        render(currentResult, null)
+                      }}>
+                        <span style={{fontSize: "small"}}>导出图片</span>
+                      </Button>
+                    </>
+
+                  }
+
+                  <Button size={"small"} onClick={() => removeResult(result)}>
+                    <span style={{fontSize: "small"}}>删除数据</span>
+                  </Button>
+                </div>
+              </div>
+            ))
           }
         </div>
       </Modal>
@@ -140,7 +190,7 @@ const BatchLoadFromExcel = (props) => {
           <Button className='u-pf-btn'
                   type={"primary"}
                   style={{marginTop: 20}}
-                  onClick={()=>render(currentResult)}
+                  onClick={() => render(currentResult)}
           >
             导出图片
           </Button>

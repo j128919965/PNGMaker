@@ -4,7 +4,7 @@ import "./ProjectForm.css"
 import {Empty, Input, Button, Modal} from "antd";
 import {UploadOutlined} from '@ant-design/icons';
 
-import {EditorHeight, EditorWidth} from '../../data/constants'
+import {A4Height, A4Width, EditorHeight, EditorWidth} from '../../data/constants'
 import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {InputDataLoadResult} from "../../data/InputData";
@@ -45,7 +45,7 @@ function TypeOfImage(props) {
             上传图片
           </Button>
           <br/>
-          {data[point.id]? data[point.id].substring(data[point.id].indexOf("/file/")+6) : '未选择文件'}
+          {data[point.id] ? data[point.id].substring(data[point.id].indexOf("/file/") + 6) : '未选择文件'}
         </div>
       </div>
     </div>
@@ -53,10 +53,6 @@ function TypeOfImage(props) {
 }
 
 export default class ProjectForm extends React.Component {
-  /**
-   * @type {HTMLCanvasElement}
-   */
-  pfPreviewCanvas
 
   constructor(props) {
     super(props);
@@ -156,6 +152,19 @@ export default class ProjectForm extends React.Component {
     return list
   }
 
+  downloadPNG = async (project) => {
+    let canvasElement = document.createElement('canvas')
+    canvasElement.width = A4Width
+    canvasElement.height = A4Height
+
+    let pfImageRenderer = new ImageRenderer()
+    pfImageRenderer.load(project)
+    canvasElement.getContext('2d').clearRect(0, 0, canvasElement.width, canvasElement.height)
+
+    await pfImageRenderer.showPreview(canvasElement, InputDataLoadResult.fromMap(this.state.data, project.id))
+    return canvasElement
+  }
+
   render() {
     const {project} = this.state
     return (
@@ -197,13 +206,32 @@ export default class ProjectForm extends React.Component {
                               pfImageRenderer.load(project)
                               let pfReviewCanvas = document.getElementById('pfPreviewCanvas')
                               pfReviewCanvas.getContext('2d').clearRect(0, 0, pfReviewCanvas.width, pfReviewCanvas.height)
-                              await pfImageRenderer.showPreview(pfReviewCanvas, InputDataLoadResult.fromMap(this.state.data , project.id))
+                              await pfImageRenderer.showPreview(pfReviewCanvas, InputDataLoadResult.fromMap(this.state.data, project.id))
                             })
                           }}
                   >
                     预 览
                   </Button>
-                  <Button type="primary" className="u-pf-btn" id='pfSave'>
+                  <Button type="primary" className="u-pf-btn"
+                          onClick={() => {
+
+                            this.downloadPNG(project).then((canvasElement) => {
+                              const MIME_TYPE = "image/png";
+                              const imgURL = canvasElement.toDataURL(MIME_TYPE);
+                              const dlLink = document.createElement('a');
+
+                              let now = new Date()
+                              let pngName = project.name + " " + now.getFullYear() + (now.getMonth() + 1 > 10 ? now.getMonth() + 1 : "0" + (now.getMonth() + 1)) + (now.getDate() > 10 ? now.getDate() : "0" + now.getDate())
+                              dlLink.download = pngName;
+                              dlLink.href = imgURL;
+                              dlLink.dataset.downloader = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
+
+                              document.body.appendChild(dlLink);
+                              dlLink.click();
+                              document.body.removeChild(dlLink);
+                            })
+                          }}
+                  >
                     导 出
                   </Button>
                 </div>
