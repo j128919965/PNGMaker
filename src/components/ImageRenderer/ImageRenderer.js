@@ -159,13 +159,13 @@ export default class ImageRenderer {
    * @param inputDataLoadResult {InputData[]}
    */
   checkData(inputDataLoadResult) {
-    // TODO: 一条一条检查是否正常，如果不想检查也可以先放一放
+    // 一条一条检查是否正常，如果不想检查也可以先放一放
 
   }
 
   /**
    * 将已渲染好的图片下载下来
-   * @param id{null}
+   * @param id {string?}
    */
   async download(inputDataLoadResult, id) {
     this.backGroundCanvas.getContext('2d').clearRect(0, 0, A4Width, A4Height)

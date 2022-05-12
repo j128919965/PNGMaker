@@ -30,21 +30,10 @@ const BatchLoadFromExcel = (props) => {
   }
 
   const render = async (result, id) => {
-    // TODO: 调用渲染并下载API
-
     let blImageRenderer = new ImageRenderer()
     blImageRenderer.load(project)
     await blImageRenderer.download(result, id)
-
   }
-
-  useEffect(() => {
-      if (previewVisible) {
-        drawPreView()
-      }
-    }
-    , [previewVisible]
-  )
 
   const drawPreView = async () => {
     const previewCanvas = document.getElementById("m-bl-preview")
@@ -53,6 +42,14 @@ const BatchLoadFromExcel = (props) => {
     blImageRenderer.load(project)
     await blImageRenderer.showPreview(previewCanvas, currentResult)
   }
+
+  useEffect(() => {
+      if (previewVisible) {
+        drawPreView().then(() => console.log("draw preview success :", project.name))
+      }
+    }, [previewVisible]
+  )
+
 
   return (
     <>
@@ -79,15 +76,11 @@ const BatchLoadFromExcel = (props) => {
               batchLoadResults &&
               <Button type="primary"
                       size="small"
-                      onClick={() => {
-                        let p = 1
-                        for (const res of batchLoadResults) {
-                          if (res.success) {
-                            render(res, p)
-                            p++
-                          }
-                        }
-                      }}
+                      onClick={
+                        () => batchLoadResults.filter(res => res.success).forEach((res, index) => {
+                          render(res, index + 1)
+                        })
+                      }
               >
                 <span style={{fontSize: "small"}}>下载全部</span>
               </Button>
@@ -110,44 +103,44 @@ const BatchLoadFromExcel = (props) => {
 
           }
           {batchLoadResults &&
-          batchLoadResults.map(
-            /**
-             * @param index {number}
-             * @param result {InputDataLoadResult}
-             */
-            (result, index) => (
-              <div className="m-bl-line" key={index}>
-                <div className={`m-bl-line-icon ${result.success ? 'u-success' : 'u-warning'}`}>
-                  {result.success ? <CheckOutlined/> : <ExclamationOutlined/>}
-                </div>
-                <div className="m-bl-line-word">
-                  第 {index + 1} 行 {result.success ? '解析成功' : '解析错误：' + result.message}
-                </div>
-                <div className="m-bl-line-btns">
-                  {
-                    result.success &&
-                    <>
-                      <Button size={"small"} onClick={() => {
-                        setCurrentResult(result)
-                        setPreviewVisible(true)
-                      }}>
-                        <span style={{fontSize: "small"}}>查看预览</span>
-                      </Button>
-                      <Button size={"small"} onClick={() => {
-                        render(result, index + 1)
-                      }}>
-                        <span style={{fontSize: "small"}}>导出图片</span>
-                      </Button>
-                    </>
+            batchLoadResults.map(
+              /**
+               * @param index {number}
+               * @param result {InputDataLoadResult}
+               */
+              (result, index) => (
+                <div className="m-bl-line" key={index}>
+                  <div className={`m-bl-line-icon ${result.success ? 'u-success' : 'u-warning'}`}>
+                    {result.success ? <CheckOutlined/> : <ExclamationOutlined/>}
+                  </div>
+                  <div className="m-bl-line-word">
+                    第 {index + 1} 行 {result.success ? '解析成功' : '解析错误：' + result.message}
+                  </div>
+                  <div className="m-bl-line-btns">
+                    {
+                      result.success &&
+                      <>
+                        <Button size={"small"} onClick={() => {
+                          setCurrentResult(result)
+                          setPreviewVisible(true)
+                        }}>
+                          <span style={{fontSize: "small"}}>查看预览</span>
+                        </Button>
+                        <Button size={"small"} onClick={() => {
+                          render(result, index + 1)
+                        }}>
+                          <span style={{fontSize: "small"}}>导出图片</span>
+                        </Button>
+                      </>
 
-                  }
+                    }
 
-                  <Button size={"small"} onClick={() => removeResult(result)}>
-                    <span style={{fontSize: "small"}}>删除数据</span>
-                  </Button>
+                    <Button size={"small"} onClick={() => removeResult(result)}>
+                      <span style={{fontSize: "small"}}>删除数据</span>
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))
+              ))
           }
         </div>
       </Modal>

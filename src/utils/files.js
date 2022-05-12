@@ -5,8 +5,6 @@ const uploadImage = async (file) => {
   // form.append('file', file)
   form.append('image', file)
   return new Promise((resolve, reject) => {
-    // TODO: update
-    // fetch('https://service-eybsd6ln-1307637143.sh.apigw.tencentcs.com/release/upload', {
     fetch(urls.files.upload, {
       method: 'POST',
       body: form,
