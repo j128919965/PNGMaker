@@ -1,11 +1,11 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Modal} from "antd";
 import {CheckOutlined, ExclamationOutlined, LoadingOutlined} from "@ant-design/icons";
 
 import excelx from "../../utils/excel/excelx";
 
 import "./index.css"
-import {A4Height, A4Width, EditorHeight, EditorWidth} from "../../data/constants";
+import {EditorHeight, EditorWidth} from "../../data/constants";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 
 
@@ -18,7 +18,7 @@ const BatchLoadFromExcel = (props) => {
 
   const [previewVisible, setPreviewVisible] = useState(false)
 
-  const [currentResult , setCurrentResult] = useState(null)
+  const [currentResult, setCurrentResult] = useState(null)
 
 
   const removeResult = (res) => {
@@ -31,33 +31,11 @@ const BatchLoadFromExcel = (props) => {
 
   const render = async (result, id) => {
     // TODO: 调用渲染并下载API
-    let canvasElement = document.createElement('canvas')
-    canvasElement.width = A4Width
-    canvasElement.height = A4Height
-    console.log(result)
+
     let blImageRenderer = new ImageRenderer()
     blImageRenderer.load(project)
-    canvasElement.getContext('2d').clearRect(0, 0, canvasElement.width, canvasElement.height)
+    await blImageRenderer.download(result, id)
 
-    await blImageRenderer.showPreview(canvasElement, result)
-
-    const MIME_TYPE = "image/png";
-    const imgURL = canvasElement.toDataURL(MIME_TYPE);
-    const dlLink = document.createElement('a');
-
-    let now = new Date()
-
-    let pngName = project.name + " " + now.getFullYear() + (now.getMonth() + 1 > 10 ? now.getMonth() + 1 : "0" + (now.getMonth() + 1)) + (now.getDate() > 10 ? now.getDate() : "0" + now.getDate())
-    if (id !== null){
-      pngName = pngName + " " + id
-    }
-    dlLink.download = pngName;
-    dlLink.href = imgURL;
-    dlLink.dataset.downloader = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
-
-    document.body.appendChild(dlLink);
-    dlLink.click();
-    document.body.removeChild(dlLink);
   }
 
   useEffect(() => {
@@ -65,7 +43,8 @@ const BatchLoadFromExcel = (props) => {
         drawPreView()
       }
     }
-    , [previewVisible])
+    , [previewVisible]
+  )
 
   const drawPreView = async () => {
     const previewCanvas = document.getElementById("m-bl-preview")
@@ -100,7 +79,7 @@ const BatchLoadFromExcel = (props) => {
               batchLoadResults &&
               <Button type="primary"
                       size="small"
-                      onClick={()=>{
+                      onClick={() => {
                         let p = 1
                         for (const res of batchLoadResults) {
                           if (res.success) {
@@ -154,9 +133,8 @@ const BatchLoadFromExcel = (props) => {
                       }}>
                         <span style={{fontSize: "small"}}>查看预览</span>
                       </Button>
-                      <Button size={"small"} onClick={()=>{
-                        setCurrentResult(result)
-                        render(currentResult, null)
+                      <Button size={"small"} onClick={() => {
+                        render(result, index + 1)
                       }}>
                         <span style={{fontSize: "small"}}>导出图片</span>
                       </Button>
@@ -190,7 +168,7 @@ const BatchLoadFromExcel = (props) => {
           <Button className='u-pf-btn'
                   type={"primary"}
                   style={{marginTop: 20}}
-                  onClick={() => render(currentResult)}
+                  onClick={() => render(currentResult, null)}
           >
             导出图片
           </Button>

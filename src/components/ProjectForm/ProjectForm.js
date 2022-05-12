@@ -4,7 +4,7 @@ import "./ProjectForm.css"
 import {Empty, Input, Button, Modal} from "antd";
 import {UploadOutlined} from '@ant-design/icons';
 
-import {A4Height, A4Width, EditorHeight, EditorWidth} from '../../data/constants'
+import {EditorHeight, EditorWidth} from '../../data/constants'
 import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {InputDataLoadResult} from "../../data/InputData";
@@ -153,28 +153,11 @@ export default class ProjectForm extends React.Component {
   }
 
   downloadPNG = async (project) => {
-    let canvasElement = document.createElement('canvas')
-    canvasElement.width = A4Width
-    canvasElement.height = A4Height
 
     let pfImageRenderer = new ImageRenderer()
     pfImageRenderer.load(project)
-    canvasElement.getContext('2d').clearRect(0, 0, canvasElement.width, canvasElement.height)
+    await  pfImageRenderer.download(InputDataLoadResult.fromMap(this.state.data, project.id), null)
 
-    await pfImageRenderer.showPreview(canvasElement, InputDataLoadResult.fromMap(this.state.data, project.id))
-    const MIME_TYPE = "image/png";
-    const imgURL = canvasElement.toDataURL(MIME_TYPE);
-    const dlLink = document.createElement('a');
-
-    let now = new Date()
-    let pngName = project.name + " " + now.getFullYear() + (now.getMonth() + 1 > 10 ? now.getMonth() + 1 : "0" + (now.getMonth() + 1)) + (now.getDate() > 10 ? now.getDate() : "0" + now.getDate())
-    dlLink.download = pngName;
-    dlLink.href = imgURL;
-    dlLink.dataset.downloader = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
-
-    document.body.appendChild(dlLink);
-    dlLink.click();
-    document.body.removeChild(dlLink);
   }
 
   render() {

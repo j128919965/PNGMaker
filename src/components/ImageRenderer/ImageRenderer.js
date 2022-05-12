@@ -1,4 +1,4 @@
-import {A4Height, A4Width, EditorHeight, EditorWidth , RedPointSize} from "../../data/constants";
+import {A4Height, A4Width, EditorHeight, EditorWidth, RedPointSize} from "../../data/constants";
 import ImageLoader from "../../utils/imageLoader";
 import {Position} from "../../data/ProjectMetadata";
 import {message} from "antd";
@@ -74,7 +74,6 @@ export default class ImageRenderer {
     // 先检查数据是否和本项目对应
     this.checkData(data)
 
-    // TODO: 渲染（绘制）
     // 注意point位置的等比例缩放
     let trulyPos = {}
     const proj = this.project
@@ -166,9 +165,29 @@ export default class ImageRenderer {
 
   /**
    * 将已渲染好的图片下载下来
+   * @param id{null}
    */
-  download() {
-    // TODO: 下载逻辑
+  async download(inputDataLoadResult, id) {
+    this.backGroundCanvas.getContext('2d').clearRect(0, 0, A4Width, A4Height)
+    await this.render(inputDataLoadResult.data)
+
+    const MIME_TYPE = "image/png";
+    const imgURL = this.backGroundCanvas.toDataURL(MIME_TYPE);
+    const dlLink = document.createElement('a');
+
+    let now = new Date()
+
+    let pngName = this.project.name + " " + now.getFullYear() + (now.getMonth() + 1 > 10 ? now.getMonth() + 1 : "0" + (now.getMonth() + 1)) + (now.getDate() > 10 ? now.getDate() : "0" + now.getDate())
+    if (id !== null) {
+      pngName = pngName + " " + id
+    }
+    dlLink.download = pngName;
+    dlLink.href = imgURL;
+    dlLink.dataset.downloader = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
+
+    document.body.appendChild(dlLink);
+    dlLink.click();
+    document.body.removeChild(dlLink);
   }
 
 
