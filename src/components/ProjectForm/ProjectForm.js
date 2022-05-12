@@ -162,7 +162,19 @@ export default class ProjectForm extends React.Component {
     canvasElement.getContext('2d').clearRect(0, 0, canvasElement.width, canvasElement.height)
 
     await pfImageRenderer.showPreview(canvasElement, InputDataLoadResult.fromMap(this.state.data, project.id))
-    return canvasElement
+    const MIME_TYPE = "image/png";
+    const imgURL = canvasElement.toDataURL(MIME_TYPE);
+    const dlLink = document.createElement('a');
+
+    let now = new Date()
+    let pngName = project.name + " " + now.getFullYear() + (now.getMonth() + 1 > 10 ? now.getMonth() + 1 : "0" + (now.getMonth() + 1)) + (now.getDate() > 10 ? now.getDate() : "0" + now.getDate())
+    dlLink.download = pngName;
+    dlLink.href = imgURL;
+    dlLink.dataset.downloader = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
+
+    document.body.appendChild(dlLink);
+    dlLink.click();
+    document.body.removeChild(dlLink);
   }
 
   render() {
@@ -213,24 +225,7 @@ export default class ProjectForm extends React.Component {
                     预 览
                   </Button>
                   <Button type="primary" className="u-pf-btn"
-                          onClick={() => {
-
-                            this.downloadPNG(project).then((canvasElement) => {
-                              const MIME_TYPE = "image/png";
-                              const imgURL = canvasElement.toDataURL(MIME_TYPE);
-                              const dlLink = document.createElement('a');
-
-                              let now = new Date()
-                              let pngName = project.name + " " + now.getFullYear() + (now.getMonth() + 1 > 10 ? now.getMonth() + 1 : "0" + (now.getMonth() + 1)) + (now.getDate() > 10 ? now.getDate() : "0" + now.getDate())
-                              dlLink.download = pngName;
-                              dlLink.href = imgURL;
-                              dlLink.dataset.downloader = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
-
-                              document.body.appendChild(dlLink);
-                              dlLink.click();
-                              document.body.removeChild(dlLink);
-                            })
-                          }}
+                          onClick={()=>{this.downloadPNG(project)}}
                   >
                     导 出
                   </Button>
@@ -256,7 +251,8 @@ export default class ProjectForm extends React.Component {
               style={{border: '1px solid #ccc', borderRadius: '5px'}}>
               no canvas
             </canvas>
-            <Button className='u-pf-btn' type={"primary"} style={{marginTop: 20}}>导 出</Button>
+            <Button className='u-pf-btn' type={"primary"} style={{marginTop: 20}}
+                    onClick={()=>{this.downloadPNG(project)}}>导 出</Button>
           </div>
         </Modal>
       </>
