@@ -30,7 +30,6 @@ const BatchLoadFromExcel = (props) => {
   }
 
   const render = async (result, id) => {
-    // TODO: 调用渲染并下载API
 
     let blImageRenderer = new ImageRenderer()
     blImageRenderer.load(project)
