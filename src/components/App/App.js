@@ -10,6 +10,7 @@ import files from "../../utils/files"
 
 import './App.css';
 import BatchLoadFromExcel from "../BatchLoadFromExcel/BatchLoadFromExcel";
+import {CloudData} from "../CloudData/CloudData";
 
 const App = () => {
 
@@ -18,7 +19,9 @@ const App = () => {
      */
     const [project, setProject] = useState(null)
 
-    const [batchModalVisible , setBatchModalVisible] = useState(false)
+  const [batchModalVisible , setBatchModalVisible] = useState(false)
+
+  const [cloudDataVisible , setCloudDataVisible] = useState(false)
 
     const [openProjectVisible,setOpenProjectVisible] = useState(false)
 
@@ -151,12 +154,8 @@ const App = () => {
           {
             key: "tool-cloud",
             label: '云端数据',
-            disabled: true,
             onClick: async ()=>{
-              // let results = await InputDataStore.getNotRenderedByProject(project.id)
-              // results.forEach(r=>r.id = undefined)
-              // let resp = await InputDataStore.save(results[0])
-              // console.log(resp)
+              setCloudDataVisible(true)
             }
           }
         ],
@@ -199,6 +198,8 @@ const App = () => {
         </div>
 
         {batchModalVisible && <BatchLoadFromExcel project={project} close={()=>setBatchModalVisible(false)}/>}
+
+        {cloudDataVisible && <CloudData project={project} close={()=>setCloudDataVisible(false)} />}
 
         <Modal title="打开项目"
                visible={openProjectVisible}

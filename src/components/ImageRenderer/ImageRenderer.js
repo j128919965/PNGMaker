@@ -48,7 +48,13 @@ export default class ImageRenderer {
     }
 
     // 先渲染
-    await this.render(inputDataLoadResult.data)
+    try {
+      await this.render(inputDataLoadResult.data)
+    }catch (e){
+      message.error(e)
+      throw e
+    }
+
 
     // 在已设置的 previewCanvas 上展示
     // 自动缩放
@@ -80,7 +86,6 @@ export default class ImageRenderer {
     for (let p of proj.points) {
       trulyPos[p.id] = new Position((p.position.x * A4Width) / EditorWidth, (p.position.y * A4Height) / EditorHeight)
     }
-    console.log(trulyPos)
     const canvas = this.backGroundCanvas
     const context = canvas.getContext("2d")
 

@@ -88,7 +88,7 @@ export class InputDataLoadResult {
     let result = new InputDataLoadResult();
     result.id = obj.id
     result.projectId = obj.projectId
-    result.success = obj.success
+    result.success = obj.success??true
     result.data =  obj.data.map(d=>InputData.fromObj(d))
     return result
   }
