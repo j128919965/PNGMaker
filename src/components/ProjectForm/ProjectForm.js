@@ -1,13 +1,14 @@
 import React from "react";
 
 import "./ProjectForm.css"
-import {Empty, Input, Button, Modal} from "antd";
+import {Empty, Input, Button, Modal, message} from "antd";
 import {UploadOutlined} from '@ant-design/icons';
 
 import {EditorHeight, EditorWidth} from '../../data/constants'
 import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {InputDataLoadResult} from "../../data/InputData";
+import InputDataStore from "../../data/InputDataStore";
 
 /**
  *
@@ -153,11 +154,15 @@ export default class ProjectForm extends React.Component {
   }
 
   downloadPNG = async (project) => {
-
     let pfImageRenderer = new ImageRenderer()
     pfImageRenderer.load(project)
     await  pfImageRenderer.download(InputDataLoadResult.fromMap(this.state.data, project.id), null)
+  }
 
+  saveInputDataResult =async ()=>{
+    let data = InputDataLoadResult.fromMap(this.state.data, this.state.project.id)
+    let resp = await InputDataStore.save(data)
+    message.success(`保存成功，请在电脑端 "云端数据" 查看`)
   }
 
   render() {
@@ -211,6 +216,11 @@ export default class ProjectForm extends React.Component {
                           onClick={()=>{this.downloadPNG(project)}}
                   >
                     导 出
+                  </Button>
+                  <Button type="primary" className="u-pf-btn"
+                          onClick={()=>this.saveInputDataResult()}
+                  >
+                    保 存
                   </Button>
                 </div>
               </div>

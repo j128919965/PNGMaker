@@ -160,10 +160,6 @@ export class Pattern {
    */
   align = 1
 
-  setCanvasProperties(canvas) {
-    errors.throw("implement me !")
-  }
-
   static checkAlign = (align)=>{
     if (align > 5 || align < 1){
       errors.throw("对齐方式错误！")
@@ -218,14 +214,6 @@ export class FontPattern extends Pattern {
 export class PicturePattern extends Pattern {
   width
   height
-
-  /**
-   *
-   * @param canvas {HTMLCanvasElement}
-   */
-  setCanvasProperties(canvas) {
-    // TODO
-  }
 
   static default() {
     return PicturePattern.fromObj(null)

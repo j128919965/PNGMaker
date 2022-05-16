@@ -1,15 +1,11 @@
-import React, {useEffect, useState} from "react";
-import {Button, Modal} from "antd";
+import {Button, message, Modal} from "antd";
 import {CheckOutlined, ExclamationOutlined, LoadingOutlined} from "@ant-design/icons";
-
-import excelx from "../../utils/excel/excelx";
-
-import "./index.css"
 import {EditorHeight, EditorWidth} from "../../data/constants";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
+import {useEffect, useState} from "react";
+import InputDataStore from "../../data/InputDataStore";
 
-
-const BatchLoadFromExcel = (props) => {
+export const CloudData = (props) => {
   const {project, close} = props
 
   const [batchLoadResults, setBatchLoadResults] = useState(null)
@@ -20,23 +16,33 @@ const BatchLoadFromExcel = (props) => {
 
   const [currentResult, setCurrentResult] = useState(null)
 
+  const init = async ()=>{
+    setLoading(true)
+    let results = await InputDataStore.getNotRenderedByProject(project.id)
+    setBatchLoadResults(results)
+    setLoading(false)
+  }
 
-  const removeResult = (res) => {
-    let newResults = batchLoadResults.filter(result => result !== res);
-    if (newResults.length === 0) {
-      newResults = null
+  const removeResult = async (res) => {
+    let deleted = await InputDataStore.remove(res.id)
+    if (deleted){
+      message.success("删除成功")
+      await init()
+    }else {
+      message.error("删除失败，请检查")
     }
-    setBatchLoadResults(newResults)
   }
 
   const render = async (result, id) => {
     let blImageRenderer = new ImageRenderer()
     blImageRenderer.load(project)
     await blImageRenderer.download(result, id)
+    await InputDataStore.setRendered(result.id)
+    init()
   }
 
   const drawPreView = async () => {
-    const previewCanvas = document.getElementById("m-bl-preview")
+    const previewCanvas = document.getElementById("m-cd-preview")
     previewCanvas.getContext('2d').clearRect(0, 0, previewCanvas.width, previewCanvas.height)
     let blImageRenderer = new ImageRenderer()
     blImageRenderer.load(project)
@@ -50,36 +56,29 @@ const BatchLoadFromExcel = (props) => {
     }, [previewVisible]
   )
 
+  useEffect(()=>{
+    init()
+  },[])
 
   return (
     <>
       <Modal
         title={
           <div className="m-bl-modal-title">
-            <div className="m-bl-mt-word">批量导入</div>
-            <Button type="primary"
-                    size="small"
-                    onClick={
-                      async () => {
-                        let result = await excelx.openFile(project, () => {
-                          setBatchLoadResults(null)
-                          setLoading(true)
-                        })
-                        setLoading(false)
-                        setBatchLoadResults(result)
-                      }
-                    }>
-              <span style={{fontSize: "small"}}>打开文件</span>
-
-            </Button>
+            <div className="m-bl-mt-word">云端数据</div>
             {
               batchLoadResults &&
               <Button type="primary"
                       size="small"
                       onClick={
-                        () => batchLoadResults.filter(res => res.success).forEach((res, index) => {
-                          render(res, index + 1)
-                        })
+                        async () => {
+                          let results = batchLoadResults.filter(res => res.success)
+                          for(let i in results){
+                            await render(results[i], parseInt(i) + 1)
+                            await InputDataStore.setRendered(results[i].id)
+                          }
+                          await init()
+                        }
                       }
               >
                 <span style={{fontSize: "small"}}>下载全部</span>
@@ -100,7 +99,6 @@ const BatchLoadFromExcel = (props) => {
               <LoadingOutlined/>
               <div style={{fontSize: 20}}>正在解析文件，请稍等</div>
             </div>
-
           }
           {batchLoadResults &&
             batchLoadResults.map(
@@ -155,7 +153,7 @@ const BatchLoadFromExcel = (props) => {
           <canvas
             width={EditorWidth * 0.8}
             height={EditorHeight * 0.8}
-            id='m-bl-preview' style={{border: '1px solid black'}}>
+            id='m-cd-preview' style={{border: '1px solid black'}}>
             请更换浏览器！推荐使用Google Chrome
           </canvas>
           <Button className='u-pf-btn'
@@ -170,5 +168,3 @@ const BatchLoadFromExcel = (props) => {
     </>
   )
 }
-
-export default BatchLoadFromExcel

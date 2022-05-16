@@ -1,0 +1,30 @@
+.m-cd-modal-title{
+    display: flex;
+    width: 300px;
+    justify-content: space-around;
+}
+
+.m-cd-mt-word{
+    font-size: large;
+    margin-right: 30px;
+}
+
+.m-cd-line{
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 20px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.m-cd-line-icon{
+    font-size: 20px;
+}
+
+.m-cd-line-btns {
+    width: 220px;
+    display: flex;
+    justify-content: space-between;
+}
+

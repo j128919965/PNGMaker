@@ -13,6 +13,7 @@ const ImageLoader = {
     img.setAttribute('crossOrigin', 'anonymous')
     img.src = url
     return new Promise((res,rej)=>{
+      setTimeout(()=>rej("加载图片超时，请检查") , 10000)
       img.onload = ()=>{
         cache[url] = img
         res(img)

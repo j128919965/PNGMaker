@@ -62,10 +62,10 @@ const onGetWorkBook = async (workbook, project) => {
         let point = project.points[i]
         if (project.points[i].type === 1) {
           let cell = row.getCell(i + 1)
-          if (cell.type === Exceljs.ValueType.String) {
-            data.push(new InputData(point.id, cell.value))
+          if (cell.value?.length < 1) {
+            throw new Error(`第${rowNumber}行 第${i + 1}列 输入为空！！`)
           } else {
-            throw new Error(`第${rowNumber}行 第${i + 1}列 输入类型不是字符串，或输入为空！！`)
+            data.push(new InputData(point.id, cell.value))
           }
         } else {
           if (imageMap[rowNumber][i + 1]) {
