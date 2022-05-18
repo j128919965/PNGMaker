@@ -170,6 +170,14 @@ const App = () => {
                accept="image/gif,image/jpeg,image/jpg,image/png"/>
         <div className="g-page">
           <Menu mode="horizontal" items={items}/>
+          <div className="m-head-btn" onClick={
+            async ()=>{
+              setProjectList(await ProjectStore.getAll())
+              setOpenProjectVisible(true)
+            }
+          }>
+            点击选择项目
+          </div>
           {
             project &&
             <div className="m-menu-proj-name">

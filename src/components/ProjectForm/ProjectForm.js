@@ -199,7 +199,7 @@ export default class ProjectForm extends React.Component {
                   {this.formList()}
                 </div>
                 <div>
-                  <Button type="primary" className="u-pf-btn"
+                  <Button type="primary" className="u-pf-btn" id="u-pf-btn-preview"
                           onClick={() => {
                             this.setState({isModalVisible: true}, async () => {
                               let pfImageRenderer = new ImageRenderer()
@@ -212,7 +212,7 @@ export default class ProjectForm extends React.Component {
                   >
                     预 览
                   </Button>
-                  <Button type="primary" className="u-pf-btn"
+                  <Button type="primary" className="u-pf-btn" id="u-pf-btn-download"
                           onClick={()=>{this.downloadPNG(project)}}
                   >
                     导 出

@@ -30,6 +30,26 @@ body {
     color: #aaa;
 }
 
+.m-app-pl-line {
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 20px;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+}
+
+.m-app-pl-line-name {
+    font-size: 18px;
+}
+
+.m-app-pl-line-btns {
+    width: 110px;
+    display: flex;
+    justify-content: space-between;
+}
+
 @media screen and (min-width: 1200px) {
 
     .g-page {
@@ -66,26 +86,6 @@ body {
 
     .m-main-right {
         width: 33%;
-    }
-
-    .m-app-pl-line {
-        display: flex;
-        box-sizing: border-box;
-        width: 100%;
-        padding: 20px;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #ccc;
-    }
-
-    .m-app-pl-line-name {
-        font-size: 18px;
-    }
-
-    .m-app-pl-line-btns {
-        width: 110px;
-        display: flex;
-        justify-content: space-between;
     }
 
 }

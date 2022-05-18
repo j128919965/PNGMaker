@@ -69,10 +69,6 @@
     color: #1890FF;
 }
 
-.u-pf-editor-upload:hover{
-
-}
-
 .m-pf-preview-container{
     width: 100%;
     display: flex;
@@ -97,4 +93,43 @@
     flex-direction: column;
     font-size: 24px;
     color: #aaa;
+}
+
+@media screen and (max-width: 1200px){
+    .m-pf-editor{
+
+    }
+
+    .m-pf-editor>div {
+        border: 1px solid #ddd;
+        min-height: 150px;
+        height: auto;
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .m-pf-editor>div>div{
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+    }
+
+    .m-pf-editor-list{
+        width: 280px;
+    }
+
+    #u-pf-btn-preview, #u-pf-btn-download{
+        display: none;
+    }
+
+    .m-pf-editor-text>div>label>Input{
+        margin: 0;
+    }
+
+    .u-pf-btn{
+        margin: 15px 0 15px;
+    }
 }

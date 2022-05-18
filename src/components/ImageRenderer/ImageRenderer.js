@@ -74,7 +74,7 @@ export default class ImageRenderer {
           return datum.data
         }
       }
-      throw new Error(`ID为${id}的输入项为空！`)
+      console.error(`ID为${id}的输入项为空！`)
     }
 
     // 先检查数据是否和本项目对应
