@@ -113,6 +113,20 @@ body {
         color: rgba(0, 0, 0, 0.5);
     }
 
+    .m-head-btn:after{
+        border-color: #555;
+        border-style: solid;
+        border-width: 0 0.1rem 0.1rem 0;
+        content: "";
+        display: flex;
+        height: 0.6rem;
+        margin-left: 0.5rem;
+        margin-right: 0.225rem;
+        transform: rotate(45deg);
+        transform-origin: 75% 75%;
+        width: 0.6rem;
+    }
+
     .g-page > ul {
         display: none;
     }
@@ -133,5 +147,8 @@ body {
         width: 100%;
     }
 
+    .m-hide-in-mobile{
+        display: none;
+    }
 }
 

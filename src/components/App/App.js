@@ -43,6 +43,9 @@ const App = () => {
       setProject(proj)
       !ignorePe && pe.current.resetProj(proj)
       pf.current.updateProject(proj)
+      const headBtn = document.getElementById('headBtn');
+      console.log(1)
+      headBtn.innerHTML = proj.name
     }
 
     const openProjectById = async (id)=>{
@@ -170,7 +173,7 @@ const App = () => {
                accept="image/gif,image/jpeg,image/jpg,image/png"/>
         <div className="g-page">
           <Menu mode="horizontal" items={items}/>
-          <div className="m-head-btn" onClick={
+          <div className="m-head-btn" id='headBtn' onClick={
             async ()=>{
               setProjectList(await ProjectStore.getAll())
               setOpenProjectVisible(true)
@@ -224,7 +227,7 @@ const App = () => {
                   <Button size="small" onClick={()=>openProjectById(p.id)}>
                     打开
                   </Button>
-                  <Button size="small" onClick={()=>{
+                  <Button size="small" className="m-hide-in-mobile" onClick={()=>{
                     Modal.confirm({
                       title: `删除项目`,
                       content: `确认删除 ${p.name} 吗`,
@@ -239,7 +242,6 @@ const App = () => {
                         }else {
                           message.error("删除失败")
                         }
-
                       }
                     })
                   }}>
