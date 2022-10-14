@@ -50,6 +50,15 @@ body {
     justify-content: space-between;
 }
 
+/* 我是实在懒得起名了，这样起名不好的 */
+.m-app-menu-login-btn {
+    position: absolute;
+    right: 20px;
+    top: 8px;
+    width: 60px;
+    height: 30px;
+}
+
 @media screen and (min-width: 1200px) {
 
     .g-page {
@@ -113,7 +122,7 @@ body {
         color: rgba(0, 0, 0, 0.5);
     }
 
-    .m-head-btn:after{
+    .m-head-btn:after {
         border-color: #555;
         border-style: solid;
         border-width: 0 0.1rem 0.1rem 0;
@@ -147,7 +156,11 @@ body {
         width: 100%;
     }
 
-    .m-hide-in-mobile{
+    .m-hide-in-mobile {
+        display: none;
+    }
+
+    .m-app-menu-login-btn {
         display: none;
     }
 }

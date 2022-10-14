@@ -1,5 +1,5 @@
-// const Server = 'http://localhost:8080'
-const Server = 'http://101.35.11.84:9898'
+const Server = 'http://localhost:8080/agapi'
+// const Server = 'http://101.35.11.84:9898'
 
 const urls = {
   projects: {
@@ -12,12 +12,12 @@ const urls = {
   files: {
     upload: Server + '/file'
   },
-  input :{
-    create : Server + '/input/new',
+  input: {
+    create: Server + '/input/new',
     getAllByProject: Server + '/input/by-proj',
-    getNotRenderedByProject : Server + '/input/by-proj/no-rendered',
-    del : Server + '/input/delete',
-    setRendered : Server + '/input/set-rendered'
+    getNotRenderedByProject: Server + '/input/by-proj/no-rendered',
+    del: Server + '/input/delete',
+    setRendered: Server + '/input/set-rendered'
   }
 }
 

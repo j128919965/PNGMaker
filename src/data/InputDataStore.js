@@ -1,6 +1,7 @@
 import {InputDataLoadResult} from "./InputData";
-import {get, post} from "../utils/httpx";
 import urls from "./urls";
+import {message} from "antd";
+import httpx2 from "../utils/httpx2";
 
 const InputDataStore = {
   /**
@@ -8,22 +9,31 @@ const InputDataStore = {
    * @return {Promise<InputDataLoadResult[]>}
    */
   async getNotRenderedByProject(projectId) {
-    let resps = await get(urls.input.getNotRenderedByProject, {projectId})
+    let resp = await httpx2.get(urls.input.getNotRenderedByProject, {projectId})
+    if (!resp.s) {
+      message.error(resp.m)
+      return []
+    }
+    let resps = resp.d
     resps.forEach(resp => resp.data = JSON.parse(resp.data))
     resps = resps.map(resp => InputDataLoadResult.fromObj(resp))
     return resps
   },
 
   async getAllByProject(projectId) {
-    let resps = await get(urls.input.getAllByProject , {projectId})
+    let resp = await httpx2.get(urls.input.getAllByProject, {projectId})
+    if (!resp.s) {
+      message.error(resp.m)
+      return []
+    }
+    let resps = resp.d
     resps.forEach(resp => resp.data = JSON.parse(resp.data))
     resps = resps.map(resp => InputDataLoadResult.fromObj(resp))
     return resps
   },
 
-  async setRendered(id){
-    let resp = await post(urls.input.setRendered+`?id=${id}`)
-    return resp
+  async setRendered(id) {
+    return httpx2.post(urls.input.setRendered + `?id=${id}`)
   },
   /**
    * 上传数据到服务端
@@ -34,10 +44,10 @@ const InputDataStore = {
     let obj = {...result}
     obj.success = undefined
     obj.data = JSON.stringify(obj.data)
-    return post(urls.input.create, obj)
+    return httpx2.post(urls.input.create, obj)
   },
-  async remove(id){
-    let resp = await post(urls.input.del+`?id=${id}`)
+  async remove(id) {
+    let resp = await httpx2.post(urls.input.del + `?id=${id}`)
     return resp
   }
 }

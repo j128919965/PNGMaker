@@ -19,13 +19,15 @@ const App = () => {
      */
     const [project, setProject] = useState(null)
 
-  const [batchModalVisible , setBatchModalVisible] = useState(false)
+    const [batchModalVisible, setBatchModalVisible] = useState(false)
 
-  const [cloudDataVisible , setCloudDataVisible] = useState(false)
+    const [cloudDataVisible, setCloudDataVisible] = useState(false)
 
-    const [openProjectVisible,setOpenProjectVisible] = useState(false)
+    const [openProjectVisible, setOpenProjectVisible] = useState(false)
 
-    const [projectList , setProjectList] = useState([])
+    const [projectList, setProjectList] = useState([])
+
+    const [isLogin, setIsLogin] = useState(false)
 
     /**
      * 项目编辑器
@@ -44,11 +46,10 @@ const App = () => {
       !ignorePe && pe.current.resetProj(proj)
       pf.current.updateProject(proj)
       const headBtn = document.getElementById('headBtn');
-      console.log(1)
       headBtn.innerHTML = proj.name
     }
 
-    const openProjectById = async (id)=>{
+    const openProjectById = async (id) => {
       message.info("正在加载项目，请稍候")
       let proj = await ProjectStore.getById(id)
       updateProject(proj)
@@ -64,15 +65,18 @@ const App = () => {
           {
             key: "proj-create",
             label: '新建项目',
+            disabled: !isLogin,
             onClick: async () => {
               let proj = await ProjectStore.createNewProject()
-              updateProject(proj)
+              if (proj != null) {
+                updateProject(proj)
+              }
             }
           },
           {
             key: "proj-open",
             label: '打开项目',
-            onClick : async ()=>{
+            onClick: async () => {
               setProjectList(await ProjectStore.getAll())
               setOpenProjectVisible(true)
             }
@@ -80,13 +84,13 @@ const App = () => {
           {
             key: "proj-save",
             label: '保存项目',
-            disabled: !project,
+            disabled: !project || !isLogin,
             onClick: async () => {
               let resp = await ProjectStore.save(project)
               console.log(resp)
-              if (resp){
+              if (resp.s) {
                 message.success("保存成功")
-              }else {
+              } else {
                 message.warn("保存失败，项目可能已被删除")
               }
 
@@ -95,7 +99,7 @@ const App = () => {
           {
             key: "proj-remove",
             label: '删除项目',
-            disabled: !project,
+            disabled: !project || !isLogin,
             onClick: async () => {
               Modal.confirm({
                 title: `删除项目`,
@@ -105,10 +109,10 @@ const App = () => {
                 cancelText: '取消',
                 onOk: async () => {
                   let resp = await ProjectStore.delete(project.id)
-                  if(resp){
+                  if (resp) {
                     message.success("删除成功")
                     setProject(null)
-                  }else {
+                  } else {
                     message.error("删除失败")
                   }
                 }
@@ -131,7 +135,7 @@ const App = () => {
                 key: "tool-bg-open",
                 label: "上传背景",
                 onClick: async () => {
-                  project.background = await files.readFile(()=>{
+                  project.background = await files.readFile(() => {
                     message.info("图片正在加载中，请稍候")
                   });
                   updateProject(project)
@@ -140,7 +144,7 @@ const App = () => {
               {
                 key: "tool-bg-rem",
                 label: "移除背景",
-                onClick:()=>{
+                onClick: () => {
                   project.background = null
                   updateProject(project)
                 }
@@ -150,14 +154,14 @@ const App = () => {
           {
             key: "tool-excel",
             label: '批量生成',
-            onClick:()=>{
+            onClick: () => {
               setBatchModalVisible(true)
             }
           },
           {
             key: "tool-cloud",
             label: '云端数据',
-            onClick: async ()=>{
+            onClick: async () => {
               setCloudDataVisible(true)
             }
           }
@@ -172,9 +176,20 @@ const App = () => {
         <input type="file" id="upload-block-real-input" style={{display: 'none'}}
                accept="image/gif,image/jpeg,image/jpg,image/png"/>
         <div className="g-page">
-          <Menu mode="horizontal" items={items}/>
+          <div style={{position: "relative"}}>
+            <Menu mode="horizontal" items={items}/>
+            {
+              isLogin ?
+                <Button className="m-app-menu-login-btn" onClick={() => setIsLogin(false)}>
+                  退出
+                </Button> :
+                <Button className="m-app-menu-login-btn" onClick={() => setIsLogin(true)}>
+                  登录
+                </Button>
+            }
+          </div>
           <div className="m-head-btn" id='headBtn' onClick={
-            async ()=>{
+            async () => {
               setProjectList(await ProjectStore.getAll())
               setOpenProjectVisible(true)
             }
@@ -208,50 +223,60 @@ const App = () => {
           </div>
         </div>
 
-        {batchModalVisible && <BatchLoadFromExcel project={project} close={()=>setBatchModalVisible(false)}/>}
+        {batchModalVisible && <BatchLoadFromExcel project={project} close={() => setBatchModalVisible(false)}/>}
 
-        {cloudDataVisible && <CloudData project={project} close={()=>setCloudDataVisible(false)} />}
+        {cloudDataVisible && <CloudData project={project} close={() => setCloudDataVisible(false)}/>}
 
         <Modal title="打开项目"
                visible={openProjectVisible}
-               onCancel={()=>setOpenProjectVisible(false)}
+               onCancel={() => setOpenProjectVisible(false)}
                footer={null}
         >
           {
-            projectList.map(p=>
+            projectList.map(p =>
               <div className="m-app-pl-line" key={p.id}>
                 <div className="m-app-pl-line-name">
                   {p.name}
                 </div>
                 <div className="m-app-pl-line-btns">
-                  <Button size="small" onClick={()=>openProjectById(p.id)}>
+                  <Button size="small" onClick={() => openProjectById(p.id)}>
                     打开
                   </Button>
-                  <Button size="small" className="m-hide-in-mobile" onClick={()=>{
-                    Modal.confirm({
-                      title: `删除项目`,
-                      content: `确认删除 ${p.name} 吗`,
-                      icon: <ExclamationCircleOutlined/>,
-                      okText: '确认',
-                      cancelText: '取消',
-                      onOk: async () => {
-                        let resp = await ProjectStore.delete(p.id)
-                        if (resp){
-                          message.success("删除c成功")
-                          setProjectList(await ProjectStore.getAll())
-                        }else {
-                          message.error("删除失败")
-                        }
-                      }
-                    })
-                  }}>
-                    删除
-                  </Button>
+                  {
+                    isLogin &&
+                    <Button size="small" className="m-hide-in-mobile"
+                            onClick={() => {
+                              if (!isLogin) {
+                                message.error("请先登录！")
+                                return
+                              }
+                              Modal.confirm({
+                                title: `删除项目`,
+                                content: `确认删除 ${p.name} 吗`,
+                                icon: <ExclamationCircleOutlined/>,
+                                okText: '确认',
+                                cancelText: '取消',
+                                onOk: async () => {
+                                  let resp = await ProjectStore.delete(p.id)
+                                  if (resp) {
+                                    message.success("删除c成功")
+                                    setProjectList(await ProjectStore.getAll())
+                                  } else {
+                                    message.error("删除失败")
+                                  }
+                                }
+                              })
+                            }}>
+                      删除
+                    </Button>
+                  }
                 </div>
               </div>
             )
           }
         </Modal>
+
+
       </div>
 
     );
