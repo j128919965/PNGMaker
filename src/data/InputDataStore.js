@@ -38,7 +38,7 @@ const InputDataStore = {
   /**
    * 上传数据到服务端
    * @param result {InputDataLoadResult}
-   * @return {Promise<InputDataLoadResult>}
+   * @return {Promise<WebResponse>}
    */
   async save(result) {
     let obj = {...result}

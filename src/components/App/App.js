@@ -1,7 +1,8 @@
 import EdiText from "react-editext";
-import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined} from "@ant-design/icons";
-import {Button, Menu, message, Modal} from "antd";
-import {useRef, useState} from "react";
+import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined, UserOutlined} from "@ant-design/icons";
+import {Button, Menu, message, Modal, Popover, Select} from "antd";
+
+import {useEffect, useRef, useState} from "react";
 
 import ProjectEditor from "../ProjectEditor/ProjectEditor";
 import ProjectForm from "../ProjectForm/ProjectForm";
@@ -11,6 +12,12 @@ import files from "../../utils/files"
 import './App.css';
 import BatchLoadFromExcel from "../BatchLoadFromExcel/BatchLoadFromExcel";
 import {CloudData} from "../CloudData/CloudData";
+import {Login} from "../Login/Login";
+import {ProjectMetadata} from "../../data/ProjectMetadata";
+import {RoleManage} from "../RoleManage/RoleManage";
+
+
+const {Option} = Select
 
 const App = () => {
 
@@ -25,9 +32,15 @@ const App = () => {
 
     const [openProjectVisible, setOpenProjectVisible] = useState(false)
 
+    const [roleManageVisible, setRoleManageVisible] = useState(false)
+
+    const [loginModalVisible, setLoginModalVisible] = useState(false)
+
     const [projectList, setProjectList] = useState([])
 
     const [isLogin, setIsLogin] = useState(false)
+
+    const [role, setRole] = useState(0)
 
     /**
      * 项目编辑器
@@ -56,6 +69,13 @@ const App = () => {
       setOpenProjectVisible(false)
     }
 
+    const successLogin = role => {
+      message.success("登录成功")
+      setIsLogin(true)
+      setLoginModalVisible(false)
+      setRole(role)
+    }
+
     const items = [
       {
         key: "proj",
@@ -65,7 +85,7 @@ const App = () => {
           {
             key: "proj-create",
             label: '新建项目',
-            disabled: !isLogin,
+            disabled: role < 1,
             onClick: async () => {
               let proj = await ProjectStore.createNewProject()
               if (proj != null) {
@@ -84,22 +104,20 @@ const App = () => {
           {
             key: "proj-save",
             label: '保存项目',
-            disabled: !project || !isLogin,
+            disabled: !project || role < 1,
             onClick: async () => {
               let resp = await ProjectStore.save(project)
-              console.log(resp)
               if (resp.s) {
                 message.success("保存成功")
               } else {
                 message.warn("保存失败，项目可能已被删除")
               }
-
             }
           },
           {
             key: "proj-remove",
             label: '删除项目',
-            disabled: !project || !isLogin,
+            disabled: !project || role < 2,
             onClick: async () => {
               Modal.confirm({
                 title: `删除项目`,
@@ -130,6 +148,7 @@ const App = () => {
           {
             key: "tool-bg",
             label: '背景图片',
+            disabled: role < 1,
             children: [
               {
                 key: "tool-bg-open",
@@ -154,6 +173,7 @@ const App = () => {
           {
             key: "tool-excel",
             label: '批量生成',
+            disabled: role < 1,
             onClick: () => {
               setBatchModalVisible(true)
             }
@@ -161,13 +181,42 @@ const App = () => {
           {
             key: "tool-cloud",
             label: '云端数据',
+            disabled: role < 1,
             onClick: async () => {
               setCloudDataVisible(true)
             }
           }
         ],
       },
+      {
+        key: "account",
+        label: '账  户',
+        icon: <UserOutlined/>,
+        disabled: !isLogin,
+        children: [
+          {
+            key: 'account-role',
+            label: '权限管理',
+            onClick: () => {
+              setRoleManageVisible(true)
+            }
+          }
+        ]
+      }
     ];
+
+
+    useEffect(() => {
+      if (localStorage.getItem("accessToken")) {
+        setIsLogin(true)
+        console.log("setup - isLogin")
+      }
+      let r = localStorage.getItem("role")
+      if (r) {
+        setRole(parseInt(r))
+        console.log("setup - set role", r)
+      }
+    }, [setIsLogin, setRole])
 
 
     return (
@@ -180,10 +229,19 @@ const App = () => {
             <Menu mode="horizontal" items={items}/>
             {
               isLogin ?
-                <Button className="m-app-menu-login-btn" onClick={() => setIsLogin(false)}>
-                  退出
-                </Button> :
-                <Button className="m-app-menu-login-btn" onClick={() => setIsLogin(true)}>
+                <div className="m-app-menu-login-btn">
+                  <span>{localStorage.getItem("username")} &nbsp;</span>
+                  <Button onClick={() => {
+                    localStorage.removeItem("username")
+                    localStorage.removeItem("accessToken")
+                    localStorage.removeItem("role")
+                    setIsLogin(false)
+                    setRole(0)
+                  }}>
+                    退出
+                  </Button>
+                </div> :
+                <Button className="m-app-menu-login-btn" onClick={() => setLoginModalVisible(true)}>
                   登录
                 </Button>
             }
@@ -206,6 +264,7 @@ const App = () => {
                        editButtonClassName="m-menu-proj-name-btn"
                        editButtonContent={<EditOutlined/>}
                        value={project.name}
+                       canEdit={role >= 1}
                        onSave={v => {
                          project.name = v;
                          setProject(project)
@@ -218,7 +277,7 @@ const App = () => {
               <ProjectEditor ref={pe} onProjectUpdate={(proj) => updateProject(proj, true)}/>
             </div>
             <div className="m-main-right">
-              <ProjectForm ref={pf} project={project}/>
+              <ProjectForm ref={pf} project={project} role={role}/>
             </div>
           </div>
         </div>
@@ -227,13 +286,19 @@ const App = () => {
 
         {cloudDataVisible && <CloudData project={project} close={() => setCloudDataVisible(false)}/>}
 
+        {loginModalVisible && <Login onLogin={successLogin} close={() => setLoginModalVisible(false)}/>}
+
+        {roleManageVisible && <RoleManage close={() => setRoleManageVisible(false)} role={role}/>}
+
         <Modal title="打开项目"
                visible={openProjectVisible}
                onCancel={() => setOpenProjectVisible(false)}
                footer={null}
+               width={600}
         >
           {
             projectList.map(p =>
+              p.role <= role &&
               <div className="m-app-pl-line" key={p.id}>
                 <div className="m-app-pl-line-name">
                   {p.name}
@@ -243,7 +308,7 @@ const App = () => {
                     打开
                   </Button>
                   {
-                    isLogin &&
+                    role >= 1 &&
                     <Button size="small" className="m-hide-in-mobile"
                             onClick={() => {
                               if (!isLogin) {
@@ -270,12 +335,39 @@ const App = () => {
                       删除
                     </Button>
                   }
+                  {
+                    role >= 2 &&
+                    <Popover placement="top" content={<>
+                      <Select defaultValue={p.role} style={{width: 150}}
+                              onChange={async r => {
+                                let projectMetadata = ProjectMetadata.fromObj(JSON.parse(p.content));
+                                projectMetadata.role = r;
+                                let resp = await ProjectStore.save(projectMetadata)
+                                if (!resp.s) {
+                                  message.error(resp.m)
+                                  return
+                                }
+                                message.success("修改项目可见性成功")
+                                p.role = r
+                              }}>
+                        <Option value={0}>所有人可见</Option>
+                        <Option value={1}>教师可见</Option>
+                        <Option value={2}>管理员可见</Option>
+                        {
+                          role >= 3 && <Option value={3}>测试内部可见</Option>
+                        }
+                      </Select>
+                    </>}>
+                      <Button size="small" className="m-hide-in-mobile">
+                        可见性
+                      </Button>
+                    </Popover>
+                  }
                 </div>
               </div>
             )
           }
         </Modal>
-
 
       </div>
 

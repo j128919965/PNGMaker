@@ -31,7 +31,7 @@ const ProjectStore = {
     /**
      * 保存
      * @param proj {ProjectMetadata}
-     * @return {Promise<Boolean>}
+     * @return {Promise<WebResponse>}
      */
     async save(proj) {
         return httpx2.post(urls.projects.save, proj.toBackendObj())

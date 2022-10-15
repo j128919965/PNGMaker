@@ -1,5 +1,5 @@
-const Server = 'http://localhost:8080/agapi'
-// const Server = 'http://101.35.11.84:9898'
+// const Server = 'http://localhost:8080/agapi'
+const Server = 'http://101.35.11.84:9898/agapi'
 
 const urls = {
   projects: {
@@ -18,6 +18,16 @@ const urls = {
     getNotRenderedByProject: Server + '/input/by-proj/no-rendered',
     del: Server + '/input/delete',
     setRendered: Server + '/input/set-rendered'
+  },
+  users: {
+    login: Server + '/user/login',
+    register: Server + '/user/register',
+    role : Server + '/user/role'
+  },
+  roleAsks :{
+    create : Server + '/roleask/new',
+    handle : Server + '/roleask/handle',
+    getAllNotHandled : Server + '/roleask/not-handled',
   }
 }
 
