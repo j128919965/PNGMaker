@@ -21,7 +21,7 @@ const InputDataStore = {
   },
 
   async getAllByProject(projectId) {
-    let resp = await httpx2.get(urls.input.getAllByProject, {projectId})
+    let resp = await httpx2.get(urls.input.getAllByProject + `?projectId=${projectId}`)
     if (!resp.s) {
       message.error(resp.m)
       return []
