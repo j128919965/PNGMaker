@@ -25,6 +25,8 @@ export class ProjectMetadata {
 
   latestPointId
 
+  role
+
   static default(id) {
     return ProjectMetadata.fromObj({id})
   }
@@ -37,6 +39,7 @@ export class ProjectMetadata {
     proj.points = []
     obj.points?.forEach(p => proj.points.push(RedPoint.fromObj(p)))
     proj.latestPointId = obj?.latestPointId ?? 0
+    proj.role = obj?.role ?? 0
     return proj
   }
 
@@ -49,7 +52,7 @@ export class ProjectMetadata {
 
   toBackendObj(){
     let content = JSON.stringify(this)
-    return {id:this.id , name:this.name , content}
+    return {id:this.id , name:this.name , content,role : this.role}
   }
 }
 

@@ -4,7 +4,6 @@ import {CheckOutlined, ExclamationOutlined, LoadingOutlined} from "@ant-design/i
 
 import excelx from "../../utils/excel/excelx";
 
-import "./index.css"
 import {EditorHeight, EditorWidth} from "../../data/constants";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 

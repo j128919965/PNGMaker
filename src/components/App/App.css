@@ -45,9 +45,21 @@ body {
 }
 
 .m-app-pl-line-btns {
-    width: 110px;
+    width: 180px;
     display: flex;
     justify-content: space-between;
+}
+
+/* 我是实在懒得起名了，这样起名不好的 */
+.m-app-menu-login-btn {
+    position: absolute;
+    right: 20px;
+    top: 7px;
+    /*width: 60px;*/
+}
+
+.margin-top {
+    margin-top: 20px;
 }
 
 @media screen and (min-width: 1200px) {
@@ -65,7 +77,7 @@ body {
         height: 40px;
         position: absolute;
         top: 3px;
-        left: 250px;
+        left: 330px;
         z-index: 999;
         display: flex;
         align-items: center;
@@ -90,6 +102,56 @@ body {
 
 }
 
+.m-bl-modal-title{
+    display: flex;
+    width: 300px;
+    justify-content: space-around;
+}
+
+.m-bl-mt-word{
+    font-size: large;
+    margin-right: 30px;
+}
+
+.m-bl-line{
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 20px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.m-bl-line-icon{
+    font-size: 20px;
+}
+
+.m-bl-line-btns {
+    width: 220px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.percent50 {
+    width: 50%;
+}
+
+
+.percent40 {
+    width: 40%;
+}
+
+.percent25 {
+    width: 25%;
+}
+
+.percent15 {
+    width: 15%;
+}
+
+
+
+
 @media screen and (max-width: 1200px) {
 
     .g-page {
@@ -113,7 +175,7 @@ body {
         color: rgba(0, 0, 0, 0.5);
     }
 
-    .m-head-btn:after{
+    .m-head-btn:after {
         border-color: #555;
         border-style: solid;
         border-width: 0 0.1rem 0.1rem 0;
@@ -147,7 +209,11 @@ body {
         width: 100%;
     }
 
-    .m-hide-in-mobile{
+    .m-hide-in-mobile {
+        display: none;
+    }
+
+    .m-app-menu-login-btn {
         display: none;
     }
 }

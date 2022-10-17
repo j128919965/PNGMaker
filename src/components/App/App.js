@@ -1,7 +1,8 @@
 import EdiText from "react-editext";
-import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined} from "@ant-design/icons";
-import {Button, Menu, message, Modal} from "antd";
-import {useRef, useState} from "react";
+import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined, UserOutlined} from "@ant-design/icons";
+import {Button, Menu, message, Modal, Popover, Select} from "antd";
+
+import {useEffect, useRef, useState} from "react";
 
 import ProjectEditor from "../ProjectEditor/ProjectEditor";
 import ProjectForm from "../ProjectForm/ProjectForm";
@@ -11,6 +12,12 @@ import files from "../../utils/files"
 import './App.css';
 import BatchLoadFromExcel from "../BatchLoadFromExcel/BatchLoadFromExcel";
 import {CloudData} from "../CloudData/CloudData";
+import {Login} from "../Login/Login";
+import {ProjectMetadata} from "../../data/ProjectMetadata";
+import {RoleManage} from "../RoleManage/RoleManage";
+
+
+const {Option} = Select
 
 const App = () => {
 
@@ -19,13 +26,21 @@ const App = () => {
      */
     const [project, setProject] = useState(null)
 
-  const [batchModalVisible , setBatchModalVisible] = useState(false)
+    const [batchModalVisible, setBatchModalVisible] = useState(false)
 
-  const [cloudDataVisible , setCloudDataVisible] = useState(false)
+    const [cloudDataVisible, setCloudDataVisible] = useState(false)
 
-    const [openProjectVisible,setOpenProjectVisible] = useState(false)
+    const [openProjectVisible, setOpenProjectVisible] = useState(false)
 
-    const [projectList , setProjectList] = useState([])
+    const [roleManageVisible, setRoleManageVisible] = useState(false)
+
+    const [loginModalVisible, setLoginModalVisible] = useState(false)
+
+    const [projectList, setProjectList] = useState([])
+
+    const [isLogin, setIsLogin] = useState(false)
+
+    const [role, setRole] = useState(0)
 
     /**
      * 项目编辑器
@@ -44,15 +59,21 @@ const App = () => {
       !ignorePe && pe.current.resetProj(proj)
       pf.current.updateProject(proj)
       const headBtn = document.getElementById('headBtn');
-      console.log(1)
       headBtn.innerHTML = proj.name
     }
 
-    const openProjectById = async (id)=>{
+    const openProjectById = async (id) => {
       message.info("正在加载项目，请稍候")
       let proj = await ProjectStore.getById(id)
       updateProject(proj)
       setOpenProjectVisible(false)
+    }
+
+    const successLogin = role => {
+      message.success("登录成功")
+      setIsLogin(true)
+      setLoginModalVisible(false)
+      setRole(role)
     }
 
     const items = [
@@ -64,15 +85,18 @@ const App = () => {
           {
             key: "proj-create",
             label: '新建项目',
+            disabled: role < 1,
             onClick: async () => {
               let proj = await ProjectStore.createNewProject()
-              updateProject(proj)
+              if (proj != null) {
+                updateProject(proj)
+              }
             }
           },
           {
             key: "proj-open",
             label: '打开项目',
-            onClick : async ()=>{
+            onClick: async () => {
               setProjectList(await ProjectStore.getAll())
               setOpenProjectVisible(true)
             }
@@ -80,22 +104,20 @@ const App = () => {
           {
             key: "proj-save",
             label: '保存项目',
-            disabled: !project,
+            disabled: !project || role < 1,
             onClick: async () => {
               let resp = await ProjectStore.save(project)
-              console.log(resp)
-              if (resp){
+              if (resp.s) {
                 message.success("保存成功")
-              }else {
+              } else {
                 message.warn("保存失败，项目可能已被删除")
               }
-
             }
           },
           {
             key: "proj-remove",
             label: '删除项目',
-            disabled: !project,
+            disabled: !project || role < 2,
             onClick: async () => {
               Modal.confirm({
                 title: `删除项目`,
@@ -105,10 +127,10 @@ const App = () => {
                 cancelText: '取消',
                 onOk: async () => {
                   let resp = await ProjectStore.delete(project.id)
-                  if(resp){
+                  if (resp) {
                     message.success("删除成功")
                     setProject(null)
-                  }else {
+                  } else {
                     message.error("删除失败")
                   }
                 }
@@ -126,12 +148,13 @@ const App = () => {
           {
             key: "tool-bg",
             label: '背景图片',
+            disabled: role < 1,
             children: [
               {
                 key: "tool-bg-open",
                 label: "上传背景",
                 onClick: async () => {
-                  project.background = await files.readFile(()=>{
+                  project.background = await files.readFile(() => {
                     message.info("图片正在加载中，请稍候")
                   });
                   updateProject(project)
@@ -140,7 +163,7 @@ const App = () => {
               {
                 key: "tool-bg-rem",
                 label: "移除背景",
-                onClick:()=>{
+                onClick: () => {
                   project.background = null
                   updateProject(project)
                 }
@@ -150,20 +173,50 @@ const App = () => {
           {
             key: "tool-excel",
             label: '批量生成',
-            onClick:()=>{
+            disabled: role < 1,
+            onClick: () => {
               setBatchModalVisible(true)
             }
           },
           {
             key: "tool-cloud",
             label: '云端数据',
-            onClick: async ()=>{
+            disabled: role < 1,
+            onClick: async () => {
               setCloudDataVisible(true)
             }
           }
         ],
       },
+      {
+        key: "account",
+        label: '账  户',
+        icon: <UserOutlined/>,
+        disabled: !isLogin,
+        children: [
+          {
+            key: 'account-role',
+            label: '权限管理',
+            onClick: () => {
+              setRoleManageVisible(true)
+            }
+          }
+        ]
+      }
     ];
+
+
+    useEffect(() => {
+      if (localStorage.getItem("accessToken")) {
+        setIsLogin(true)
+        console.log("setup - isLogin")
+      }
+      let r = localStorage.getItem("role")
+      if (r) {
+        setRole(parseInt(r))
+        console.log("setup - set role", r)
+      }
+    }, [setIsLogin, setRole])
 
 
     return (
@@ -172,9 +225,29 @@ const App = () => {
         <input type="file" id="upload-block-real-input" style={{display: 'none'}}
                accept="image/gif,image/jpeg,image/jpg,image/png"/>
         <div className="g-page">
-          <Menu mode="horizontal" items={items}/>
+          <div style={{position: "relative"}}>
+            <Menu mode="horizontal" items={items}/>
+            {
+              isLogin ?
+                <div className="m-app-menu-login-btn">
+                  <span>{localStorage.getItem("username")} &nbsp;</span>
+                  <Button onClick={() => {
+                    localStorage.removeItem("username")
+                    localStorage.removeItem("accessToken")
+                    localStorage.removeItem("role")
+                    setIsLogin(false)
+                    setRole(0)
+                  }}>
+                    退出
+                  </Button>
+                </div> :
+                <Button className="m-app-menu-login-btn" onClick={() => setLoginModalVisible(true)}>
+                  登录
+                </Button>
+            }
+          </div>
           <div className="m-head-btn" id='headBtn' onClick={
-            async ()=>{
+            async () => {
               setProjectList(await ProjectStore.getAll())
               setOpenProjectVisible(true)
             }
@@ -191,6 +264,7 @@ const App = () => {
                        editButtonClassName="m-menu-proj-name-btn"
                        editButtonContent={<EditOutlined/>}
                        value={project.name}
+                       canEdit={role >= 1}
                        onSave={v => {
                          project.name = v;
                          setProject(project)
@@ -203,55 +277,98 @@ const App = () => {
               <ProjectEditor ref={pe} onProjectUpdate={(proj) => updateProject(proj, true)}/>
             </div>
             <div className="m-main-right">
-              <ProjectForm ref={pf} project={project}/>
+              <ProjectForm ref={pf} project={project} role={role}/>
             </div>
           </div>
         </div>
 
-        {batchModalVisible && <BatchLoadFromExcel project={project} close={()=>setBatchModalVisible(false)}/>}
+        {batchModalVisible && <BatchLoadFromExcel project={project} close={() => setBatchModalVisible(false)}/>}
 
-        {cloudDataVisible && <CloudData project={project} close={()=>setCloudDataVisible(false)} />}
+        {cloudDataVisible && <CloudData project={project} close={() => setCloudDataVisible(false)}/>}
+
+        {loginModalVisible && <Login onLogin={successLogin} close={() => setLoginModalVisible(false)}/>}
+
+        {roleManageVisible && <RoleManage close={() => setRoleManageVisible(false)} role={role}/>}
 
         <Modal title="打开项目"
                visible={openProjectVisible}
-               onCancel={()=>setOpenProjectVisible(false)}
+               onCancel={() => setOpenProjectVisible(false)}
                footer={null}
+               width={600}
         >
           {
-            projectList.map(p=>
+            projectList.map(p =>
+              p.role <= role &&
               <div className="m-app-pl-line" key={p.id}>
                 <div className="m-app-pl-line-name">
                   {p.name}
                 </div>
                 <div className="m-app-pl-line-btns">
-                  <Button size="small" onClick={()=>openProjectById(p.id)}>
+                  <Button size="small" onClick={() => openProjectById(p.id)}>
                     打开
                   </Button>
-                  <Button size="small" className="m-hide-in-mobile" onClick={()=>{
-                    Modal.confirm({
-                      title: `删除项目`,
-                      content: `确认删除 ${p.name} 吗`,
-                      icon: <ExclamationCircleOutlined/>,
-                      okText: '确认',
-                      cancelText: '取消',
-                      onOk: async () => {
-                        let resp = await ProjectStore.delete(p.id)
-                        if (resp){
-                          message.success("删除c成功")
-                          setProjectList(await ProjectStore.getAll())
-                        }else {
-                          message.error("删除失败")
+                  {
+                    role >= 1 &&
+                    <Button size="small" className="m-hide-in-mobile"
+                            onClick={() => {
+                              if (!isLogin) {
+                                message.error("请先登录！")
+                                return
+                              }
+                              Modal.confirm({
+                                title: `删除项目`,
+                                content: `确认删除 ${p.name} 吗`,
+                                icon: <ExclamationCircleOutlined/>,
+                                okText: '确认',
+                                cancelText: '取消',
+                                onOk: async () => {
+                                  let resp = await ProjectStore.delete(p.id)
+                                  if (resp) {
+                                    message.success("删除c成功")
+                                    setProjectList(await ProjectStore.getAll())
+                                  } else {
+                                    message.error("删除失败")
+                                  }
+                                }
+                              })
+                            }}>
+                      删除
+                    </Button>
+                  }
+                  {
+                    role >= 2 &&
+                    <Popover placement="top" content={<>
+                      <Select defaultValue={p.role} style={{width: 150}}
+                              onChange={async r => {
+                                let projectMetadata = ProjectMetadata.fromObj(JSON.parse(p.content));
+                                projectMetadata.role = r;
+                                let resp = await ProjectStore.save(projectMetadata)
+                                if (!resp.s) {
+                                  message.error(resp.m)
+                                  return
+                                }
+                                message.success("修改项目可见性成功")
+                                p.role = r
+                              }}>
+                        <Option value={0}>所有人可见</Option>
+                        <Option value={1}>教师可见</Option>
+                        <Option value={2}>管理员可见</Option>
+                        {
+                          role >= 3 && <Option value={3}>测试内部可见</Option>
                         }
-                      }
-                    })
-                  }}>
-                    删除
-                  </Button>
+                      </Select>
+                    </>}>
+                      <Button size="small" className="m-hide-in-mobile">
+                        可见性
+                      </Button>
+                    </Popover>
+                  }
                 </div>
               </div>
             )
           }
         </Modal>
+
       </div>
 
     );

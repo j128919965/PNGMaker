@@ -61,7 +61,8 @@ export default class ProjectForm extends React.Component {
     this.state = {
       project: null,
       data: {},
-      isModalVisible: false
+      isModalVisible: false,
+      role: props.role
     }
   }
 
@@ -70,7 +71,6 @@ export default class ProjectForm extends React.Component {
    * @param project {ProjectMetadata}
    */
   updateProject(project) {
-
     const prev = this.state.project
     // 新项目
     if (prev === null || prev.id !== project.id) {
@@ -156,12 +156,16 @@ export default class ProjectForm extends React.Component {
   downloadPNG = async (project) => {
     let pfImageRenderer = new ImageRenderer()
     pfImageRenderer.load(project)
-    await  pfImageRenderer.download(InputDataLoadResult.fromMap(this.state.data, project.id), null)
+    await pfImageRenderer.download(InputDataLoadResult.fromMap(this.state.data, project.id), null)
   }
 
-  saveInputDataResult =async ()=>{
+  saveInputDataResult = async () => {
     let data = InputDataLoadResult.fromMap(this.state.data, this.state.project.id)
     let resp = await InputDataStore.save(data)
+    if (!resp.s) {
+      message.error(resp.m)
+      return
+    }
     message.success(`保存成功，请在电脑端 "云端数据" 查看`)
   }
 
@@ -199,26 +203,34 @@ export default class ProjectForm extends React.Component {
                   {this.formList()}
                 </div>
                 <div>
-                  <Button type="primary" className="u-pf-btn" id="u-pf-btn-preview"
-                          onClick={() => {
-                            this.setState({isModalVisible: true}, async () => {
-                              let pfImageRenderer = new ImageRenderer()
-                              pfImageRenderer.load(project)
-                              let pfReviewCanvas = document.getElementById('pfPreviewCanvas')
-                              pfReviewCanvas.getContext('2d').clearRect(0, 0, pfReviewCanvas.width, pfReviewCanvas.height)
-                              await pfImageRenderer.showPreview(pfReviewCanvas, InputDataLoadResult.fromMap(this.state.data, project.id))
-                            })
-                          }}
-                  >
-                    预 览
-                  </Button>
-                  <Button type="primary" className="u-pf-btn" id="u-pf-btn-download"
-                          onClick={()=>{this.downloadPNG(project)}}
-                  >
-                    导 出
-                  </Button>
+                  {
+                    this.props.role > 0 &&
+                    <Button type="primary" className="u-pf-btn" id="u-pf-btn-preview"
+                            onClick={() => {
+                              this.setState({isModalVisible: true}, async () => {
+                                let pfImageRenderer = new ImageRenderer()
+                                pfImageRenderer.load(project)
+                                let pfReviewCanvas = document.getElementById('pfPreviewCanvas')
+                                pfReviewCanvas.getContext('2d').clearRect(0, 0, pfReviewCanvas.width, pfReviewCanvas.height)
+                                await pfImageRenderer.showPreview(pfReviewCanvas, InputDataLoadResult.fromMap(this.state.data, project.id))
+                              })
+                            }}
+                    >
+                      预 览
+                    </Button>
+                  }
+                  {
+                    this.props.role > 0 &&
+                    <Button type="primary" className="u-pf-btn" id="u-pf-btn-download"
+                            onClick={() => {
+                              this.downloadPNG(project)
+                            }}
+                    >
+                      导 出
+                    </Button>
+                  }
                   <Button type="primary" className="u-pf-btn"
-                          onClick={()=>this.saveInputDataResult()}
+                          onClick={() => this.saveInputDataResult()}
                   >
                     保 存
                   </Button>
@@ -245,7 +257,9 @@ export default class ProjectForm extends React.Component {
               no canvas
             </canvas>
             <Button className='u-pf-btn' type={"primary"} style={{marginTop: 20}}
-                    onClick={()=>{this.downloadPNG(project)}}>导 出</Button>
+                    onClick={() => {
+                      this.downloadPNG(project)
+                    }}>导 出</Button>
           </div>
         </Modal>
       </>
