@@ -9,7 +9,7 @@ const InputDataStore = {
    * @return {Promise<InputDataLoadResult[]>}
    */
   async getNotRenderedByProject(projectId) {
-    let resp = await httpx2.get(urls.input.getNotRenderedByProject, {projectId})
+    let resp = await httpx2.get(urls.input.getNotRenderedByProject + `?projectId=${projectId}`)
     if (!resp.s) {
       message.error(resp.m)
       return []
