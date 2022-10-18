@@ -232,7 +232,7 @@ export default class ProjectForm extends React.Component {
                   <Button type="primary" className="u-pf-btn"
                           onClick={() => this.saveInputDataResult()}
                   >
-                    保 存
+                    上 传
                   </Button>
                 </div>
               </div>

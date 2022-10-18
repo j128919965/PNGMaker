@@ -1,4 +1,4 @@
-import {Button, message, Modal} from "antd";
+import {Button, message, Modal, Collapse} from "antd";
 import {CheckOutlined, ExclamationOutlined, LoadingOutlined} from "@ant-design/icons";
 import {EditorHeight, EditorWidth} from "../../data/constants";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
@@ -16,7 +16,9 @@ export const CloudData = (props) => {
 
   const [currentResult, setCurrentResult] = useState(null)
 
-  const init = async ()=>{
+  const {Panel} = Collapse
+
+  const init = async () => {
     setLoading(true)
     let results = await InputDataStore.getNotRenderedByProject(project.id)
     setBatchLoadResults(results)
@@ -25,10 +27,10 @@ export const CloudData = (props) => {
 
   const removeResult = async (res) => {
     let deleted = await InputDataStore.remove(res.id)
-    if (deleted){
+    if (deleted) {
       message.success("删除成功")
       await init()
-    }else {
+    } else {
       message.error("删除失败，请检查")
     }
   }
@@ -56,9 +58,9 @@ export const CloudData = (props) => {
     }, [previewVisible]
   )
 
-  useEffect(()=>{
+  useEffect(() => {
     init()
-  },[])
+  }, [])
 
   return (
     <>
@@ -73,7 +75,7 @@ export const CloudData = (props) => {
                       onClick={
                         async () => {
                           let results = batchLoadResults.filter(res => res.success)
-                          for(let i in results){
+                          for (let i in results) {
                             await render(results[i], parseInt(i) + 1)
                             await InputDataStore.setRendered(results[i].id)
                           }
@@ -92,7 +94,7 @@ export const CloudData = (props) => {
         width={800}
         footer={null}
       >
-        <div>
+        <Collapse>
           {
             loading &&
             <div style={{width: '100%', textAlign: 'center', fontSize: 50}}>
@@ -101,12 +103,13 @@ export const CloudData = (props) => {
             </div>
           }
           {batchLoadResults &&
-            batchLoadResults.map(
-              /**
-               * @param index {number}
-               * @param result {InputDataLoadResult}
-               */
-              (result, index) => (
+          batchLoadResults.map(
+            /**
+             * @param index {number}
+             * @param result {InputDataLoadResult}
+             */
+            (result, index) => (
+              <Panel header={"this is panel header" + (index+1)} key={index}>
                 <div className="m-bl-line" key={index}>
                   <div className={`m-bl-line-icon ${result.success ? 'u-success' : 'u-warning'}`}>
                     {result.success ? <CheckOutlined/> : <ExclamationOutlined/>}
@@ -130,17 +133,16 @@ export const CloudData = (props) => {
                           <span style={{fontSize: "small"}}>导出图片</span>
                         </Button>
                       </>
-
                     }
-
                     <Button size={"small"} onClick={() => removeResult(result)}>
                       <span style={{fontSize: "small"}}>删除数据</span>
                     </Button>
                   </div>
                 </div>
-              ))
+              </Panel>
+            ))
           }
-        </div>
+        </Collapse>
       </Modal>
 
       <Modal title='图片预览'

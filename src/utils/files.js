@@ -1,9 +1,31 @@
 import urls from "../data/urls";
 
-const uploadImage = async (file) => {
+const uploadImage = async (file, needCompress) => {
   let form = new FormData();
   // form.append('file', file)
   form.append('image', file)
+  if (needCompress){
+    let compressCanvas = document.createElement("canvas")
+    let width = file.width
+    let height = file.height
+    let scale = height / width
+    let quality = 0.5
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    // 创建属性节点
+    const anw = document.createAttribute('width')
+    anw.nodeValue = w
+    const anh = document.createAttribute('height')
+    anh.nodeValue = h
+    canvas.setAttributeNode(anw)
+    canvas.setAttributeNode(anh)
+    ctx.drawImage(file, 0, 0, w, h)
+    // 图像质量
+    if (file.quality && file.quality <= 1 && file.quality > 0) {
+      quality = file.quality
+    }
+    const data = canvas.toDataURL('image/jpeg', quality)
+  }
   return new Promise((resolve, reject) => {
     fetch(urls.files.upload, {
       method: 'POST',
