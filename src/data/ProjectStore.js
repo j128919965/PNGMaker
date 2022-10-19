@@ -20,6 +20,10 @@ const ProjectStore = {
             message.error(resp.m)
             return null
         }
+        // 新创建的项目ID
+        resp = resp.d
+        resp = await httpx2.get(urls.projects.getById + `?id=${resp}`)
+        // 新创建的项目
         resp = resp.d
         proj = JSON.parse(resp.content)
         proj.id = resp.id
@@ -41,7 +45,8 @@ const ProjectStore = {
      * @return {Promise<boolean>}
      */
     async delete(id) {
-        return httpx2.post(urls.projects.del + '?id=' + id)
+        let resp = await httpx2.post(urls.projects.del + '?id=' + id)
+        return resp.s && resp.d !== 0
     },
 }
 

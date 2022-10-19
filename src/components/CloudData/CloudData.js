@@ -1,9 +1,67 @@
-import {Button, message, Modal, Collapse} from "antd";
+import {Button, Empty, message, Modal, Select} from "antd";
 import {CheckOutlined, ExclamationOutlined, LoadingOutlined} from "@ant-design/icons";
 import {EditorHeight, EditorWidth} from "../../data/constants";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import InputDataStore from "../../data/InputDataStore";
+
+import './index.css'
+
+const {Option} = Select
+
+/**
+ *
+ * @param result {InputDataLoadResult}
+ * @param project {ProjectMetadata}
+ */
+const getDataLine = (result, project) => {
+  let map = {}
+  project.points.forEach(point => map[point.id] = point)
+  return result.data
+    .filter(data => map[data.pointId] != null)
+    .filter(data => map[data.pointId].type === 1)
+    .filter(data => data?.data?.length >= 1)
+    .map(data => {
+      /**
+       * @type {RedPoint}
+       */
+      let point = map[data.pointId];
+      return `${point.label?.length >= 1 ? point.label : '未命名输入'} : ${data.data}`
+    }).join("，")
+}
+
+const getDataDiv = (result, project) => {
+  let map = {}
+  project.points.forEach(point => map[point.id] = point)
+  let r = result.data
+    .filter(data => map[data.pointId] != null)
+    .filter(data => data?.data?.length >= 1)
+    .map(data => {
+      /**
+       * @type {RedPoint}
+       */
+      let point = map[data.pointId];
+      return <div>
+        <div className="m-cd-data-div-title">
+          {point.label?.length >= 1 ? point.label : '未命名输入'}
+        </div>
+        {
+          point.type === 1 &&
+          <div className="m-cd-data-div-word">
+            {data.data}
+          </div>
+        }
+        {
+          point.type === 2 &&
+          <img src={data.data} width={150} height={150} alt={point.label}/>
+        }
+
+      </div>
+    })
+  return <>
+    {r.map(e => <div>{e}</div>)}
+  </>
+}
 
 export const CloudData = (props) => {
   const {project, close} = props
@@ -14,13 +72,16 @@ export const CloudData = (props) => {
 
   const [previewVisible, setPreviewVisible] = useState(false)
 
+  const [dataVisible, setDataVisible] = useState(false)
+
   const [currentResult, setCurrentResult] = useState(null)
 
-  const {Panel} = Collapse
+  const [showRendered, setShowRendered] = useState(false)
 
   const init = async () => {
+    console.log("cloud data init")
     setLoading(true)
-    let results = await InputDataStore.getNotRenderedByProject(project.id)
+    let results = await InputDataStore.getAllByProject(project.id, showRendered)
     setBatchLoadResults(results)
     setLoading(false)
   }
@@ -60,7 +121,7 @@ export const CloudData = (props) => {
 
   useEffect(() => {
     init()
-  }, [])
+  }, [showRendered])
 
   return (
     <>
@@ -86,63 +147,92 @@ export const CloudData = (props) => {
                 <span style={{fontSize: "small"}}>下载全部</span>
               </Button>
             }
+            {
+              batchLoadResults &&
+              <Select defaultValue={1} size={"small"} onChange={v => {
+                setShowRendered(v === 2)
+              }}>
+                <Option value={1}>最新数据</Option>
+                <Option value={2}>历史数据</Option>
+              </Select>
+            }
           </div>
         }
-        visible={!previewVisible}
+        visible={!previewVisible && !dataVisible}
         onCancel={close}
         onOk={close}
         width={800}
         footer={null}
       >
-        <Collapse>
-          {
-            loading &&
-            <div style={{width: '100%', textAlign: 'center', fontSize: 50}}>
-              <LoadingOutlined/>
-              <div style={{fontSize: 20}}>正在解析文件，请稍等</div>
-            </div>
-          }
-          {batchLoadResults &&
+        {
+          loading &&
+          <div style={{width: '100%', textAlign: 'center', fontSize: 50}}>
+            <LoadingOutlined/>
+            <div style={{fontSize: 20}}>正在加载云端数据，请稍等</div>
+          </div>
+        }
+        {
+          batchLoadResults?.length >= 1 &&
           batchLoadResults.map(
             /**
              * @param index {number}
              * @param result {InputDataLoadResult}
              */
             (result, index) => (
-              <Panel header={"this is panel header" + (index+1)} key={index}>
-                <div className="m-bl-line" key={index}>
-                  <div className={`m-bl-line-icon ${result.success ? 'u-success' : 'u-warning'}`}>
-                    {result.success ? <CheckOutlined/> : <ExclamationOutlined/>}
-                  </div>
-                  <div className="m-bl-line-word">
-                    第 {index + 1} 行 {result.success ? '解析成功' : '解析错误：' + result.message}
-                  </div>
-                  <div className="m-bl-line-btns">
-                    {
-                      result.success &&
-                      <>
-                        <Button size={"small"} onClick={() => {
-                          setCurrentResult(result)
-                          setPreviewVisible(true)
-                        }}>
-                          <span style={{fontSize: "small"}}>查看预览</span>
-                        </Button>
-                        <Button size={"small"} onClick={() => {
-                          render(result, index + 1)
-                        }}>
-                          <span style={{fontSize: "small"}}>导出图片</span>
-                        </Button>
-                      </>
-                    }
-                    <Button size={"small"} onClick={() => removeResult(result)}>
-                      <span style={{fontSize: "small"}}>删除数据</span>
-                    </Button>
-                  </div>
+              <div className="m-bl-line" key={index}>
+                <div className={`m-bl-line-icon ${result.success ? 'u-success' : 'u-warning'}`}>
+                  {result.success ? <CheckOutlined/> : <ExclamationOutlined/>}
                 </div>
-              </Panel>
+                <div className="m-bl-line-word">
+                  {
+                    !result.success &&
+                    `第 ${index + 1} 行 '解析错误：' + ${result.message}`
+                  }
+                  {
+                    result.success &&
+                    <div title={getDataLine(result, project)}
+                         className="m-cd-data-line">{getDataLine(result, project)}</div>
+                  }
+
+                </div>
+                <div className="m-cd-line-btns">
+                  {
+                    result.success &&
+                    <>
+                      <Button size={"small"} onClick={() => {
+                        setCurrentResult(result)
+                        setDataVisible(true)
+                      }}>
+                        <span style={{fontSize: "small"}}>查看数据</span>
+                      </Button>
+
+                      <Button size={"small"} onClick={() => {
+                        setCurrentResult(result)
+                        setPreviewVisible(true)
+                      }}>
+                        <span style={{fontSize: "small"}}>查看预览</span>
+                      </Button>
+                      <Button size={"small"} onClick={() => {
+                        render(result, index + 1)
+                      }}>
+                        <span style={{fontSize: "small"}}>导出图片</span>
+                      </Button>
+                    </>
+                  }
+                  <Button size={"small"} onClick={() => removeResult(result)}>
+                    <span style={{fontSize: "small"}}>删除数据</span>
+                  </Button>
+                </div>
+              </div>
             ))
-          }
-        </Collapse>
+        }
+        {
+          !(batchLoadResults?.length >= 1) &&
+          <div className="m-main-hint">
+            <Empty description=""/>
+            暂无符合要求的云端数据
+          </div>
+        }
       </Modal>
 
       <Modal title='图片预览'
@@ -166,6 +256,18 @@ export const CloudData = (props) => {
             导出图片
           </Button>
         </div>
+      </Modal>
+
+      <Modal title='数据展示'
+             width={EditorWidth * 0.8 + 100}
+             visible={dataVisible}
+             footer={null}
+             onCancel={() => setDataVisible(false)}
+      >
+        {
+          dataVisible &&
+          getDataDiv(currentResult, project)
+        }
       </Modal>
     </>
   )

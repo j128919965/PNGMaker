@@ -20,7 +20,7 @@ const InputDataStore = {
     return resps
   },
 
-  async getAllByProject(projectId) {
+  async getAllByProject(projectId, rendered) {
     let resp = await httpx2.get(urls.input.getAllByProject + `?projectId=${projectId}`)
     if (!resp.s) {
       message.error(resp.m)
@@ -28,7 +28,7 @@ const InputDataStore = {
     }
     let resps = resp.d
     resps.forEach(resp => resp.data = JSON.parse(resp.data))
-    resps = resps.map(resp => InputDataLoadResult.fromObj(resp))
+    resps = resps.filter(resp => resp.rendered === rendered).map(resp => InputDataLoadResult.fromObj(resp))
     return resps
   },
 

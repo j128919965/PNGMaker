@@ -129,7 +129,8 @@ const App = () => {
                   let resp = await ProjectStore.delete(project.id)
                   if (resp) {
                     message.success("删除成功")
-                    setProject(null)
+                    // 不知道为啥，不异步删除没法关闭confirm框
+                    setTimeout(() => updateProject(null), 0)
                   } else {
                     message.error("删除失败")
                   }
@@ -156,7 +157,7 @@ const App = () => {
                 onClick: async () => {
                   project.background = await files.readFile(() => {
                     message.info("图片正在加载中，请稍候")
-                  });
+                  }, false);
                   updateProject(project)
                 }
               },
@@ -225,7 +226,7 @@ const App = () => {
         <input type="file" id="upload-block-real-input" style={{display: 'none'}}
                accept="image/gif,image/jpeg,image/jpg,image/png"/>
         <div className="g-page">
-          <div style={{position: "relative"}}>
+          <div className="m-hide-in-mobile" style={{position: "relative"}}>
             <Menu mode="horizontal" items={items}/>
             {
               isLogin ?
@@ -324,7 +325,10 @@ const App = () => {
                                 onOk: async () => {
                                   let resp = await ProjectStore.delete(p.id)
                                   if (resp) {
-                                    message.success("删除c成功")
+                                    message.success("删除成功")
+                                    if (project.id === p.id) {
+                                      setTimeout(() => updateProject(null), 0)
+                                    }
                                     setProjectList(await ProjectStore.getAll())
                                   } else {
                                     message.error("删除失败")
