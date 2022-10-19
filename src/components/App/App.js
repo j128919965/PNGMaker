@@ -85,7 +85,7 @@ const App = () => {
           {
             key: "proj-create",
             label: '新建项目',
-            disabled: role < 1,
+            disabled: role < 2,
             onClick: async () => {
               let proj = await ProjectStore.createNewProject()
               if (proj != null) {
@@ -104,7 +104,7 @@ const App = () => {
           {
             key: "proj-save",
             label: '保存项目',
-            disabled: !project || role < 1,
+            disabled: !project || role < 2,
             onClick: async () => {
               let resp = await ProjectStore.save(project)
               if (resp.s) {
@@ -265,7 +265,7 @@ const App = () => {
                        editButtonClassName="m-menu-proj-name-btn"
                        editButtonContent={<EditOutlined/>}
                        value={project.name}
-                       canEdit={role >= 1}
+                       canEdit={role > 1}
                        onSave={v => {
                          project.name = v;
                          setProject(project)
@@ -309,7 +309,7 @@ const App = () => {
                     打开
                   </Button>
                   {
-                    role >= 1 &&
+                    role >= 2 &&
                     <Button size="small" className="m-hide-in-mobile"
                             onClick={() => {
                               if (!isLogin) {
