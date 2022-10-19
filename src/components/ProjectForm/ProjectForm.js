@@ -71,6 +71,13 @@ export default class ProjectForm extends React.Component {
    * @param project {ProjectMetadata}
    */
   updateProject(project) {
+    if (project == null) {
+      this.setState({
+        project: null,
+        data: {}
+      })
+      return;
+    }
     const prev = this.state.project
     // 新项目
     if (prev === null || prev.id !== project.id) {

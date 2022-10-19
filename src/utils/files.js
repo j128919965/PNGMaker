@@ -37,9 +37,7 @@ const files = {
           onSubmitOpen()
         }
         let file = reader.files[0]
-        if (needCompress) {
-          file = await new Compress(file).compressUpload()
-        }
+        file = await new Compress(file, -1, needCompress ? 0.2 : 0.6).compressUpload()
         if (file.size > 1024 * 1024 * 10) {
           rej("文件大小不能大于10m")
         }
