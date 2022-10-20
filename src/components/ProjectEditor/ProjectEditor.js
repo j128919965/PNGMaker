@@ -5,6 +5,7 @@ import ImageLoader from "../../utils/imageLoader";
 import canvasx from '../../utils/canvasx'
 import {EditorHeight, EditorWidth} from "../../data/constants";
 import RedPointEditor from "./RedPointEditor/RedPointEditor";
+import {message} from "antd";
 
 export default class ProjectEditor extends Component {
   /**
@@ -42,7 +43,11 @@ export default class ProjectEditor extends Component {
     this.prepareCanvas()
     if (proj.background) {
       // 提前加载
-      await ImageLoader.load(proj.background)
+      try {
+        await ImageLoader.load(proj.background)
+      }catch (e) {
+        message.error(e)
+      }
     }
     this.project = proj
 
@@ -60,11 +65,10 @@ export default class ProjectEditor extends Component {
      * @type {CanvasRenderingContext2D}
      */
     let ctx = this.canvas.getContext('2d')
+    ctx.clearRect(0, 0, EditorWidth, EditorHeight)
     if (proj.background != null) {
       let img = await ImageLoader.load(proj.background)
       ctx.drawImage(img, 0, 0, EditorWidth, EditorHeight)
-    }else {
-      ctx.clearRect(0, 0, EditorWidth, EditorHeight)
     }
 
     // 没有小红点
