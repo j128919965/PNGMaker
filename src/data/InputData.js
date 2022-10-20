@@ -1,4 +1,4 @@
-export class InputData{
+export class InputData {
 
   /**
    * 对应的小红点ID
@@ -11,13 +11,13 @@ export class InputData{
    */
   data
 
-  constructor(pointId , data) {
+  constructor(pointId, data) {
     this.pointId = pointId
     this.data = data
   }
 
-  static fromObj(obj){
-    return new InputData(obj.pointId , obj.data)
+  static fromObj(obj) {
+    return new InputData(obj.pointId, obj.data)
   }
 }
 
@@ -51,7 +51,7 @@ export class InputDataLoadResult {
    */
   data
 
-  static success(data , projectId){
+  static success(data, projectId) {
     let result = new InputDataLoadResult();
     result.success = true
     result.data = data
@@ -59,7 +59,7 @@ export class InputDataLoadResult {
     return result
   }
 
-  static failure(message){
+  static failure(message) {
     let result = new InputDataLoadResult();
     result.success = false
     result.message = message
@@ -72,11 +72,11 @@ export class InputDataLoadResult {
    * @param projectId {number}
    * @return {InputDataLoadResult}
    */
-  static fromMap(map,projectId){
+  static fromMap(map, projectId) {
     let result = new InputDataLoadResult();
     result.projectId = projectId
     result.success = true
-    result.data =  Object.keys(map).map(key => new InputData(parseInt(key),map[key]))
+    result.data = Object.keys(map).map(key => new InputData(parseInt(key), map[key]))
     return result
   }
 
@@ -84,12 +84,12 @@ export class InputDataLoadResult {
    * 调接口获取对象
    * @param obj
    */
-  static fromObj(obj){
+  static fromObj(obj) {
     let result = new InputDataLoadResult();
     result.id = obj.id
     result.projectId = obj.projectId
-    result.success = obj.success??true
-    result.data =  obj.data.map(d=>InputData.fromObj(d))
+    result.success = obj.success ?? true
+    result.data = obj.data.map(d => InputData.fromObj(d))
     return result
   }
 }

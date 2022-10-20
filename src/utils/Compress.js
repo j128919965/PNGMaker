@@ -119,9 +119,9 @@ class Compress {
   // 判断图片是否过大
   isLimitSize(image) {
     const isLimitSize = this.targetSize < (image.size / 1024 / 128)
-    console.log('size',image.size)
-    console.log('isLimitSize',isLimitSize)
-    console.log('targetSize',this.targetSize)
+    console.log('size', image.size)
+    console.log('isLimitSize', isLimitSize)
+    console.log('targetSize', this.targetSize)
     console.log(image)
     if (!isLimitSize) {
       return true

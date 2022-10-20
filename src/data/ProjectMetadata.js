@@ -43,16 +43,16 @@ export class ProjectMetadata {
     return proj
   }
 
-  createNextPoint(position){
-    let redPoint = RedPoint.fromObj({id:this.latestPointId + 1 , position:position});
+  createNextPoint(position) {
+    let redPoint = RedPoint.fromObj({id: this.latestPointId + 1, position: position});
     this.points.push(redPoint)
     this.latestPointId++
     return redPoint
   }
 
-  toBackendObj(){
+  toBackendObj() {
     let content = JSON.stringify(this)
-    return {id:this.id , name:this.name , content,role : this.role}
+    return {id: this.id, name: this.name, content, role: this.role}
   }
 }
 
@@ -89,7 +89,7 @@ export class RedPoint {
    * 移动
    * @param pos {Position}
    */
-  moveTo(pos){
+  moveTo(pos) {
     this.position = pos
   }
 
@@ -128,7 +128,7 @@ export class Position {
   x = 0
   y = 0
 
-  constructor(x,y) {
+  constructor(x, y) {
     this.x = x
     this.y = y
   }
@@ -163,8 +163,8 @@ export class Pattern {
    */
   align = 1
 
-  static checkAlign = (align)=>{
-    if (align > 5 || align < 1){
+  static checkAlign = (align) => {
+    if (align > 5 || align < 1) {
       errors.throw("对齐方式错误！")
     }
   }
@@ -172,7 +172,7 @@ export class Pattern {
   /**
    * @return {Pattern}
    */
-  clone(){
+  clone() {
     errors.throw("implement me !")
   }
 }

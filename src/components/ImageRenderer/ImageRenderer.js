@@ -50,7 +50,7 @@ export default class ImageRenderer {
     // 先渲染
     try {
       await this.render(inputDataLoadResult.data)
-    }catch (e){
+    } catch (e) {
       message.error(e)
       throw e
     }
