@@ -8,6 +8,7 @@ import ProjectEditor from "../ProjectEditor/ProjectEditor";
 import ProjectForm from "../ProjectForm/ProjectForm";
 import ProjectStore from "../../data/ProjectStore";
 import files from "../../utils/files"
+import formula from "../../utils/formula";
 
 import './App.css';
 import BatchLoadFromExcel from "../BatchLoadFromExcel/BatchLoadFromExcel";

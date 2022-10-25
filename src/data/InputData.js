@@ -1,3 +1,5 @@
+import formula from "../utils/formula";
+
 export class InputData {
 
   /**
@@ -69,14 +71,27 @@ export class InputDataLoadResult {
   /**
    * 创建一个数据列表对象
    * @param map {Object} 在线编辑数据后得到的
-   * @param projectId {number}
+   * @param project {ProjectMetadata}
    * @return {InputDataLoadResult}
    */
-  static fromMap(map, projectId) {
+  static fromMap(map, project) {
     let result = new InputDataLoadResult();
-    result.projectId = projectId
+    result.projectId = project.id
     result.success = true
-    result.data = Object.keys(map).map(key => new InputData(parseInt(key), map[key]))
+    const data = Object.keys(map).map(key => new InputData(parseInt(key), map[key]))
+    project.points.filter(p => !p.visible).forEach(p => {
+      const value = formula.exec(p,undefined).d
+      console.log("add invisible input , value = " + value)
+      if (map[p.id.toString()] == null) {
+        console.log("invisible : null")
+        data.push(new InputData(p.id, value))
+      }else if (map[p.id.toString()].length < 1){
+        console.log("invisible : 空字符串")
+        data.filter(i => i.pointId === p.id)[0].data = value
+      }
+    })
+    result.data = data
+    console.log(result.data)
     return result
   }
 

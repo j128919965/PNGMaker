@@ -86,6 +86,18 @@ export class RedPoint {
   label = ""
 
   /**
+   * 默认值（公式）
+   * @type {string}
+   */
+  defaultValue = ""
+
+  /**
+   * 是否可见
+   * @type {boolean}
+   */
+  visible = true
+
+  /**
    * 移动
    * @param pos {Position}
    */
@@ -113,6 +125,8 @@ export class RedPoint {
     point.position = Position.fromObj(obj?.position)
     point.type = obj?.type ?? 1
     point.label = obj?.label ?? ''
+    point.defaultValue = obj?.defaultValue ?? ''
+    point.visible = obj?.visible ?? true
     if (point.type === 1) {
       point.pattern = FontPattern.fromObj(obj?.pattern)
     } else if (point.type === 2) {

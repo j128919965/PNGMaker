@@ -5,13 +5,16 @@ import {
   CloseCircleOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
-  FontColorsOutlined
+  EyeOutlined,
+  FontColorsOutlined,
+  FunctionOutlined
 } from "@ant-design/icons";
-import {Input, Menu, Modal, Select, Switch} from "antd";
+import {Button, Input, Menu, Modal, Select, Switch, Tooltip} from "antd";
 
 import {FontPattern, PicturePattern, RedPoint} from "../../../data/ProjectMetadata";
 
 import './RedPointEditor.css'
+import formula from "../../../utils/formula";
 
 const {Option} = Select
 
@@ -30,7 +33,10 @@ const RedPointEditor = forwardRef((props, ref) => {
   const [isWord, setIsWord] = useState(redPoint.type === 1)
 
   useImperativeHandle(ref, () => ({
-    setRedPoint:(p)=>{setRedPoint(p);setIsWord(p.type === 1)}
+    setRedPoint: (p) => {
+      setRedPoint(p);
+      setIsWord(p.type === 1)
+    }
   }))
 
   const updatePoint = () => {
@@ -75,7 +81,15 @@ const RedPointEditor = forwardRef((props, ref) => {
       setTempLabel(redPoint.label)
       setIsLabelModalVisible(true)
     }),
-    getItem('删除', 'pe-sub4', <CloseCircleOutlined/>, undefined, async () => {
+    getItem('可见性', 'pe-sub4', <EyeOutlined/>, undefined, () => {
+      setTempVisible(redPoint.visible)
+      setIsVisibleModalVisible(true)
+    }),
+    getItem('默认值', 'pe-sub5', <FunctionOutlined/>, undefined, () => {
+      setTempDefault(redPoint.defaultValue)
+      setIsDefaultModalVisible(true)
+    }),
+    getItem('删除', 'pe-sub6', <CloseCircleOutlined/>, undefined, async () => {
       Modal.confirm({
         title: `删除项目`,
         content: <>确认删除 {redPoint.id} 吗？<br/>注意，已保存的云端数据可能会解析出错。</>,
@@ -94,7 +108,9 @@ const RedPointEditor = forwardRef((props, ref) => {
   const setPointType = (type) => {
     Modal.confirm({
       title: `修改输入类型`,
-      content: <div>确认将输入类型修改为 {type === 1 ? '文字' : '图片'} 吗？<br/> 已设置过的 {type === 2 ? '文字' : '图片'} 格式将会丢失！<br/>同时，已保存的云端数据将解析出错。</div>,
+      content:
+        <div>确认将输入类型修改为 {type === 1 ? '文字' : '图片'} 吗？<br/> 已设置过的 {type === 2 ? '文字' : '图片'} 格式将会丢失！<br/>同时，已保存的云端数据将解析出错。
+        </div>,
       icon: <ExclamationCircleOutlined/>,
       okText: '确认',
       cancelText: '取消',
@@ -109,12 +125,19 @@ const RedPointEditor = forwardRef((props, ref) => {
         updatePoint()
       }
     })
-
   }
 
   const [tempLabel, setTempLabel] = useState(redPoint.label);
 
+  const [tempVisible, setTempVisible] = useState(redPoint.visible);
+
+  const [tempDefault, setTempDefault] = useState(redPoint.defaultValue);
+
   const [isLabelModalVisible, setIsLabelModalVisible] = useState(false);
+
+  const [isVisibleModalVisible, setIsVisibleModalVisible] = useState(false);
+
+  const [isDefaultModalVisible, setIsDefaultModalVisible] = useState(false);
 
   const [tempFont, setTempFont] = useState(FontPattern.default())
 
@@ -123,6 +146,14 @@ const RedPointEditor = forwardRef((props, ref) => {
   const [tempPicture, setTempPicture] = useState(PicturePattern.default())
 
   const [isPictureModalVisible, setIsPictureModalVisible] = useState(false)
+
+  const calcFormula = () => {
+    const resp = formula.exec(redPoint, tempDefault)
+    if (resp.s) {
+      return <span>{resp.d}</span>
+    }
+    return <span style={{color: "red"}}>{resp.m}</span>
+  }
 
   return (
     <>
@@ -153,6 +184,65 @@ const RedPointEditor = forwardRef((props, ref) => {
         <Input placeholder="输入备注" value={tempLabel} onChange={(v) => {
           setTempLabel(v.target.value)
         }}/>
+      </Modal>
+
+
+      <Modal title="修改默认值"
+             visible={isDefaultModalVisible}
+             onOk={() => {
+               redPoint.defaultValue = tempDefault
+               updatePoint()
+               setIsDefaultModalVisible(false)
+             }}
+             onCancel={() => setIsDefaultModalVisible(false)}
+             okText="确定"
+             cancelText="取消"
+      >
+        <div style={{display:"flex",flexWrap:"nowrap"}}>
+          <Input placeholder="输入默认值（公式）" value={tempDefault} onChange={(v) => {
+            setTempDefault(v.target.value)
+          }}/>
+          <Tooltip placement="topRight" title={() => calcFormula()}>
+            <Button>预览</Button>
+          </Tooltip>
+        </div>
+        <div style={{marginTop:'20px',marginLeft:'20px'}}>
+          <h3>可用的功能：</h3>
+          <h4>变量</h4>
+          <ul>
+            <li>{'${now.year}'} ：当前年</li>
+            <li>{'${now.month}'} ：当前月</li>
+            <li>{'${now.day}'} ：当前日</li>
+          </ul>
+          <h4>函数</h4>
+          <ul>
+            <li>{'${uuid(n)}'} ：长度为n的随机字符串</li>
+          </ul>
+          <h3>示例</h3>
+          <ul>
+            <li>输入公式为：{'今天是${now.year}年，${now.month}月，${now.day}日。随机编号为${uuid(5)}'}</li>
+            <li>得到的示例结果为：今天是2022年，10月，25日。随机编号为I31ZA</li>
+          </ul>
+        </div>
+
+      </Modal>
+
+
+      <Modal title="修改可见性"
+             visible={isVisibleModalVisible}
+             onOk={() => {
+               redPoint.visible = tempVisible
+               updatePoint()
+               setIsVisibleModalVisible(false)
+             }}
+             onCancel={() => setIsVisibleModalVisible(false)}
+             okText="确定"
+             cancelText="取消"
+      >
+        <Switch checked={tempVisible}
+                checkedChildren="可见"
+                unCheckedChildren="隐藏"
+                onChange={v => setTempVisible(v)}/>
       </Modal>
 
 
