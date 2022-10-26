@@ -148,7 +148,7 @@ const RedPointEditor = forwardRef((props, ref) => {
   const [isPictureModalVisible, setIsPictureModalVisible] = useState(false)
 
   const calcFormula = () => {
-    const resp = formula.exec(redPoint, tempDefault)
+    const resp = formula.exec(tempDefault, redPoint, props.project)
     if (resp.s) {
       return <span>{resp.d}</span>
     }
@@ -198,7 +198,7 @@ const RedPointEditor = forwardRef((props, ref) => {
              okText="确定"
              cancelText="取消"
       >
-        <div style={{display:"flex",flexWrap:"nowrap"}}>
+        <div style={{display: "flex", flexWrap: "nowrap"}}>
           <Input placeholder="输入默认值（公式）" value={tempDefault} onChange={(v) => {
             setTempDefault(v.target.value)
           }}/>
@@ -206,13 +206,16 @@ const RedPointEditor = forwardRef((props, ref) => {
             <Button>预览</Button>
           </Tooltip>
         </div>
-        <div style={{marginTop:'20px',marginLeft:'20px'}}>
+        <div style={{marginTop: '20px', marginLeft: '20px'}}>
           <h3>可用的功能：</h3>
           <h4>变量</h4>
           <ul>
             <li>{'${now.year}'} ：当前年</li>
             <li>{'${now.month}'} ：当前月</li>
             <li>{'${now.day}'} ：当前日</li>
+            <li>{'${point.label}'} ：当前输入项的名称</li>
+            <li>{'${project.name}'} ：当前项目名</li>
+            <li>{'${project.id}'} ：当前项目ID</li>
           </ul>
           <h4>函数</h4>
           <ul>
@@ -222,6 +225,9 @@ const RedPointEditor = forwardRef((props, ref) => {
           <ul>
             <li>输入公式为：{'今天是${now.year}年，${now.month}月，${now.day}日。随机编号为${uuid(5)}'}</li>
             <li>得到的示例结果为：今天是2022年，10月，25日。随机编号为I31ZA</li>
+          </ul>
+          <ul>
+            <li>如果输入项类型为图片，默认值请输入图片链接</li>
           </ul>
         </div>
 
@@ -284,7 +290,7 @@ const RedPointEditor = forwardRef((props, ref) => {
                    }}
             />
           </div>
-          <div className="m-re-pt-block">
+          <div className="m-re-pt-block small">
             加粗
             <Switch defaultChecked={tempFont.bold}
                     style={{width: 40}}
@@ -293,7 +299,7 @@ const RedPointEditor = forwardRef((props, ref) => {
                       setTempFont(tempFont)
                     }}/>
           </div>
-          <div className="m-re-pt-block">
+          <div className="m-re-pt-block small">
             斜体
             <Switch defaultChecked={tempFont.italic}
                     style={{width: 40}}
@@ -301,6 +307,11 @@ const RedPointEditor = forwardRef((props, ref) => {
                       tempFont.italic = checked
                       setTempFont(tempFont)
                     }}/>
+          </div>
+          <div className="m-re-pt-block small">
+            字体颜色
+            <Input type='color' defaultValue={tempFont.color} style={{width: "42px"}}
+                   onChange={v => tempFont.color = v.target.value}/>
           </div>
           <div className="m-re-pt-block" style={{width: '100%'}}>
             对齐方式

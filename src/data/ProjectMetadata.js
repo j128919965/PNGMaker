@@ -194,6 +194,7 @@ export class Pattern {
 export class FontPattern extends Pattern {
   fontType
   fontSize
+  color
   bold
   italic
 
@@ -219,6 +220,7 @@ export class FontPattern extends Pattern {
     pattern.italic = obj?.italic ?? false
     pattern.fontSize = obj?.fontSize ?? 16
     pattern.fontType = obj?.fontType ?? '宋体'
+    pattern.color = obj?.color ?? '#333'
     return pattern
   }
 

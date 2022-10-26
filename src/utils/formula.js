@@ -22,12 +22,13 @@ function generateMixed(n) {
 }
 
 /**
- *
- * @param point {RedPoint}
- * @param defaultValue {string}
+ * 执行公式
+ * @param defaultValue {string} 要执行的公式
+ * @param point {RedPoint} 输入项
+ * @param project {ProjectMetadata} 项目
  * @returns ExecResult
  */
-const exec = (point, defaultValue) => {
+const exec = (defaultValue, point, project) => {
   const date = new Date().toLocaleDateString().split("/")
   const now = {
     year: parseInt(date[0]),

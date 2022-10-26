@@ -140,7 +140,7 @@ const getAccessTokenHeaders = () => {
  * @param resp {WebResponse}
  * @returns {boolean} 401xxx 是后端定义的有关权限错误的错误码集合
  */
-const isAuthError = (resp) => resp.c > 401000 && resp.c < 402000
+const isAuthError = (resp) => resp?.c > 401000 && resp?.c < 402000
 
 const getRefreshAble = (url, data) => checkAndGetResp(() => doGet(url, data, getAccessTokenHeaders()))
 const postRefreshAble = (url, data) => checkAndGetResp(() => doPost(url, data, getAccessTokenHeaders()))

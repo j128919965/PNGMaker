@@ -206,6 +206,7 @@ export default class ProjectEditor extends Component {
 
             </div>
             <RedPointEditor className="m-pe-gray-right" ref={this.rpEditor}
+                            project={this.project}
                             onUpdate={this.onRedPointEditorUpdateProject.bind(this)}
                             onDelete={this.onRedPointEditorDeleteProject.bind(this)}/>
           </div>
