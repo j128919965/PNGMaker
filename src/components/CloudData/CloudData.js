@@ -4,6 +4,7 @@ import {EditorHeight, EditorWidth} from "../../data/constants";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {useEffect, useState} from "react";
 import InputDataStore from "../../data/InputDataStore";
+import {click} from "@testing-library/user-event/dist/click";
 
 export const CloudData = (props) => {
   const {project, close} = props
@@ -62,6 +63,19 @@ export const CloudData = (props) => {
     init()
   }, [])
 
+  const creatBtn = (result, title) => {
+
+    return (
+        <Button size={"small"} onClick={(event) => {
+          setCurrentResult(result)
+          setPreviewVisible(true)
+          event.stopPropagation()
+        }}>
+          <span style={{fontSize: "small"}}>{title}</span>
+        </Button>
+    )
+  }
+
   return (
     <>
       <Modal
@@ -109,7 +123,7 @@ export const CloudData = (props) => {
              * @param result {InputDataLoadResult}
              */
             (result, index) => (
-              <Panel header={"this is panel header" + (index+1)} key={index}>
+              <Panel header={"this is panel header" + (index+1)} key={index} extra={creatBtn(result, "查看预览")}>
                 <div className="m-bl-line" key={index}>
                   <div className={`m-bl-line-icon ${result.success ? 'u-success' : 'u-warning'}`}>
                     {result.success ? <CheckOutlined/> : <ExclamationOutlined/>}
@@ -121,12 +135,6 @@ export const CloudData = (props) => {
                     {
                       result.success &&
                       <>
-                        <Button size={"small"} onClick={() => {
-                          setCurrentResult(result)
-                          setPreviewVisible(true)
-                        }}>
-                          <span style={{fontSize: "small"}}>查看预览</span>
-                        </Button>
                         <Button size={"small"} onClick={() => {
                           render(result, index + 1)
                         }}>

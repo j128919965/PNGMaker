@@ -1,31 +1,26 @@
 import urls from "../data/urls";
 
-const uploadImage = async (file, needCompress) => {
+const imageCompress = (file) => {
+  let data = ""//保存地址
+  const reader = new FileReader()
+  // 读取文件并将文件以URL的形式保存在resulr属性中 base64格式
+  reader.readAsDataURL(file)
+  // 文件读取完成时触发
+  reader.onload = async e => {
+    const image = new Image()
+    if (typeof e.target.result === 'object') {
+      // 把Array Buffer转化为blob 如果是base64不需要
+      data = window.URL.createObjectURL(new Blob([e.target.result]))
+    } else {
+      data = e.target.result//base64格式图片地址
+    }
+  }
+}
+
+const uploadImage = async (file) => {
   let form = new FormData();
   // form.append('file', file)
   form.append('image', file)
-  if (needCompress){
-    let compressCanvas = document.createElement("canvas")
-    let width = file.width
-    let height = file.height
-    let scale = height / width
-    let quality = 0.5
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    // 创建属性节点
-    const anw = document.createAttribute('width')
-    anw.nodeValue = w
-    const anh = document.createAttribute('height')
-    anh.nodeValue = h
-    canvas.setAttributeNode(anw)
-    canvas.setAttributeNode(anh)
-    ctx.drawImage(file, 0, 0, w, h)
-    // 图像质量
-    if (file.quality && file.quality <= 1 && file.quality > 0) {
-      quality = file.quality
-    }
-    const data = canvas.toDataURL('image/jpeg', quality)
-  }
   return new Promise((resolve, reject) => {
     fetch(urls.files.upload, {
       method: 'POST',
@@ -53,7 +48,7 @@ const files = {
     return new Promise((res, rej) => {
       const reader = document.getElementById('upload-block-real-input')
       reader.onchange = async () => {
-        if (onSubmitOpen){
+        if (onSubmitOpen) {
           onSubmitOpen()
         }
         let file = reader.files[0]
