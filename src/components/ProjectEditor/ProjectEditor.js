@@ -1,10 +1,11 @@
-import {Component , createRef} from "react";
+import {Component, createRef} from "react";
 
 import "./ProjectEditor.css"
 import ImageLoader from "../../utils/imageLoader";
 import canvasx from '../../utils/canvasx'
 import {EditorHeight, EditorWidth} from "../../data/constants";
 import RedPointEditor from "./RedPointEditor/RedPointEditor";
+import {message} from "antd";
 
 export default class ProjectEditor extends Component {
   /**
@@ -42,11 +43,15 @@ export default class ProjectEditor extends Component {
     this.prepareCanvas()
     if (proj.background) {
       // 提前加载
-      await ImageLoader.load(proj.background)
+      try {
+        await ImageLoader.load(proj.background)
+      } catch (e) {
+        message.error(e)
+      }
     }
     this.project = proj
 
-    this.canvas.getContext('2d').clearRect(0,0,EditorWidth , EditorHeight)
+    this.canvas.getContext('2d').clearRect(0, 0, EditorWidth, EditorHeight)
     await this.reDraw()
     this.setState({ready: true})
   }
@@ -60,19 +65,18 @@ export default class ProjectEditor extends Component {
      * @type {CanvasRenderingContext2D}
      */
     let ctx = this.canvas.getContext('2d')
+    ctx.clearRect(0, 0, EditorWidth, EditorHeight)
     if (proj.background != null) {
       let img = await ImageLoader.load(proj.background)
       ctx.drawImage(img, 0, 0, EditorWidth, EditorHeight)
-    }else {
-      ctx.clearRect(0, 0, EditorWidth, EditorHeight)
     }
 
     // 没有小红点
-    if (proj.points?.length < 1){
-      ctx.font="48px 宋体"
+    if (proj.points?.length < 1) {
+      ctx.font = "48px 宋体"
       ctx.fillStyle = "#666"
       let x = EditorWidth / 2 - ctx.measureText("双击此处创建输入项").width / 2
-      ctx.fillText("双击此处创建输入项" , x , 250)
+      ctx.fillText("双击此处创建输入项", x, 250)
     }
     for (let point of proj.points) {
       canvasx.drawPoint(ctx, point)
@@ -138,7 +142,7 @@ export default class ProjectEditor extends Component {
   }
 
   showRedPointEdit(redPoint) {
-    this.setState({editing: true} , ()=>{
+    this.setState({editing: true}, () => {
       this.rpEditor.current.setRedPoint(redPoint)
     })
   }
@@ -147,11 +151,11 @@ export default class ProjectEditor extends Component {
    * 红点编辑器更新红点属性
    * @param p {RedPoint}
    */
-  onRedPointEditorUpdateProject(p){
+  onRedPointEditorUpdateProject(p) {
     // 这个地方，红点编辑器不会影响到
     const {points} = this.project
     for (let i in points) {
-      if (p.id === points[i].id){
+      if (p.id === points[i].id) {
         points[i] = p
         break
       }
@@ -163,11 +167,11 @@ export default class ProjectEditor extends Component {
    * 红点编辑器删除红点属性
    * @param id {number}
    */
-  onRedPointEditorDeleteProject(id){
+  onRedPointEditorDeleteProject(id) {
     const {points} = this.project
     let nps = []
     for (let point of points) {
-      if (id === point.id){
+      if (id === point.id) {
         continue
       }
       nps.push(point)
@@ -175,7 +179,7 @@ export default class ProjectEditor extends Component {
     this.project.points = nps
     this.reDraw()
     this.props.onProjectUpdate(this.project)
-    this.setState({editing:false})
+    this.setState({editing: false})
   }
 
   render() {
@@ -196,10 +200,15 @@ export default class ProjectEditor extends Component {
         {
           editing &&
           <div className="m-pe-gray">
-            <div className="m-pe-gray-left" onClick={() => { this.setState({editing: false})}}>>
+            <div className="m-pe-gray-left" onClick={() => {
+              this.setState({editing: false})
+            }}>>
 
             </div>
-            <RedPointEditor className="m-pe-gray-right" ref={this.rpEditor} onUpdate={this.onRedPointEditorUpdateProject.bind(this)} onDelete={this.onRedPointEditorDeleteProject.bind(this)}/>
+            <RedPointEditor className="m-pe-gray-right" ref={this.rpEditor}
+                            project={this.project}
+                            onUpdate={this.onRedPointEditorUpdateProject.bind(this)}
+                            onDelete={this.onRedPointEditorDeleteProject.bind(this)}/>
           </div>
         }
       </div>

@@ -18,12 +18,33 @@
     align-items: center;
 }
 
+.m-cd-data-line {
+    overflow: hidden;
+    max-width: 350px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .m-cd-line-icon{
     font-size: 20px;
 }
 
 .m-cd-line-btns {
-    width: 220px;
+    width: 300px;
     display: flex;
     justify-content: space-between;
+}
+
+.m-cd-data-div-title {
+    color: #aaaaaa;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+.m-cd-data-div-word {
+    color: black;
+    font-size: 16px;
+    margin-top: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
 }

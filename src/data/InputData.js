@@ -1,4 +1,6 @@
-export class InputData{
+import formula from "../utils/formula";
+
+export class InputData {
 
   /**
    * 对应的小红点ID
@@ -11,13 +13,13 @@ export class InputData{
    */
   data
 
-  constructor(pointId , data) {
+  constructor(pointId, data) {
     this.pointId = pointId
     this.data = data
   }
 
-  static fromObj(obj){
-    return new InputData(obj.pointId , obj.data)
+  static fromObj(obj) {
+    return new InputData(obj.pointId, obj.data)
   }
 }
 
@@ -51,7 +53,7 @@ export class InputDataLoadResult {
    */
   data
 
-  static success(data , projectId){
+  static success(data, projectId) {
     let result = new InputDataLoadResult();
     result.success = true
     result.data = data
@@ -59,7 +61,7 @@ export class InputDataLoadResult {
     return result
   }
 
-  static failure(message){
+  static failure(message) {
     let result = new InputDataLoadResult();
     result.success = false
     result.message = message
@@ -69,14 +71,24 @@ export class InputDataLoadResult {
   /**
    * 创建一个数据列表对象
    * @param map {Object} 在线编辑数据后得到的
-   * @param projectId {number}
+   * @param project {ProjectMetadata}
    * @return {InputDataLoadResult}
    */
-  static fromMap(map,projectId){
+  static fromMap(map, project) {
     let result = new InputDataLoadResult();
-    result.projectId = projectId
+    result.projectId = project.id
     result.success = true
-    result.data =  Object.keys(map).map(key => new InputData(parseInt(key),map[key]))
+    const data = Object.keys(map).map(key => new InputData(parseInt(key), map[key]))
+    project.points.filter(p => !p.visible).forEach(p => {
+      const value = formula.exec(p.defaultValue, p, project).d
+      console.log("add invisible input , value = " + value)
+      if (map[p.id.toString()] == null) {
+        data.push(new InputData(p.id, value))
+      } else if (map[p.id.toString()].length < 1) {
+        data.filter(i => i.pointId === p.id)[0].data = value
+      }
+    })
+    result.data = data
     return result
   }
 
@@ -84,12 +96,12 @@ export class InputDataLoadResult {
    * 调接口获取对象
    * @param obj
    */
-  static fromObj(obj){
+  static fromObj(obj) {
     let result = new InputDataLoadResult();
     result.id = obj.id
     result.projectId = obj.projectId
-    result.success = obj.success??true
-    result.data =  obj.data.map(d=>InputData.fromObj(d))
+    result.success = obj.success ?? true
+    result.data = obj.data.map(d => InputData.fromObj(d))
     return result
   }
 }

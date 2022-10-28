@@ -18,17 +18,15 @@ import InputDataStore from "../../data/InputDataStore";
  */
 function TypeOfText(props) {
   const {point, oninput, data} = props
-  return (<div className="m-pf-editor-text">
-      <div className="u-point">{point.id}</div>
-      <div>
-        <label>{point.label?.length > 0 ? point.label : "请设置备注"}<br/>
-          <Input type="text" onInput={oninput} value={
-            data[point.id]
-          }/>
-        </label>
-      </div>
+  return <div className="m-pf-editor-text">
+    <div className="u-point">{point.id}</div>
+    <div>
+      <label>{point.label?.length > 0 ? point.label : "请设置备注"}<br/>
+        <Input type="text" placeholder={point.defaultValue} onInput={oninput} value={data[point.id]}/>
+      </label>
     </div>
-  )
+  </div>
+
 }
 
 function TypeOfImage(props) {
@@ -71,6 +69,13 @@ export default class ProjectForm extends React.Component {
    * @param project {ProjectMetadata}
    */
   updateProject(project) {
+    if (project == null) {
+      this.setState({
+        project: null,
+        data: {}
+      })
+      return;
+    }
     const prev = this.state.project
     // 新项目
     if (prev === null || prev.id !== project.id) {
@@ -130,6 +135,9 @@ export default class ProjectForm extends React.Component {
     const {points} = project
     let list = []
     for (let point of points) {
+      if (!point.visible) {
+        continue;
+      }
       if (point.type === 1) {
         list.push(
           <TypeOfText key={point.id}
@@ -156,11 +164,11 @@ export default class ProjectForm extends React.Component {
   downloadPNG = async (project) => {
     let pfImageRenderer = new ImageRenderer()
     pfImageRenderer.load(project)
-    await pfImageRenderer.download(InputDataLoadResult.fromMap(this.state.data, project.id), null)
+    await pfImageRenderer.download(InputDataLoadResult.fromMap(this.state.data, project), null)
   }
 
   saveInputDataResult = async () => {
-    let data = InputDataLoadResult.fromMap(this.state.data, this.state.project.id)
+    let data = InputDataLoadResult.fromMap(this.state.data, this.state.project)
     let resp = await InputDataStore.save(data)
     if (!resp.s) {
       message.error(resp.m)
@@ -212,7 +220,7 @@ export default class ProjectForm extends React.Component {
                                 pfImageRenderer.load(project)
                                 let pfReviewCanvas = document.getElementById('pfPreviewCanvas')
                                 pfReviewCanvas.getContext('2d').clearRect(0, 0, pfReviewCanvas.width, pfReviewCanvas.height)
-                                await pfImageRenderer.showPreview(pfReviewCanvas, InputDataLoadResult.fromMap(this.state.data, project.id))
+                                await pfImageRenderer.showPreview(pfReviewCanvas, InputDataLoadResult.fromMap(this.state.data, project))
                               })
                             }}
                     >

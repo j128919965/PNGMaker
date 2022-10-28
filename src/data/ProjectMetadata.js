@@ -43,16 +43,16 @@ export class ProjectMetadata {
     return proj
   }
 
-  createNextPoint(position){
-    let redPoint = RedPoint.fromObj({id:this.latestPointId + 1 , position:position});
+  createNextPoint(position) {
+    let redPoint = RedPoint.fromObj({id: this.latestPointId + 1, position: position});
     this.points.push(redPoint)
     this.latestPointId++
     return redPoint
   }
 
-  toBackendObj(){
+  toBackendObj() {
     let content = JSON.stringify(this)
-    return {id:this.id , name:this.name , content,role : this.role}
+    return {id: this.id, name: this.name, content, role: this.role}
   }
 }
 
@@ -86,10 +86,22 @@ export class RedPoint {
   label = ""
 
   /**
+   * 默认值（公式）
+   * @type {string}
+   */
+  defaultValue = ""
+
+  /**
+   * 是否可见
+   * @type {boolean}
+   */
+  visible = true
+
+  /**
    * 移动
    * @param pos {Position}
    */
-  moveTo(pos){
+  moveTo(pos) {
     this.position = pos
   }
 
@@ -113,6 +125,8 @@ export class RedPoint {
     point.position = Position.fromObj(obj?.position)
     point.type = obj?.type ?? 1
     point.label = obj?.label ?? ''
+    point.defaultValue = obj?.defaultValue ?? ''
+    point.visible = obj?.visible ?? true
     if (point.type === 1) {
       point.pattern = FontPattern.fromObj(obj?.pattern)
     } else if (point.type === 2) {
@@ -128,7 +142,7 @@ export class Position {
   x = 0
   y = 0
 
-  constructor(x,y) {
+  constructor(x, y) {
     this.x = x
     this.y = y
   }
@@ -163,8 +177,8 @@ export class Pattern {
    */
   align = 1
 
-  static checkAlign = (align)=>{
-    if (align > 5 || align < 1){
+  static checkAlign = (align) => {
+    if (align > 5 || align < 1) {
       errors.throw("对齐方式错误！")
     }
   }
@@ -172,7 +186,7 @@ export class Pattern {
   /**
    * @return {Pattern}
    */
-  clone(){
+  clone() {
     errors.throw("implement me !")
   }
 }
@@ -180,6 +194,7 @@ export class Pattern {
 export class FontPattern extends Pattern {
   fontType
   fontSize
+  color
   bold
   italic
 
@@ -205,6 +220,7 @@ export class FontPattern extends Pattern {
     pattern.italic = obj?.italic ?? false
     pattern.fontSize = obj?.fontSize ?? 16
     pattern.fontType = obj?.fontType ?? '宋体'
+    pattern.color = obj?.color ?? '#333'
     return pattern
   }
 

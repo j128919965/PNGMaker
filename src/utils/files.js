@@ -1,4 +1,6 @@
 import urls from "../data/urls";
+import Compress from "./Compress";
+
 
 const imageCompress = (file) => {
   let data = ""//保存地址
@@ -44,7 +46,7 @@ const files = {
    * 上传文件，并获取URL
    * @return {Promise<string>}
    */
-  readFile(onSubmitOpen) {
+  readFile(onSubmitOpen, needCompress = true) {
     return new Promise((res, rej) => {
       const reader = document.getElementById('upload-block-real-input')
       reader.onchange = async () => {
@@ -52,6 +54,7 @@ const files = {
           onSubmitOpen()
         }
         let file = reader.files[0]
+        file = await new Compress(file, -1, needCompress ? 0.2 : 0.6).compressUpload()
         if (file.size > 1024 * 1024 * 10) {
           rej("文件大小不能大于10m")
         }
@@ -66,10 +69,6 @@ const files = {
     })
   },
 
-  // uploadImage: async (file) => {
-  //   console.warn("模拟文件上传")
-  //   return "https://s2.loli.net/2022/04/30/x8ZALg4NSRpcqU2.jpg"
-  // }
   uploadImage
 }
 

@@ -50,7 +50,7 @@ export default class ImageRenderer {
     // 先渲染
     try {
       await this.render(inputDataLoadResult.data)
-    }catch (e){
+    } catch (e) {
       message.error(e)
       throw e
     }
@@ -103,7 +103,7 @@ export default class ImageRenderer {
         continue
       }
       if (point.type === 1) {
-        context.fillStyle = '#333 '
+        context.fillStyle = point.pattern.color
         context.font = (point.pattern.italic ? "italic " : "normal ") + (point.pattern.bold ? "bolder " : "normal ") + point.pattern.fontSize * 3 + "px " + point.pattern.fontType
         let textWidth = context.measureText(getData(point.id)).width
         switch (point.pattern.align) {
@@ -132,7 +132,10 @@ export default class ImageRenderer {
         }
 
       } else if (point.type === 2) {
-        let img = await ImageLoader.load(getData(point.id))
+        let img = await ImageLoader.safeLoad(getData(point.id))
+        if (img == null){
+          continue
+        }
         let imgWidth = point.pattern.width * A4Width / EditorWidth
         let imgHeight = point.pattern.height * A4Height / EditorHeight
         switch (point.pattern.align) {

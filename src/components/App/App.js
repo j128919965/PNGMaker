@@ -8,6 +8,7 @@ import ProjectEditor from "../ProjectEditor/ProjectEditor";
 import ProjectForm from "../ProjectForm/ProjectForm";
 import ProjectStore from "../../data/ProjectStore";
 import files from "../../utils/files"
+import formula from "../../utils/formula";
 
 import './App.css';
 import BatchLoadFromExcel from "../BatchLoadFromExcel/BatchLoadFromExcel";
@@ -85,7 +86,7 @@ const App = () => {
           {
             key: "proj-create",
             label: '新建项目',
-            disabled: role < 1,
+            disabled: role < 2,
             onClick: async () => {
               let proj = await ProjectStore.createNewProject()
               if (proj != null) {
@@ -104,7 +105,7 @@ const App = () => {
           {
             key: "proj-save",
             label: '保存项目',
-            disabled: !project || role < 1,
+            disabled: !project || role < 2,
             onClick: async () => {
               let resp = await ProjectStore.save(project)
               if (resp.s) {
@@ -129,7 +130,8 @@ const App = () => {
                   let resp = await ProjectStore.delete(project.id)
                   if (resp) {
                     message.success("删除成功")
-                    setProject(null)
+                    // 不知道为啥，不异步删除没法关闭confirm框
+                    setTimeout(() => updateProject(null), 0)
                   } else {
                     message.error("删除失败")
                   }
@@ -156,7 +158,7 @@ const App = () => {
                 onClick: async () => {
                   project.background = await files.readFile(() => {
                     message.info("图片正在加载中，请稍候")
-                  });
+                  }, false);
                   updateProject(project)
                 }
               },
@@ -225,7 +227,7 @@ const App = () => {
         <input type="file" id="upload-block-real-input" style={{display: 'none'}}
                accept="image/gif,image/jpeg,image/jpg,image/png"/>
         <div className="g-page">
-          <div style={{position: "relative"}}>
+          <div className="m-hide-in-mobile" style={{position: "relative"}}>
             <Menu mode="horizontal" items={items}/>
             {
               isLogin ?
@@ -264,7 +266,7 @@ const App = () => {
                        editButtonClassName="m-menu-proj-name-btn"
                        editButtonContent={<EditOutlined/>}
                        value={project.name}
-                       canEdit={role >= 1}
+                       canEdit={role > 1}
                        onSave={v => {
                          project.name = v;
                          setProject(project)
@@ -308,7 +310,7 @@ const App = () => {
                     打开
                   </Button>
                   {
-                    role >= 1 &&
+                    role >= 2 &&
                     <Button size="small" className="m-hide-in-mobile"
                             onClick={() => {
                               if (!isLogin) {
@@ -324,7 +326,10 @@ const App = () => {
                                 onOk: async () => {
                                   let resp = await ProjectStore.delete(p.id)
                                   if (resp) {
-                                    message.success("删除c成功")
+                                    message.success("删除成功")
+                                    if (project.id === p.id) {
+                                      setTimeout(() => updateProject(null), 0)
+                                    }
                                     setProjectList(await ProjectStore.getAll())
                                   } else {
                                     message.error("删除失败")

@@ -102,18 +102,18 @@ body {
 
 }
 
-.m-bl-modal-title{
+.m-bl-modal-title {
     display: flex;
     width: 300px;
     justify-content: space-around;
 }
 
-.m-bl-mt-word{
+.m-bl-mt-word {
     font-size: large;
     margin-right: 30px;
 }
 
-.m-bl-line{
+.m-bl-line {
     display: flex;
     box-sizing: border-box;
     width: 100%;
@@ -122,7 +122,7 @@ body {
     align-items: center;
 }
 
-.m-bl-line-icon{
+.m-bl-line-icon {
     font-size: 20px;
 }
 
@@ -148,8 +148,6 @@ body {
 .percent15 {
     width: 15%;
 }
-
-
 
 
 @media screen and (max-width: 1200px) {
