@@ -17,7 +17,8 @@ const urls = {
     getAllByProject: Server + '/input/by-proj',
     getNotRenderedByProject: Server + '/input/by-proj/no-rendered',
     del: Server + '/input/delete',
-    setRendered: Server + '/input/set-rendered'
+    setRendered: Server + '/input/set-rendered',
+    update: Server +'/input/update'
   },
   users: {
     login: Server + '/user/login',

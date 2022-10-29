@@ -1,4 +1,4 @@
-import {Button, Empty, Form, message, Modal, Select} from "antd";
+import {Button, Empty, Form, Input, message, Modal, Select} from "antd";
 import {CheckOutlined, EditOutlined, ExclamationOutlined, LoadingOutlined} from "@ant-design/icons";
 import {EditorHeight, EditorWidth} from "../../data/constants";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
@@ -7,6 +7,7 @@ import InputDataStore from "../../data/InputDataStore";
 
 import './index.css'
 import EdiText from "react-editext";
+import {CloudDataForm} from "./CloudDataRewrite/CloudDataForm";
 
 const {Option} = Select
 
@@ -31,47 +32,6 @@ const getDataLine = (result, project) => {
     }).join("，")
 }
 
-const getDataDiv = (result, project) => {
-  let map = {}
-  project.points.forEach(point => map[point.id] = point)
-  let r = result.data
-    .filter(data => map[data.pointId] != null)
-    .filter(data => data?.data?.length >= 1)
-    .map(data => {
-      /**
-       * @type {RedPoint}
-       */
-      let point = map[data.pointId];
-      return <div>
-        <div className="m-cd-data-div-title">
-          {point.label?.length >= 1 ? point.label : '未命名输入'}
-        </div>
-        {
-          point.type === 1 &&
-          <div className="m-cd-data-div-word">
-            <EdiText saveButtonClassName="m-menu-proj-name-btn"
-                     saveButtonContent="✓"
-                     cancelButtonClassName="m-menu-proj-name-btn"
-                     cancelButtonContent="✕"
-                     editButtonClassName="m-menu-proj-name-btn"
-                     editButtonContent={<EditOutlined/>}
-                     value={data.data} onSave={v => {
-              console.log(data.data)
-            }}/>
-          </div>
-        }
-        {
-          point.type === 2 &&
-          <img src={data.data} width={150} height={150} alt={point.label}/>
-        }
-      </div>
-    })
-  return <>
-    {r.map(e => <div>
-      {e}</div>)}
-  </>
-}
-
 const dataFormRewrite = (res, proj) => {
   let map = {}
   proj.points.forEach(point => map[point.id] = point)
@@ -86,9 +46,7 @@ const dataFormRewrite = (res, proj) => {
       return <Form.Item label={point.label?.length >= 1 ? point.label : '未命名输入'}>
         {
           point.type === 1 &&
-          <div>
-            {data.data}
-          </div>
+          <Input/>
         }
         {
           point.type === 2 &&
@@ -310,7 +268,7 @@ export const CloudData = (props) => {
           <div>
             <Button onClick={()=>setRewriteVisible(true)}>全部修改</Button>
             {/*//单个修改*/}
-            {getDataDiv(currentResult, project)}
+            {CloudDataForm(currentResult, project)}
           </div>
         }
       </Modal>
