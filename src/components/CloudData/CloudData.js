@@ -1,11 +1,12 @@
-import {Button, Empty, message, Modal, Select} from "antd";
-import {CheckOutlined, ExclamationOutlined, LoadingOutlined} from "@ant-design/icons";
+import {Button, Empty, Form, message, Modal, Select} from "antd";
+import {CheckOutlined, EditOutlined, ExclamationOutlined, LoadingOutlined} from "@ant-design/icons";
 import {EditorHeight, EditorWidth} from "../../data/constants";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import React, {useEffect, useState} from "react";
 import InputDataStore from "../../data/InputDataStore";
 
 import './index.css'
+import EdiText from "react-editext";
 
 const {Option} = Select
 
@@ -48,6 +49,44 @@ const getDataDiv = (result, project) => {
         {
           point.type === 1 &&
           <div className="m-cd-data-div-word">
+            <EdiText saveButtonClassName="m-menu-proj-name-btn"
+                     saveButtonContent="✓"
+                     cancelButtonClassName="m-menu-proj-name-btn"
+                     cancelButtonContent="✕"
+                     editButtonClassName="m-menu-proj-name-btn"
+                     editButtonContent={<EditOutlined/>}
+                     value={data.data} onSave={v => {
+              console.log(data.data)
+            }}/>
+          </div>
+        }
+        {
+          point.type === 2 &&
+          <img src={data.data} width={150} height={150} alt={point.label}/>
+        }
+      </div>
+    })
+  return <>
+    {r.map(e => <div>
+      {e}</div>)}
+  </>
+}
+
+const dataFormRewrite = (res, proj) => {
+  let map = {}
+  proj.points.forEach(point => map[point.id] = point)
+  let r = res.data
+    .filter(data => map[data.pointId] != null)
+    .filter(data => data?.data?.length >= 1)
+    .map(data => {
+      /**
+       * @type {RedPoint}
+       */
+      let point = map[data.pointId];
+      return <Form.Item label={point.label?.length >= 1 ? point.label : '未命名输入'}>
+        {
+          point.type === 1 &&
+          <div>
             {data.data}
           </div>
         }
@@ -55,12 +94,12 @@ const getDataDiv = (result, project) => {
           point.type === 2 &&
           <img src={data.data} width={150} height={150} alt={point.label}/>
         }
-
-      </div>
+      </Form.Item>
     })
-  return <>
+  return <Form>
     {r.map(e => <div>{e}</div>)}
-  </>
+  </Form>
+
 }
 
 export const CloudData = (props) => {
@@ -73,6 +112,8 @@ export const CloudData = (props) => {
   const [previewVisible, setPreviewVisible] = useState(false)
 
   const [dataVisible, setDataVisible] = useState(false)
+
+  const [rewriteVisible, setRewriteVisible] = useState(false)
 
   const [currentResult, setCurrentResult] = useState(null)
 
@@ -266,9 +307,30 @@ export const CloudData = (props) => {
       >
         {
           dataVisible &&
-          getDataDiv(currentResult, project)
+          <div>
+            <Button onClick={()=>setRewriteVisible(true)}>全部修改</Button>
+            {/*//单个修改*/}
+            {getDataDiv(currentResult, project)}
+          </div>
+        }
+      </Modal>
+
+      <Modal title='数据修改'
+             width={EditorWidth * 0.8 + 100}
+             visible={rewriteVisible}
+             footer={null}
+             onCancel={() => setRewriteVisible(false)}
+      >
+        {
+          dataVisible &&
+            <div>
+              {//整体修改
+              dataFormRewrite(currentResult, project)}
+              <Button>保存数据</Button>
+            </div>
         }
       </Modal>
     </>
   )
 }
+
