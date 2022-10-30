@@ -1,0 +1,25 @@
+import {Button, Select} from "antd";
+import InputDataStore from "../../../data/InputDataStore";
+import React, {useState} from "react";
+
+export const CloudDataAllDownload = (props) => {
+
+  const {batchLoadResults, render, init} = props
+
+  return (
+    <Button type="primary"
+            size="small"
+            onClick={
+              async () => {
+                let results = batchLoadResults.filter(res => res.success)
+                for (let i in results) {
+                  await render(results[i], parseInt(i) + 1)
+                  await InputDataStore.setRendered(results[i].id)
+                }
+                await init()
+              }
+            }
+    >
+      <span style={{fontSize: "small"}}>下载全部</span>
+    </Button>)
+}
