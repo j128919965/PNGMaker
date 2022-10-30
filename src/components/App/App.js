@@ -16,6 +16,7 @@ import {CloudData} from "../CloudData/CloudData";
 import {Login} from "../Login/Login";
 import {ProjectMetadata} from "../../data/ProjectMetadata";
 import {RoleManage} from "../RoleManage/RoleManage";
+import {FormulaEditor} from "../FomulaEditor/FormulaEditor";
 
 
 const {Option} = Select
@@ -43,6 +44,8 @@ const App = () => {
 
     const [role, setRole] = useState(0)
 
+    const [outputNameConfigVisible,setOutputNameConfigVisible] = useState(false)
+
     /**
      * 项目编辑器
      * @type {React.MutableRefObject<ProjectEditor>}
@@ -60,7 +63,7 @@ const App = () => {
       !ignorePe && pe.current.resetProj(proj)
       pf.current.updateProject(proj)
       const headBtn = document.getElementById('headBtn');
-      headBtn.innerHTML = proj.name
+      headBtn.innerHTML = proj?.name
     }
 
     const openProjectById = async (id) => {
@@ -187,6 +190,14 @@ const App = () => {
             onClick: async () => {
               setCloudDataVisible(true)
             }
+          },
+          {
+            key: "tool-output",
+            label: '导出配置',
+            disabled: role < 1,
+            onClick: async () => {
+              setOutputNameConfigVisible(true)
+            }
           }
         ],
       },
@@ -291,6 +302,19 @@ const App = () => {
         {loginModalVisible && <Login onLogin={successLogin} close={() => setLoginModalVisible(false)}/>}
 
         {roleManageVisible && <RoleManage close={() => setRoleManageVisible(false)} role={role}/>}
+
+        {outputNameConfigVisible &&
+        <FormulaEditor project={project}
+                       defaultValue={project.outputNamePattern}
+                       title="配置导出文件名"
+                       containsData={true}
+                       onSuccess={tmp => {
+                         project.outputNamePattern = tmp
+                         updateProject(project,true)
+                         setOutputNameConfigVisible(false)
+                       }}
+                       close={() => setOutputNameConfigVisible(false)}/>
+        }
 
         <Modal title="打开项目"
                visible={openProjectVisible}

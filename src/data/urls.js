@@ -15,6 +15,7 @@ const urls = {
   input: {
     create: Server + '/input/new',
     getAllByProject: Server + '/input/by-proj',
+    getPage: Server + '/input/by-proj/v2',
     getNotRenderedByProject: Server + '/input/by-proj/no-rendered',
     del: Server + '/input/delete',
     setRendered: Server + '/input/set-rendered',

@@ -2,6 +2,7 @@ import {A4Height, A4Width, EditorHeight, EditorWidth, RedPointSize} from "../../
 import ImageLoader from "../../utils/imageLoader";
 import {Position} from "../../data/ProjectMetadata";
 import {message} from "antd";
+import formula from "../../utils/formula";
 
 const LargerRedPointSize = RedPointSize * A4Width / EditorWidth;
 
@@ -77,9 +78,6 @@ export default class ImageRenderer {
       console.error(`ID为${id}的输入项为空！`)
     }
 
-    // 先检查数据是否和本项目对应
-    this.checkData(data)
-
     // 注意point位置的等比例缩放
     let trulyPos = {}
     const proj = this.project
@@ -133,7 +131,7 @@ export default class ImageRenderer {
 
       } else if (point.type === 2) {
         let img = await ImageLoader.safeLoad(getData(point.id))
-        if (img == null){
+        if (img == null) {
           continue
         }
         let imgWidth = point.pattern.width * A4Width / EditorWidth
@@ -161,21 +159,14 @@ export default class ImageRenderer {
     }
   }
 
-  /**
-   * 检查传入的数据是否格式正确
-   * 主要检查：每一项的类型是否对应、必填项是否填写正常（字符串是否为空、如果是）
-   * @param inputDataLoadResult {InputData[]}
-   */
-  checkData(inputDataLoadResult) {
-    // 一条一条检查是否正常，如果不想检查也可以先放一放
-
-  }
 
   /**
    * 将已渲染好的图片下载下来
    * @param id {string?}
+   * @param inputDataLoadResult {InputDataLoadResult}
+   * @param project {ProjectMetadata}
    */
-  async download(inputDataLoadResult, id) {
+  async download(inputDataLoadResult, id, project) {
     this.backGroundCanvas.getContext('2d').clearRect(0, 0, A4Width, A4Height)
     await this.render(inputDataLoadResult.data)
 
@@ -186,9 +177,13 @@ export default class ImageRenderer {
     let now = new Date()
 
     let pngName = this.project.name + " " + now.getFullYear() + (now.getMonth() + 1 > 10 ? now.getMonth() + 1 : "0" + (now.getMonth() + 1)) + (now.getDate() > 10 ? now.getDate() : "0" + now.getDate())
-    if (id !== null) {
-      pngName = pngName + " " + id
+    let execResult = formula.exec(project.outputNamePattern, null, project, inputDataLoadResult);
+    if (execResult.s) {
+      pngName = execResult.d
     }
+    // if (id !== null) {
+    //   pngName = pngName + " " + id
+    // }
     dlLink.download = pngName;
     dlLink.href = imgURL;
     dlLink.dataset.downloader = [MIME_TYPE, dlLink.download, dlLink.href].join(':');

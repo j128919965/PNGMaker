@@ -26,9 +26,10 @@ function generateMixed(n) {
  * @param defaultValue {string} 要执行的公式
  * @param point {RedPoint} 输入项
  * @param project {ProjectMetadata} 项目
+ * @param result {InputDataLoadResult}
  * @returns ExecResult
  */
-const exec = (defaultValue, point, project) => {
+const exec = (defaultValue, point, project, result) => {
   const date = new Date().toLocaleDateString().split("/")
   const now = {
     year: parseInt(date[0]),
@@ -36,6 +37,25 @@ const exec = (defaultValue, point, project) => {
     day: parseInt(date[2])
   }
   const uuid = (n) => generateMixed(n)
+
+  const points = {}
+  project?.points.forEach(p => points[p.id] = {
+    id: p.id,
+    label: p.label?.length > 0 ? p.label : '未命名输入',
+    value: null
+  })
+
+  result?.data.filter(d => points[d.pointId] != null).forEach(d => {
+    points[d.pointId].value = d.data
+  })
+
+  Object.keys(points).forEach(key => {
+    let id = parseInt(key)
+    if (points[id].value == null) {
+      points[id].value = `输入${id}的示例数据`
+    }
+  })
+
   try {
     let input = '`' + (defaultValue == null ? point.defaultValue : defaultValue) + '`'
     let d = eval(input)

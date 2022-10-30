@@ -1,12 +1,13 @@
-import {Button, Form, Input} from "antd";
+import {Button, Form, Input, message} from "antd";
 import React, {useEffect, useState} from "react";
-import urls from "../../../data/urls";
 import {EditorWidth} from "../../../data/constants";
 import Modal from "antd/es/modal/Modal";
+import {InputDataLoadResult} from "../../../data/InputData";
+import InputDataStore from "../../../data/InputDataStore";
 
 export const CloudDataForm = (props) => {
 
-  const {close} = props
+  const {close,onSuccess} = props
 
   const {currentResult, project} = props
 
@@ -18,19 +19,21 @@ export const CloudDataForm = (props) => {
 
   const [currentData, setCurrentData] = useState(null);
 
-  const [newData, setNewData] = useState(null);
+
+  useEffect(() => {
+    initData()
+  }, [])
 
   //存放小红点{id, label, type}
-  let pointsMap = {}
+  const pointsMap = {}
   project.points.forEach(point => pointsMap[point.id] = point)
+
 
   const initData = (value) => {
 
     let curData = currentResult.data
       .filter(data => pointsMap[data.pointId] != null)
-      .filter(data => data?.data?.length >= 1)
-    //初始化数据
-    console.log(curData)
+
     setCurrentData(curData)
 
     //根据数据生成展示数据的DOM数组
@@ -39,18 +42,17 @@ export const CloudDataForm = (props) => {
        * @type {RedPoint}
        */
       let point = pointsMap[data.pointId]
-      if (point.type === 1){
+      if (point == null) {
+        return null
+      }
+      if (point.type === 1) {
         return [data.pointId, point.label?.length >= 1 ? point.label : '未命名输入',
           <div>{data.data}</div>]
-      }else if (point.type ===2){
+      } else {
         return [data.pointId, point.label?.length >= 1 ? point.label : '未命名输入',
           <img src={data.data} width={150} height={150} alt={point.label}/>]
       }
-    }))
-  }
-
-  const save = () => {
-    urls.input.update(newData)
+    }).filter(x => x != null))
   }
 
   const renderEditor = () => {
@@ -59,37 +61,45 @@ export const CloudDataForm = (props) => {
        * @type {RedPoint}
        */
       let point = pointsMap[data.pointId];
-
-      if (point.type === 1){
+      if (point.type === 1) {
         return [data.pointId, point.label?.length >= 1 ? point.label : '未命名输入',
-          <Input defaultValue={data.data}/>]
-      }else if (point.type ===2){
+          <Input/>]
+      } else {
         return [data.pointId, point.label?.length >= 1 ? point.label : '未命名输入',
           <img src={data.data} width={150} height={150} alt={point.label}/>]
       }
     }))
   }
 
-  useEffect(()=>{
-    initData()
-  }, [])
+  const getInitFormValues = () => {
+    let curData = currentResult.data
+      .filter(data => pointsMap[data.pointId] != null)
+    let initData = {}
+    curData.forEach(e => {
+      initData[e.pointId] = e.data
+    })
+    return initData
+  }
 
   return (
     <Modal title={
       <div>
-        <span>数据展示</span>
         {
+
           !isEditing &&
-          <Button onClick={() => {
-            renderEditor()
-            setIsEditing(true)
-          }}>全部修改</Button>
+          <>
+            <span>数据展示</span>
+            <Button style={{marginLeft: '30px'}} size="small" onClick={async () => {
+              await renderEditor()
+              setIsEditing(true)
+            }}>修改</Button>
+          </>
         }
         {
           isEditing &&
           <span>
-            <Button type="primary" htmlType="submit">保存</Button>
-            <Button onClick={() => {
+            <span>数据编辑</span>
+            <Button style={{marginLeft: '30px'}} size="small" onClick={() => {
               setIsEditing(false)
               initData()
             }}>取消</Button>
@@ -101,12 +111,27 @@ export const CloudDataForm = (props) => {
            footer={null}
            onCancel={close}
     >
-      <Form onFinish={(values)=>{console.log(values)}}>
+      <Form initialValues={getInitFormValues()} onFinish={async (values) => {
+        let inputDataLoadResult = InputDataLoadResult.fromMap(values, project);
+        inputDataLoadResult.id = currentResult.id
+        let resp = await InputDataStore.update(inputDataLoadResult)
+        if (!resp.s) {
+          message.error(resp.m)
+          return
+        }
+        message.success("修改成功")
+        onSuccess()
+      }}>
         {!isEditing &&
-        (dataInDiv || []).map(e => <Form.Item name={e[0]} label={e[1]}>{e[2]}</Form.Item>)
+          (dataInDiv || []).map(e => <Form.Item key={e[0]} name={e[0]} label={e[1]}>{e[2]}</Form.Item>)
         }
         {isEditing &&
-        (dataInForm || []).map(e => <Form.Item name={e[0]} label={e[1]}>{e[2]}</Form.Item>)
+          (dataInForm || []).map(e => <Form.Item key={e[0]} name={e[0]} label={e[1]}>{e[2]}</Form.Item>)
+        }
+        {
+          isEditing &&
+
+          <Button type="primary" htmlType="submit" size="small">保存</Button>
         }
       </Form>
     </Modal>)

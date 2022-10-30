@@ -15,6 +15,7 @@ import {FontPattern, PicturePattern, RedPoint} from "../../../data/ProjectMetada
 
 import './RedPointEditor.css'
 import formula from "../../../utils/formula";
+import {FormulaEditor} from "../../FomulaEditor/FormulaEditor";
 
 const {Option} = Select
 
@@ -86,7 +87,6 @@ const RedPointEditor = forwardRef((props, ref) => {
       setIsVisibleModalVisible(true)
     }),
     getItem('默认值', 'pe-sub5', <FunctionOutlined/>, undefined, () => {
-      setTempDefault(redPoint.defaultValue)
       setIsDefaultModalVisible(true)
     }),
     getItem('删除', 'pe-sub6', <CloseCircleOutlined/>, undefined, async () => {
@@ -131,8 +131,6 @@ const RedPointEditor = forwardRef((props, ref) => {
 
   const [tempVisible, setTempVisible] = useState(redPoint.visible);
 
-  const [tempDefault, setTempDefault] = useState(redPoint.defaultValue);
-
   const [isLabelModalVisible, setIsLabelModalVisible] = useState(false);
 
   const [isVisibleModalVisible, setIsVisibleModalVisible] = useState(false);
@@ -146,14 +144,6 @@ const RedPointEditor = forwardRef((props, ref) => {
   const [tempPicture, setTempPicture] = useState(PicturePattern.default())
 
   const [isPictureModalVisible, setIsPictureModalVisible] = useState(false)
-
-  const calcFormula = () => {
-    const resp = formula.exec(tempDefault, redPoint, props.project)
-    if (resp.s) {
-      return <span>{resp.d}</span>
-    }
-    return <span style={{color: "red"}}>{resp.m}</span>
-  }
 
   return (
     <>
@@ -187,52 +177,20 @@ const RedPointEditor = forwardRef((props, ref) => {
       </Modal>
 
 
-      <Modal title="修改默认值"
-             visible={isDefaultModalVisible}
-             onOk={() => {
-               redPoint.defaultValue = tempDefault
-               updatePoint()
-               setIsDefaultModalVisible(false)
-             }}
-             onCancel={() => setIsDefaultModalVisible(false)}
-             okText="确定"
-             cancelText="取消"
-      >
-        <div style={{display: "flex", flexWrap: "nowrap"}}>
-          <Input placeholder="输入默认值（公式）" value={tempDefault} onChange={(v) => {
-            setTempDefault(v.target.value)
-          }}/>
-          <Tooltip placement="topRight" title={() => calcFormula()}>
-            <Button>预览</Button>
-          </Tooltip>
-        </div>
-        <div style={{marginTop: '20px', marginLeft: '20px'}}>
-          <h3>可用的功能：</h3>
-          <h4>变量</h4>
-          <ul>
-            <li>{'${now.year}'} ：当前年</li>
-            <li>{'${now.month}'} ：当前月</li>
-            <li>{'${now.day}'} ：当前日</li>
-            <li>{'${point.label}'} ：当前输入项的名称</li>
-            <li>{'${project.name}'} ：当前项目名</li>
-            <li>{'${project.id}'} ：当前项目ID</li>
-          </ul>
-          <h4>函数</h4>
-          <ul>
-            <li>{'${uuid(n)}'} ：长度为n的随机字符串</li>
-          </ul>
-          <h3>示例</h3>
-          <ul>
-            <li>输入公式为：{'今天是${now.year}年，${now.month}月，${now.day}日。随机编号为${uuid(5)}'}</li>
-            <li>得到的示例结果为：今天是2022年，10月，25日。随机编号为I31ZA</li>
-          </ul>
-          <ul>
-            <li>如果输入项类型为图片，默认值请输入图片链接</li>
-          </ul>
-        </div>
+      {
+        isDefaultModalVisible &&
+        <FormulaEditor project={props.project}
+                       redPoint={redPoint}
+                       defaultValue={redPoint.defaultValue}
+                       onSuccess={tmp => {
+                         redPoint.defaultValue = tmp
+                         updatePoint()
+                         setIsDefaultModalVisible(false)
+                       }}
+                       close={() => setIsDefaultModalVisible(false)}
+        />
 
-      </Modal>
-
+      }
 
       <Modal title="修改可见性"
              visible={isVisibleModalVisible}

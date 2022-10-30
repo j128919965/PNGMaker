@@ -79,7 +79,7 @@ export class InputDataLoadResult {
     result.projectId = project.id
     result.success = true
     const data = Object.keys(map).map(key => new InputData(parseInt(key), map[key]))
-    project.points.filter(p => !p.visible).forEach(p => {
+    project.points.filter(p => p.defaultValue?.length > 0).forEach(p => {
       const value = formula.exec(p.defaultValue, p, project).d
       console.log("add invisible input , value = " + value)
       if (map[p.id.toString()] == null) {

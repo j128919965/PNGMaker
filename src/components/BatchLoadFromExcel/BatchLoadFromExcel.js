@@ -31,7 +31,7 @@ const BatchLoadFromExcel = (props) => {
   const render = async (result, id) => {
     let blImageRenderer = new ImageRenderer()
     blImageRenderer.load(project)
-    await blImageRenderer.download(result, id)
+    await blImageRenderer.download(result, id,project)
   }
 
   const drawPreView = async () => {

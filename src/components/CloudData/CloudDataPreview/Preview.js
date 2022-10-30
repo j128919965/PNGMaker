@@ -4,7 +4,7 @@ import React from "react";
 
 export const Preview = (props) => {
 
-  const {render, currentResult} = props
+  const {render, currentResult, onSuccess} = props
 
   return (
     <div className='m-pf-preview-container' style={{width: '100%', display: 'flex',}}>
@@ -17,7 +17,10 @@ export const Preview = (props) => {
       <Button className='u-pf-btn'
               type={"primary"}
               style={{marginTop: 20}}
-              onClick={() => render(currentResult, null)}
+              onClick={async () => {
+                await render(currentResult, null)
+                onSuccess()
+              }}
       >
         导出图片
       </Button>

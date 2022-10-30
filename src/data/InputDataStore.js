@@ -2,6 +2,8 @@ import {InputDataLoadResult} from "./InputData";
 import urls from "./urls";
 import {message} from "antd";
 import httpx2 from "../utils/httpx2";
+import {post} from "../utils/httpx";
+
 
 const InputDataStore = {
   /**
@@ -32,6 +34,18 @@ const InputDataStore = {
     return resps
   },
 
+  async getPage(projectId, rendered, start,pageSize) {
+    let resp = await httpx2.get(urls.input.getPage + `?projectId=${projectId}&num=${pageSize}&rendered=${rendered}&start=${start}`)
+    if (!resp.s) {
+      message.error(resp.m)
+      return []
+    }
+    let {data, total} = resp.d
+    data.forEach(resp => resp.data = JSON.parse(resp.data))
+    data = data.map(resp => InputDataLoadResult.fromObj(resp))
+    return {data, total}
+  },
+
   async setRendered(id) {
     return httpx2.post(urls.input.setRendered + `?id=${id}`)
   },
@@ -45,6 +59,18 @@ const InputDataStore = {
     obj.success = undefined
     obj.data = JSON.stringify(obj.data)
     return httpx2.post(urls.input.create, obj)
+  },
+  /**
+   * 修改数据
+   * @param result {InputDataLoadResult}
+   * @return {Promise<WebResponse>}
+   */
+  async update(result) {
+    let data = {
+      id: result.id,
+      data: JSON.stringify(result.data)
+    }
+    return httpx2.post(urls.input.update, data)
   },
   async remove(id) {
     let resp = await httpx2.post(urls.input.del + `?id=${id}`)

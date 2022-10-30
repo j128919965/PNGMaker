@@ -164,7 +164,7 @@ export default class ProjectForm extends React.Component {
   downloadPNG = async (project) => {
     let pfImageRenderer = new ImageRenderer()
     pfImageRenderer.load(project)
-    await pfImageRenderer.download(InputDataLoadResult.fromMap(this.state.data, project), null)
+    await pfImageRenderer.download(InputDataLoadResult.fromMap(this.state.data, project), null, project)
   }
 
   saveInputDataResult = async () => {

@@ -1,10 +1,10 @@
-import {Button, Select} from "antd";
+import {Button} from "antd";
 import InputDataStore from "../../../data/InputDataStore";
-import React, {useState} from "react";
+import React from "react";
 
 export const CloudDataAllDownload = (props) => {
 
-  const {batchLoadResults, render, init} = props
+  const {batchLoadResults, render, reload} = props
 
   return (
     <Button type="primary"
@@ -16,7 +16,7 @@ export const CloudDataAllDownload = (props) => {
                   await render(results[i], parseInt(i) + 1)
                   await InputDataStore.setRendered(results[i].id)
                 }
-                await init()
+                await reload()
               }
             }
     >

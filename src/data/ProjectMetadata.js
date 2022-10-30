@@ -27,6 +27,8 @@ export class ProjectMetadata {
 
   role
 
+  outputNamePattern
+
   static default(id) {
     return ProjectMetadata.fromObj({id})
   }
@@ -40,6 +42,7 @@ export class ProjectMetadata {
     obj.points?.forEach(p => proj.points.push(RedPoint.fromObj(p)))
     proj.latestPointId = obj?.latestPointId ?? 0
     proj.role = obj?.role ?? 0
+    proj.outputNamePattern = obj?.outputNamePattern ?? "${project.name} ${now.year}${now.month}${now.day}"
     return proj
   }
 
