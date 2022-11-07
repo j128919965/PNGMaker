@@ -9,6 +9,7 @@ import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {InputDataLoadResult} from "../../data/InputData";
 import InputDataStore from "../../data/InputDataStore";
+import {clear} from "@testing-library/user-event/dist/clear";
 
 /**
  *
@@ -60,7 +61,9 @@ export default class ProjectForm extends React.Component {
       project: null,
       data: {},
       isModalVisible: false,
-      role: props.role
+      role: props.role,
+      isUpload: true,
+      countDown: props.proantiShakeTime
     }
   }
 
@@ -89,7 +92,6 @@ export default class ProjectForm extends React.Component {
       })
       return
     }
-
 
     const {data} = this.state
 
@@ -237,15 +239,20 @@ export default class ProjectForm extends React.Component {
                       导 出
                     </Button>
                   }
-                  <Button type="primary" className="u-pf-btn"
-                          onClick={() => this.saveInputDataResult()}
+                  <Button type="primary" className="u-pf-btn" disabled={!this.state.isUpload}
+                          onClick={() => {
+                            this.saveInputDataResult()
+                            this.setState({isUpload: false})
+                            setTimeout(() => {
+                              this.setState({isUpload: true, countDown: this.props.project.antiShakeTime})
+                            }, this.props.project.antiShakeTime * 1000)
+                          }}
                   >
                     上 传
                   </Button>
                 </div>
               </div>
             }
-
           </div>
         }
         <Modal title='图片预览'

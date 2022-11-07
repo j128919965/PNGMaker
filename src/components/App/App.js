@@ -1,6 +1,6 @@
 import EdiText from "react-editext";
 import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined, UserOutlined} from "@ant-design/icons";
-import {Button, Menu, message, Modal, Popover, Select} from "antd";
+import {Button, Form, Menu, message, Modal, Popover, Select} from "antd";
 
 import {useEffect, useRef, useState} from "react";
 
@@ -17,6 +17,7 @@ import {Login} from "../Login/Login";
 import {ProjectMetadata} from "../../data/ProjectMetadata";
 import {RoleManage} from "../RoleManage/RoleManage";
 import {FormulaEditor} from "../FomulaEditor/FormulaEditor";
+import {AntiShakeSetter} from "../AntiShakeSetter/AntiShakeSetter";
 
 
 const {Option} = Select
@@ -44,7 +45,11 @@ const App = () => {
 
     const [role, setRole] = useState(0)
 
-    const [outputNameConfigVisible,setOutputNameConfigVisible] = useState(false)
+    const [outputNameConfigVisible, setOutputNameConfigVisible] = useState(false)
+
+    const [antiShakeTime, setAntiShakeTime] = useState(30)
+
+    const [antiShakeVisible, setAntiShakeVisible] = useState(false)
 
     /**
      * 项目编辑器
@@ -198,6 +203,14 @@ const App = () => {
             onClick: async () => {
               setOutputNameConfigVisible(true)
             }
+          },
+          {
+            key: "tool-anti-shake",
+            label: '防抖时间',
+            disabled: role < 1,
+            onClick: async () => {
+              setAntiShakeVisible(true)
+            }
           }
         ],
       },
@@ -310,10 +323,20 @@ const App = () => {
                        containsData={true}
                        onSuccess={tmp => {
                          project.outputNamePattern = tmp
-                         updateProject(project,true)
+                         updateProject(project, true)
                          setOutputNameConfigVisible(false)
                        }}
                        close={() => setOutputNameConfigVisible(false)}/>
+        }
+
+        {antiShakeVisible &&
+        <AntiShakeSetter defaultValue={project.antiShakeTime}
+                         close={()=>setAntiShakeVisible(false)}
+                         onSuccess={(time)=>{
+                           project.antiShakeTime = time
+                           updateProject(project, true)
+                           setAntiShakeVisible(false)
+                         }}/>
         }
 
         <Modal title="打开项目"

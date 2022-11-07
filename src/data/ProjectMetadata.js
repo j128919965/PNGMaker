@@ -43,6 +43,7 @@ export class ProjectMetadata {
     proj.latestPointId = obj?.latestPointId ?? 0
     proj.role = obj?.role ?? 0
     proj.outputNamePattern = obj?.outputNamePattern ?? "${project.name} ${now.year}${now.month}${now.day}"
+    proj.antiShakeTime = obj?.antiShakeTime ?? 30
     return proj
   }
 
