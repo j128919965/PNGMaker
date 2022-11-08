@@ -29,6 +29,8 @@ export class ProjectMetadata {
 
   outputNamePattern
 
+  antiShakeTime
+
   static default(id) {
     return ProjectMetadata.fromObj({id})
   }

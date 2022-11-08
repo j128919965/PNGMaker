@@ -1,6 +1,6 @@
 import EdiText from "react-editext";
 import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined, UserOutlined} from "@ant-design/icons";
-import {Button, Form, Menu, message, Modal, Popover, Select} from "antd";
+import {Button, Menu, message, Modal, Popover, Select} from "antd";
 
 import {useEffect, useRef, useState} from "react";
 
@@ -8,7 +8,6 @@ import ProjectEditor from "../ProjectEditor/ProjectEditor";
 import ProjectForm from "../ProjectForm/ProjectForm";
 import ProjectStore from "../../data/ProjectStore";
 import files from "../../utils/files"
-import formula from "../../utils/formula";
 
 import './App.css';
 import BatchLoadFromExcel from "../BatchLoadFromExcel/BatchLoadFromExcel";
@@ -18,6 +17,8 @@ import {ProjectMetadata} from "../../data/ProjectMetadata";
 import {RoleManage} from "../RoleManage/RoleManage";
 import {FormulaEditor} from "../FomulaEditor/FormulaEditor";
 import {AntiShakeSetter} from "../AntiShakeSetter/AntiShakeSetter";
+
+0
 
 
 const {Option} = Select
@@ -46,8 +47,6 @@ const App = () => {
     const [role, setRole] = useState(0)
 
     const [outputNameConfigVisible, setOutputNameConfigVisible] = useState(false)
-
-    const [antiShakeTime, setAntiShakeTime] = useState(30)
 
     const [antiShakeVisible, setAntiShakeVisible] = useState(false)
 
@@ -206,7 +205,7 @@ const App = () => {
           },
           {
             key: "tool-anti-shake",
-            label: '防抖时间',
+            label: '上传冷却',
             disabled: role < 1,
             onClick: async () => {
               setAntiShakeVisible(true)

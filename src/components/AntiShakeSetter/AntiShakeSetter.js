@@ -1,4 +1,4 @@
-import {Form, Input, Modal} from "antd";
+import {Input, Modal} from "antd";
 import {useState} from "react";
 
 export const AntiShakeSetter = (props) => {
@@ -8,7 +8,7 @@ export const AntiShakeSetter = (props) => {
   const [shakeTime, setShakeTime] = useState(defaultValue)
 
   return (
-    <Modal title="防抖时间"
+    <Modal title="上传冷却"
            visible={true}
            onCancel={close}
            onOk={() => {
@@ -18,8 +18,8 @@ export const AntiShakeSetter = (props) => {
            cancelText="取消"
     >
       <div>
-        当前项目防抖时间为:{defaultValue}（单位：秒）
-        <Input type="number" placeholder="请输入项目防抖时间" min="0" onChange={v => {
+        上传冷却（秒）
+        <Input type="number" defaultValue={defaultValue} placeholder="请输入云端数据上传冷却时间" min="0" onChange={v => {
           setShakeTime(v.target.value)
         }}/>
       </div>

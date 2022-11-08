@@ -9,7 +9,6 @@ import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {InputDataLoadResult} from "../../data/InputData";
 import InputDataStore from "../../data/InputDataStore";
-import {clear} from "@testing-library/user-event/dist/clear";
 
 /**
  *
@@ -62,8 +61,7 @@ export default class ProjectForm extends React.Component {
       data: {},
       isModalVisible: false,
       role: props.role,
-      isUpload: true,
-      countDown: props.antiShakeTime
+      countDown: 0
     }
   }
 
@@ -239,31 +237,24 @@ export default class ProjectForm extends React.Component {
                       导 出
                     </Button>
                   }
-                  <Button type="primary" className="u-pf-btn" disabled={!this.state.isUpload}
+                  <Button type="primary" className="u-pf-btn" disabled={this.state.countDown !== 0}
                           onClick={() => {
                             const {antiShakeTime} = this.props.project
-                            this.saveInputDataResult()
-                            this.setState({isUpload: false, countDown: antiShakeTime}, () => {
+                            this.setState({countDown: antiShakeTime}, () => {
                               let t = setInterval(() => {
                                 const newTime = this.state.countDown - 1
-                                this.setState({countDown: newTime},()=>{
-                                  console.log(this.state.countDown)
+                                this.setState({countDown: newTime}, () => {
+                                  if (this.state.countDown <= 0) {
+                                    clearInterval(t)
+                                  }
                                 })
-                                if (this.state.countDown <= 0) {
-                                  this.setState({isUpload: true, countDown: antiShakeTime})
-                                  clearInterval(t)
-                                }
                               }, 1000)
                             })
+                            this.saveInputDataResult()
                           }}
                   >
                     {
-                      this.state.isUpload &&
-                        <div>上 传</div>
-                    }
-                    {
-                      !this.state.isUpload &&
-                        <div>{this.state.countDown} 秒</div>
+                      this.state.countDown === 0 ? <div>上 传</div> : <div>{this.state.countDown} 秒</div>
                     }
                   </Button>
                 </div>
