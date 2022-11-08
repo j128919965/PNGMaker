@@ -63,7 +63,7 @@ export default class ProjectForm extends React.Component {
       isModalVisible: false,
       role: props.role,
       isUpload: true,
-      countDown: props.proantiShakeTime
+      countDown: props.antiShakeTime
     }
   }
 
@@ -241,14 +241,30 @@ export default class ProjectForm extends React.Component {
                   }
                   <Button type="primary" className="u-pf-btn" disabled={!this.state.isUpload}
                           onClick={() => {
+                            const {antiShakeTime} = this.props.project
                             this.saveInputDataResult()
-                            this.setState({isUpload: false})
-                            setTimeout(() => {
-                              this.setState({isUpload: true, countDown: this.props.project.antiShakeTime})
-                            }, this.props.project.antiShakeTime * 1000)
+                            this.setState({isUpload: false, countDown: antiShakeTime}, () => {
+                              let t = setInterval(() => {
+                                const newTime = this.state.countDown - 1
+                                this.setState({countDown: newTime},()=>{
+                                  console.log(this.state.countDown)
+                                })
+                                if (this.state.countDown <= 0) {
+                                  this.setState({isUpload: true, countDown: antiShakeTime})
+                                  clearInterval(t)
+                                }
+                              }, 1000)
+                            })
                           }}
                   >
-                    上 传
+                    {
+                      this.state.isUpload &&
+                        <div>上 传</div>
+                    }
+                    {
+                      !this.state.isUpload &&
+                        <div>{this.state.countDown} 秒</div>
+                    }
                   </Button>
                 </div>
               </div>
