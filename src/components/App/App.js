@@ -18,7 +18,6 @@ import {RoleManage} from "../RoleManage/RoleManage";
 import {FormulaEditor} from "../FomulaEditor/FormulaEditor";
 import {AntiShakeSetter} from "../AntiShakeSetter/AntiShakeSetter";
 
-0
 
 
 const {Option} = Select
