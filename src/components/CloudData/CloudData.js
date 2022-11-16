@@ -13,8 +13,6 @@ import {Preview} from "./CloudDataPreview/Preview";
 
 const {Option} = Select
 
-const pageSize = 7;
-
 export const CloudData = (props) => {
 
   const {project, close} = props
@@ -35,6 +33,10 @@ export const CloudData = (props) => {
 
   const [total, setTotal] = useState(0)
 
+  const [pageSize, setPageSize] = useState(Math.floor((document.body.clientHeight - 220) / 62));
+
+  const [order, setOrder] = useState(false)
+
 
   const getNumberList = () => {
     let dom = []
@@ -45,7 +47,7 @@ export const CloudData = (props) => {
     }
     return <div style={{display: "flex"}}>
       <span style={{userSelect: 'none'}}>第</span>
-        {dom}
+      {dom}
       <span style={{userSelect: 'none'}}>页</span>
     </div>
   }
@@ -55,7 +57,7 @@ export const CloudData = (props) => {
     console.log("cloud data init")
     setLoading(true)
     // let results = await InputDataStore.getAllByProject(project.id, showRendered)
-    let page = await InputDataStore.getPage(project.id, showRendered, currentPage * pageSize, pageSize)
+    let page = await InputDataStore.getPage(project.id, showRendered, currentPage * pageSize, pageSize, order)
     let results = page.data
     let total = page.total
     setTotal(total)
@@ -76,7 +78,7 @@ export const CloudData = (props) => {
   const render = async (result, id) => {
     let blImageRenderer = new ImageRenderer()
     blImageRenderer.load(project)
-    await blImageRenderer.download(result, id,project)
+    await blImageRenderer.download(result, id, project)
     await InputDataStore.setRendered(result.id)
   }
 
@@ -96,7 +98,7 @@ export const CloudData = (props) => {
 
   useEffect(() => {
     reloadResults()
-  }, [showRendered, currentPage])
+  }, [showRendered, currentPage, order])
 
   return (
     <>
@@ -117,13 +119,23 @@ export const CloudData = (props) => {
                 <Option value={2}>历史数据</Option>
               </Select>
             }
+            {
+              loadResultList &&
+              <Select defaultValue={order ? 2 : 1} size={"small"} onChange={v => {
+                setOrder(v === 2)
+              }}>
+                <Option value={1}>按照创建时间倒序</Option>
+                <Option value={2}>按照创建时间正序</Option>
+              </Select>
+            }
           </div>
         }
         visible={!previewVisible && !cloudDataFormVisible}
         onCancel={close}
         onOk={close}
-        width={800}
+        width={Math.min(document.body.clientWidth - 200, 1600)}
         footer={null}
+        style={{top: 50}}
       >
         {
           loading &&

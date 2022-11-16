@@ -34,8 +34,8 @@ const InputDataStore = {
     return resps
   },
 
-  async getPage(projectId, rendered, start,pageSize) {
-    let resp = await httpx2.get(urls.input.getPage + `?projectId=${projectId}&num=${pageSize}&rendered=${rendered}&start=${start}`)
+  async getPage(projectId, rendered, start, pageSize, order) {
+    let resp = await httpx2.get(urls.input.getPage + `?projectId=${projectId}&num=${pageSize}&rendered=${rendered}&start=${start}&order=${order}`)
     if (!resp.s) {
       message.error(resp.m)
       return []

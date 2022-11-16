@@ -110,6 +110,7 @@ export const CloudDataForm = (props) => {
            visible={true}
            footer={null}
            onCancel={close}
+           style={{top:50}}
     >
       <Form initialValues={getInitFormValues()} onFinish={async (values) => {
         let inputDataLoadResult = InputDataLoadResult.fromMap(values, project);
@@ -123,10 +124,10 @@ export const CloudDataForm = (props) => {
         onSuccess()
       }}>
         {!isEditing &&
-          (dataInDiv || []).map(e => <Form.Item key={e[0]} name={e[0]} label={e[1]}>{e[2]}</Form.Item>)
+          (dataInDiv || []).map(e => <Form.Item style={{marginBottom:10}}  key={e[0]} name={e[0]} label={e[1]}>{e[2]}</Form.Item>)
         }
         {isEditing &&
-          (dataInForm || []).map(e => <Form.Item key={e[0]} name={e[0]} label={e[1]}>{e[2]}</Form.Item>)
+          (dataInForm || []).map(e => <Form.Item style={{marginBottom:10}} key={e[0]} name={e[0]} label={e[1]}>{e[2]}</Form.Item>)
         }
         {
           isEditing &&

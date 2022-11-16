@@ -28,6 +28,7 @@ export const FormulaEditor = props => {
            onCancel={close}
            okText="确定"
            cancelText="取消"
+           width={800}
     >
       <div style={{display: "flex", flexWrap: "nowrap"}}>
         <Input.TextArea placeholder="输入默认值（公式）" value={tempDefault} onChange={(v) => {

@@ -20,7 +20,7 @@
 
 .m-cd-data-line {
     overflow: hidden;
-    max-width: 350px;
+    width: 100%;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -47,4 +47,8 @@
     margin-top: 10px;
     padding-bottom: 5px;
     border-bottom: 1px solid #eee;
+}
+
+.m-bl-line-word{
+    width: calc(100% - 400px);
 }

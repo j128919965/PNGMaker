@@ -89,8 +89,9 @@ const BatchLoadFromExcel = (props) => {
         visible={!previewVisible}
         onCancel={close}
         onOk={close}
-        width={800}
+        width={Math.min(document.body.clientWidth - 200, 1600)}
         footer={null}
+        style={{top:50}}
       >
         <div>
           {

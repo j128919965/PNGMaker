@@ -20,6 +20,6 @@ export const CloudDataAllDownload = (props) => {
               }
             }
     >
-      <span style={{fontSize: "small"}}>下载全部</span>
+      <span style={{fontSize: "small"}}>导出本页全部</span>
     </Button>)
 }
