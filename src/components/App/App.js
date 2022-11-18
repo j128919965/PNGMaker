@@ -372,7 +372,7 @@ const App = () => {
                                   let resp = await ProjectStore.delete(p.id)
                                   if (resp) {
                                     message.success("删除成功")
-                                    if (project.id === p.id) {
+                                    if (project?.id === p.id) {
                                       setTimeout(() => updateProject(null), 0)
                                     }
                                     setProjectList(await ProjectStore.getAll())

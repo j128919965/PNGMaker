@@ -10,6 +10,7 @@ import {CloudDataForm} from "./CloudDataForm/CloudDataForm";
 import {CloudDataAllDownload} from "./CloudDataAllDownload/CloudDataAllDownload";
 import {CloudDataInLine} from "./CloudDataInLine/CloudDataInLine";
 import {Preview} from "./CloudDataPreview/Preview";
+import config from "../../utils/config";
 
 const {Option} = Select
 
@@ -33,10 +34,11 @@ export const CloudData = (props) => {
 
   const [total, setTotal] = useState(0)
 
-  const [pageSize, setPageSize] = useState(Math.floor((document.body.clientHeight - 220) / 62));
+  const [pageSize, setPageSize] = useState(config.get("enableCloudDataAutoSize") === "true" ? Math.floor((document.body.clientHeight - 220) / 62) : 7);
 
   const [order, setOrder] = useState(false)
 
+  const [enableCloudDataSort, setEnableCloudDataSort] = useState(config.get("enableCloudDataSort"))
 
   const getNumberList = () => {
     let dom = []
@@ -100,6 +102,16 @@ export const CloudData = (props) => {
     reloadResults()
   }, [showRendered, currentPage, order])
 
+  useEffect(() => {
+    let id1 = config.addListener("enableCloudDataSort", n => setEnableCloudDataSort(n))
+    let id2 = config.addListener("enableCloudDataAutoSize",
+      n => setPageSize(n === "true" ? Math.floor((document.body.clientHeight - 220) / 62) : 7))
+    return () => {
+      config.removeListener(id1)
+      config.removeListener(id2)
+    }
+  }, [])
+
   return (
     <>
       <Modal
@@ -120,7 +132,7 @@ export const CloudData = (props) => {
               </Select>
             }
             {
-              loadResultList &&
+              enableCloudDataSort === "true" && loadResultList &&
               <Select defaultValue={order ? 2 : 1} size={"small"} onChange={v => {
                 setOrder(v === 2)
               }}>

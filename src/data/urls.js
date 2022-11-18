@@ -1,5 +1,5 @@
-const Server = 'http://localhost:8080/agapi'
-// const Server = 'https://award.ssacgn.online/agapi'
+// const Server = 'http://localhost:8080/agapi'
+const Server = 'https://award.ssacgn.online/agapi'
 
 const urls = {
   projects: {
@@ -30,8 +30,11 @@ const urls = {
     create : Server + '/roleask/new',
     handle : Server + '/roleask/handle',
     getAllNotHandled : Server + '/roleask/not-handled',
+  },
+  cfg: {
+    get : Server + '/cfg'
   }
 }
-/*完了，我不知道这些接口都是干嘛的（挠头 哪个才是*/
+
 export default urls
 
