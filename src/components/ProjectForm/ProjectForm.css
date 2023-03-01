@@ -46,6 +46,10 @@
     margin-right: 25px;
 }
 
+.m-pf-editor-hint{
+    margin-left: 9px;
+}
+
 .u-pf-btn{
     position: relative;
     margin-top: 30px;
@@ -63,10 +67,15 @@
     background: rgba(24,144,255,0.8);
 }
 
-.u-pf-editor-upload{
+.u-pf-editor-upload-default{
     border: 1px solid #1890FF;
     border-radius: 5px;
     color: #1890FF;
+}
+.u-pf-editor-upload-error{
+    border: 1px solid #ff5454;
+    border-radius: 5px;
+    color: #ff5454;
 }
 
 .m-pf-preview-container{

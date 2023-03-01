@@ -98,6 +98,10 @@ const RedPointEditor = forwardRef((props, ref) => {
         cancelText: '取消',
         onOk: () => props.onDelete(redPoint.id)
       })
+    }),
+    getItem('是否必填','pe-sub7',<ExclamationCircleOutlined />,undefined, async ()=>{
+      setTempNecessity(redPoint.isNecessary)
+      setIsNecessaryModalVisible(true)
     })
   ]
 
@@ -131,6 +135,8 @@ const RedPointEditor = forwardRef((props, ref) => {
 
   const [tempVisible, setTempVisible] = useState(redPoint.visible);
 
+  const [tempNecessity, setTempNecessity] = useState(redPoint.isNecessary)
+
   const [isLabelModalVisible, setIsLabelModalVisible] = useState(false);
 
   const [isVisibleModalVisible, setIsVisibleModalVisible] = useState(false);
@@ -144,6 +150,8 @@ const RedPointEditor = forwardRef((props, ref) => {
   const [tempPicture, setTempPicture] = useState(PicturePattern.default())
 
   const [isPictureModalVisible, setIsPictureModalVisible] = useState(false)
+
+  const [isNecessaryModalVisible,setIsNecessaryModalVisible] = useState(false)
 
   return (
     <>
@@ -339,6 +347,24 @@ const RedPointEditor = forwardRef((props, ref) => {
           </div>
         </div>
       </Modal>
+
+      <Modal title="是否必填"
+             visible={isNecessaryModalVisible}
+             onOk={() => {
+               redPoint.isNecessary = tempNecessity
+               updatePoint()
+               setIsNecessaryModalVisible(false)
+             }}
+             onCancel={() => setIsNecessaryModalVisible(false)}
+             okText="确定"
+             cancelText="取消"
+      >
+        <Switch checked={tempNecessity}
+                checkedChildren="必填"
+                unCheckedChildren="非必填"
+                onChange={v => setTempNecessity(v)}/>
+      </Modal>
+
     </>
 
 
