@@ -35,23 +35,27 @@ function TypeOfText(props) {
 }
 /* 提示按钮，通过变红提示用户需要点击 */
 function HintButton(props) {
-  const {value, type, handler} = props
-  if (type === 0) {
+  const {value, type, clickHandler} = props
+  const typeMap={
+    default:'default',
+    error:'error'
+  }
+  if (type === typeMap.default) {
     return (
       <Button
         className='u-pf-editor-upload-default'
         icon={<UploadOutlined/>}
-        onClick={handler}
+        onClick={clickHandler}
       >
         {value}
       </Button>
     )
-  } else if (type === 1) {
+  } else if (type === typeMap.error) {
     return (
       <Button
         className='u-pf-editor-upload-error'
         icon={<UploadOutlined/>}
-        onClick={handler}
+        onClick={clickHandler}
       >
         {value}
       </Button>
@@ -69,8 +73,8 @@ function TypeOfImage(props) {
         <div>{(point.label?.length > 0 ? point.label : "请设置备注")}{point.isNecessary ?
           <ExclamationCircleTwoTone twoToneColor="red"/> : ''}<br/>
           <HintButton
-            type ={emptyHint[point.id]?1:0}
-            handler = {onclick}
+            type ={emptyHint[point.id]?'error':'default'}
+            clickHandler= {onclick}
             value={"上传图片"}/>
           <br/>
           {data[point.id] ? data[point.id].substring(data[point.id].indexOf("/file/") + 6) : '未选择文件'}

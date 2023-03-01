@@ -9,7 +9,7 @@ import {
   FontColorsOutlined,
   FunctionOutlined
 } from "@ant-design/icons";
-import {Button, Input, Menu, Modal, Select, Switch, Tooltip} from "antd";
+import {Button, Input, Menu, message, Modal, Select, Switch, Tooltip} from "antd";
 
 import {FontPattern, PicturePattern, RedPoint} from "../../../data/ProjectMetadata";
 
@@ -87,8 +87,14 @@ const RedPointEditor = forwardRef((props, ref) => {
       setIsVisibleModalVisible(true)
     }),
     getItem('默认值', 'pe-sub5', <FunctionOutlined/>, undefined, () => {
-      setIsDefaultModalVisible(true)
-    }),
+      setTempNecessity(redPoint.isNecessary)
+      if (tempNecessity||redPoint.isNecessary){
+        message.error(`必填项不可设置默认值`)
+      }else{
+        setIsDefaultModalVisible(true)
+      }
+    })
+    ,
     getItem('删除', 'pe-sub6', <CloseCircleOutlined/>, undefined, async () => {
       Modal.confirm({
         title: `删除项目`,
@@ -99,7 +105,7 @@ const RedPointEditor = forwardRef((props, ref) => {
         onOk: () => props.onDelete(redPoint.id)
       })
     }),
-    getItem('是否必填','pe-sub7',<ExclamationCircleOutlined />,undefined, async ()=>{
+    getItem('是否必填', 'pe-sub7', <ExclamationCircleOutlined/>, undefined, async () => {
       setTempNecessity(redPoint.isNecessary)
       setIsNecessaryModalVisible(true)
     })
@@ -151,7 +157,7 @@ const RedPointEditor = forwardRef((props, ref) => {
 
   const [isPictureModalVisible, setIsPictureModalVisible] = useState(false)
 
-  const [isNecessaryModalVisible,setIsNecessaryModalVisible] = useState(false)
+  const [isNecessaryModalVisible, setIsNecessaryModalVisible] = useState(false)
 
   return (
     <>
@@ -214,7 +220,12 @@ const RedPointEditor = forwardRef((props, ref) => {
         <Switch checked={tempVisible}
                 checkedChildren="可见"
                 unCheckedChildren="隐藏"
-                onChange={v => setTempVisible(v)}/>
+                onChange={v => {
+                  if (!v) {
+                    redPoint.isNecessary = false
+                  }
+                  setTempVisible(v)
+                }}/>
       </Modal>
 
 
@@ -362,7 +373,13 @@ const RedPointEditor = forwardRef((props, ref) => {
         <Switch checked={tempNecessity}
                 checkedChildren="必填"
                 unCheckedChildren="非必填"
-                onChange={v => setTempNecessity(v)}/>
+                onChange={v => {
+                  if (v) {
+                    redPoint.visible = true
+                    redPoint.defaultValue = ""
+                  }
+                  setTempNecessity(v)
+                }}/>
       </Modal>
 
     </>
