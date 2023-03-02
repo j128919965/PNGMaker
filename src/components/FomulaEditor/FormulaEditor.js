@@ -19,7 +19,7 @@ export const FormulaEditor = props => {
     <Modal title={<>
       {title == null ? '修改默认值' : title}
       <Tooltip placement="topRight" title={() => calcFormula()} mouseLeaveDelay={10}>
-        <Button size={"small"} style={{marginLeft:'10px'}}>预览</Button>
+        <Button size={"small"} style={{marginLeft: '10px'}}>预览</Button>
       </Tooltip>
 
     </>}

@@ -1,10 +1,10 @@
 import React from "react";
 
 import "./ProjectForm.css"
-import {Empty, Input, Button, Modal, message} from "antd";
-import {UploadOutlined} from '@ant-design/icons';
+import {Button, Empty, Input, message, Modal} from "antd";
+import {ExclamationCircleTwoTone, UploadOutlined} from '@ant-design/icons';
 
-import {EditorHeight, EditorWidth} from '../../data/constants'
+import {buttonStatus, EditorHeight, EditorWidth} from '../../data/constants'
 import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {InputDataLoadResult} from "../../data/InputData";
@@ -17,32 +17,63 @@ import InputDataStore from "../../data/InputDataStore";
  * @constructor
  */
 function TypeOfText(props) {
-  const {point, oninput, data} = props
+  const {point, oninput, data, emptyHint} = props
   return <div className="m-pf-editor-text">
     <div className="u-point">{point.id}</div>
     <div>
-      <label>{point.label?.length > 0 ? point.label : "请设置备注"}<br/>
-        <Input type="text" placeholder={point.defaultValue} onInput={oninput} value={data[point.id]}/>
+      <label>{point.label?.length > 0 ? point.label + ' ' : "请设置备注 "}{point.isNecessary ?
+        <ExclamationCircleTwoTone twoToneColor="red"/> : ''}<br/>
+        <Input type="text"
+               status={emptyHint[point.id] ? "error" : ""}
+               placeholder={point.defaultValue}
+               onInput={oninput}
+               value={data[point.id]}/>
       </label>
     </div>
   </div>
 
 }
 
+/* 提示按钮，通过变红提示用户需要点击 */
+function HintButton(props) {
+  const {value, type, clickHandler} = props
+
+  if (type === buttonStatus.DEFAULT) {
+    return (
+      <Button
+        className='u-pf-editor-upload-default'
+        icon={<UploadOutlined/>}
+        onClick={clickHandler}
+      >
+        {value}
+      </Button>
+    )
+  } else if (type === buttonStatus.ERROR) {
+    return (
+      <Button
+        className='u-pf-editor-upload-error'
+        icon={<UploadOutlined/>}
+        onClick={clickHandler}
+      >
+        {value}
+      </Button>
+    )
+  }
+
+}
+
 function TypeOfImage(props) {
-  const {point, onclick, data} = props
+  const {point, onclick, data, emptyHint} = props
   return (
     <div className="m-pf-editor-image">
       <div className="u-point">{props.point.id}</div>
       <div>
-        <div>{(point.label?.length > 0 ? point.label : "请设置备注")}<br/>
-          <Button
-            className='u-pf-editor-upload'
-            icon={<UploadOutlined/>}
-            onClick={onclick}
-          >
-            上传图片
-          </Button>
+        <div>{(point.label?.length > 0 ? point.label : "请设置备注 ")}{point.isNecessary ?
+          <ExclamationCircleTwoTone twoToneColor="red"/> : ''}<br/>
+          <HintButton
+            type={emptyHint[point.id] ? buttonStatus.ERROR : buttonStatus.DEFAULT}
+            clickHandler={onclick}
+            value={"上传图片"}/>
           <br/>
           {data[point.id] ? data[point.id].substring(data[point.id].indexOf("/file/") + 6) : '未选择文件'}
         </div>
@@ -50,6 +81,7 @@ function TypeOfImage(props) {
     </div>
   )
 }
+
 
 export default class ProjectForm extends React.Component {
 
@@ -61,7 +93,8 @@ export default class ProjectForm extends React.Component {
       data: {},
       isModalVisible: false,
       role: props.role,
-      countDown: 0
+      countDown: 0,
+      emptyCheckFlag: {}
     }
   }
 
@@ -81,12 +114,15 @@ export default class ProjectForm extends React.Component {
     // 新项目
     if (prev === null || prev.id !== project.id) {
       let initData = {}
+      let initFlag = {}
       for (const point of project.points) {
         initData[point.id] = ""
+        initFlag[point.id] = false
       }
       this.setState({
         project: project,
-        data: initData
+        data: initData,
+        emptyCheckFlag: initFlag
       })
       return
     }
@@ -144,6 +180,7 @@ export default class ProjectForm extends React.Component {
                       point={point}
                       oninput={e => this.updateStateData(e.target.value, point.id)}
                       data={this.state.data}
+                      emptyHint={this.state.emptyCheckFlag}
           />
         )
       } else if (point.type === 2) {
@@ -155,6 +192,7 @@ export default class ProjectForm extends React.Component {
                          this.updateStateData(imageData, point.id)
                        }}
                        data={this.state.data}
+                       emptyHint={this.state.emptyCheckFlag}
           />)
       }
     }
@@ -177,10 +215,41 @@ export default class ProjectForm extends React.Component {
     message.success(`保存成功，请在电脑端 "云端数据" 查看`)
   }
 
+  checkNecessity = () => {
+    const project = this.state.project
+    /* 是否准备完毕 */
+    let isPre = true
+    if (!project) {
+      return
+    }
+    let data = this.state.data
+    /**
+     * 遍历每个小红点的id，如果小红点必填且data为''，设置emptyCheckFlag对应为true
+     * @type {{number:boolean}}
+     */
+    let flag = this.state.emptyCheckFlag
+    const {points} = project
+    for (let point of points) {
+      if (point.isNecessary && data[point.id] === '') {
+        message.error("第 " + point.id + " 项数据未填写！")
+        flag[point.id] = true
+        isPre = false
+      } else {
+        flag[point.id] = false
+      }
+    }
+    this.setState({
+      emptyCheckFlag: flag
+    })
+
+    return isPre
+  }
+
   render() {
     const {project} = this.state
     return (
       <>
+
         {
           !project &&
           <div className="m-main-hint">
@@ -206,7 +275,9 @@ export default class ProjectForm extends React.Component {
             }
             {
               project.points.length !== 0 &&
+
               <div>
+
                 <div className="m-pf-editor-list">
                   {this.formList()}
                 </div>
@@ -250,7 +321,9 @@ export default class ProjectForm extends React.Component {
                                 })
                               }, 1000)
                             })
-                            this.saveInputDataResult()
+                            if (this.checkNecessity()) {
+                              this.saveInputDataResult()
+                            }
                           }}
                   >
                     {

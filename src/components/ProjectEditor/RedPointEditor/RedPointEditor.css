@@ -1,4 +1,4 @@
-.m-re-pt-container{
+.m-re-pt-container {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -14,4 +14,12 @@
 
 .m-re-pt-block.small {
     width: 33%;
+}
+
+.m-re-pt-block.medium {
+    width: 50%;
+}
+
+.m-re-pt-block.large {
+    width: 100%;
 }
