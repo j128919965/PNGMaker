@@ -5,9 +5,7 @@ import {
   CloseCircleOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
-  EyeOutlined,
-  FontColorsOutlined,
-  FunctionOutlined
+  FontColorsOutlined
 } from "@ant-design/icons";
 import {Button, Input, Menu, message, Modal, Select, Switch} from "antd";
 

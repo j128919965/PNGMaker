@@ -1,10 +1,10 @@
 import React from "react";
 
 import "./ProjectForm.css"
-import {Empty, Input, Button, Modal, message} from "antd";
-import {ExclamationCircleOutlined, ExclamationCircleTwoTone, UploadOutlined} from '@ant-design/icons';
+import {Button, Empty, Input, message, Modal} from "antd";
+import {ExclamationCircleTwoTone, UploadOutlined} from '@ant-design/icons';
 
-import {buttonStatus, DEFAULT, EditorHeight, EditorWidth, ERROR} from '../../data/constants'
+import {buttonStatus, EditorHeight, EditorWidth} from '../../data/constants'
 import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {InputDataLoadResult} from "../../data/InputData";

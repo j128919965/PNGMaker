@@ -2,7 +2,6 @@ import {InputDataLoadResult} from "./InputData";
 import urls from "./urls";
 import {message} from "antd";
 import httpx2 from "../utils/httpx2";
-import {post} from "../utils/httpx";
 
 
 const InputDataStore = {
