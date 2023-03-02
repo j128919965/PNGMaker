@@ -7,11 +7,11 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <form id="xlxs-reader-form" style={{display:"none"}} >
-      <input type="file" id="xlxs-reader"  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+    <form id="xlxs-reader-form" style={{display: "none"}}>
+      <input type="file" id="xlxs-reader" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
     </form>
 
-    <App />
+    <App/>
   </React.StrictMode>
 );
 

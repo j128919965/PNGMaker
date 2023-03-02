@@ -9,3 +9,8 @@ export const EditorHeight = 473;
 
 export const A4Width = 1754;
 export const A4Height = 1240;
+
+export const buttonStatus = {
+  DEFAULT: 1,
+  ERROR: 0
+}

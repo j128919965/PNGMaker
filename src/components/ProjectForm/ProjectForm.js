@@ -4,7 +4,7 @@ import "./ProjectForm.css"
 import {Empty, Input, Button, Modal, message} from "antd";
 import {ExclamationCircleOutlined, ExclamationCircleTwoTone, UploadOutlined} from '@ant-design/icons';
 
-import {EditorHeight, EditorWidth} from '../../data/constants'
+import {buttonStatus, DEFAULT, EditorHeight, EditorWidth, ERROR} from '../../data/constants'
 import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {InputDataLoadResult} from "../../data/InputData";
@@ -33,14 +33,12 @@ function TypeOfText(props) {
   </div>
 
 }
+
 /* 提示按钮，通过变红提示用户需要点击 */
 function HintButton(props) {
   const {value, type, clickHandler} = props
-  const typeMap={
-    default:'default',
-    error:'error'
-  }
-  if (type === typeMap.default) {
+
+  if (type === buttonStatus.DEFAULT) {
     return (
       <Button
         className='u-pf-editor-upload-default'
@@ -50,7 +48,7 @@ function HintButton(props) {
         {value}
       </Button>
     )
-  } else if (type === typeMap.error) {
+  } else if (type === buttonStatus.ERROR) {
     return (
       <Button
         className='u-pf-editor-upload-error'
@@ -73,8 +71,8 @@ function TypeOfImage(props) {
         <div>{(point.label?.length > 0 ? point.label : "请设置备注")}{point.isNecessary ?
           <ExclamationCircleTwoTone twoToneColor="red"/> : ''}<br/>
           <HintButton
-            type ={emptyHint[point.id]?'error':'default'}
-            clickHandler= {onclick}
+            type={emptyHint[point.id] ? buttonStatus.ERROR : buttonStatus.DEFAULT}
+            clickHandler={onclick}
             value={"上传图片"}/>
           <br/>
           {data[point.id] ? data[point.id].substring(data[point.id].indexOf("/file/") + 6) : '未选择文件'}
@@ -233,7 +231,7 @@ export default class ProjectForm extends React.Component {
     const {points} = project
     for (let point of points) {
       if (point.isNecessary && data[point.id] === '') {
-        message.error("第 "+point.id+" 项数据未填写！")
+        message.error("第 " + point.id + " 项数据未填写！")
         flag[point.id] = true
         isPre = false
       } else {

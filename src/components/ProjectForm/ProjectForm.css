@@ -1,4 +1,4 @@
-.m-pf-editor>div {
+.m-pf-editor > div {
     border: 1px solid #ddd;
     min-height: 150px;
     height: auto;
@@ -6,7 +6,8 @@
     display: flex;
     flex-direction: row;
 }
-.m-pf-editor>div>div{
+
+.m-pf-editor > div > div {
     display: flex;
     flex-direction: column;
     overflow: auto;
@@ -26,31 +27,31 @@
     margin: 7px;
 }
 
-.m-pf-editor-text, .m-pf-editor-image{
+.m-pf-editor-text, .m-pf-editor-image {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
 }
 
-.m-pf-editor-text>div>label, .m-pf-editor-image>div>div {
+.m-pf-editor-text > div > label, .m-pf-editor-image > div > div {
     font-size: xx-small;
     font-weight: bolder;
     color: #555;
     letter-spacing: 1px;
 }
 
-.m-pf-editor-text>div>label>Input{
+.m-pf-editor-text > div > label > Input {
     border: 1px solid #aaaaaa;
     width: 210px;
     height: 30px;
     margin-right: 25px;
 }
 
-.m-pf-editor-hint{
+.m-pf-editor-hint {
     margin-left: 9px;
 }
 
-.u-pf-btn{
+.u-pf-btn {
     position: relative;
     margin-top: 30px;
     margin-left: 18px;
@@ -63,37 +64,38 @@
     width: 80px;
 }
 
-.u-pf-btn:hover{
-    background: rgba(24,144,255,0.8);
+.u-pf-btn:hover {
+    background: rgba(24, 144, 255, 0.8);
 }
 
-.u-pf-editor-upload-default{
+.u-pf-editor-upload-default {
     border: 1px solid #1890FF;
     border-radius: 5px;
     color: #1890FF;
 }
-.u-pf-editor-upload-error{
+
+.u-pf-editor-upload-error {
     border: 1px solid #ff5454;
     border-radius: 5px;
     color: #ff5454;
 }
 
-.m-pf-preview-container{
+.m-pf-preview-container {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.m-pf-editor-list{
+.m-pf-editor-list {
     width: 70%;
 }
 
-.ant-upload-list-item{
+.ant-upload-list-item {
     width: 200px;
 }
 
-.m-pf-main-hint{
+.m-pf-main-hint {
     width: 70%;
     display: flex;
     justify-content: center;
@@ -104,12 +106,12 @@
     color: #aaa;
 }
 
-@media screen and (max-width: 1200px){
-    .m-pf-editor{
+@media screen and (max-width: 1200px) {
+    .m-pf-editor {
 
     }
 
-    .m-pf-editor>div {
+    .m-pf-editor > div {
         border: 1px solid #ddd;
         min-height: 150px;
         height: auto;
@@ -120,25 +122,25 @@
         align-items: center;
     }
 
-    .m-pf-editor>div>div{
+    .m-pf-editor > div > div {
         display: flex;
         flex-direction: column;
         overflow: auto;
     }
 
-    .m-pf-editor-list{
+    .m-pf-editor-list {
         width: 280px;
     }
 
-    #u-pf-btn-preview, #u-pf-btn-download{
+    #u-pf-btn-preview, #u-pf-btn-download {
         display: none;
     }
 
-    .m-pf-editor-text>div>label>Input{
+    .m-pf-editor-text > div > label > Input {
         margin: 0;
     }
 
-    .u-pf-btn{
+    .u-pf-btn {
         margin: 15px 0 15px;
     }
 }

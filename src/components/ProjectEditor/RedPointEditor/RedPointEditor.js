@@ -88,9 +88,9 @@ const RedPointEditor = forwardRef((props, ref) => {
     }),
     getItem('默认值', 'pe-sub5', <FunctionOutlined/>, undefined, () => {
       setTempNecessity(redPoint.isNecessary)
-      if (tempNecessity||redPoint.isNecessary){
+      if (tempNecessity || redPoint.isNecessary) {
         message.error(`必填项不可设置默认值`)
-      }else{
+      } else {
         setIsDefaultModalVisible(true)
       }
     })
@@ -106,6 +106,7 @@ const RedPointEditor = forwardRef((props, ref) => {
       })
     }),
     getItem('是否必填', 'pe-sub7', <ExclamationCircleOutlined/>, undefined, async () => {
+      setTempDefaultValue(redPoint.defaultValue)
       setTempNecessity(redPoint.isNecessary)
       setIsNecessaryModalVisible(true)
     })
@@ -142,6 +143,8 @@ const RedPointEditor = forwardRef((props, ref) => {
   const [tempVisible, setTempVisible] = useState(redPoint.visible);
 
   const [tempNecessity, setTempNecessity] = useState(redPoint.isNecessary)
+
+  const [tempDefaultValue, setTempDefaultValue] = useState(redPoint.defaultValue)
 
   const [isLabelModalVisible, setIsLabelModalVisible] = useState(false);
 
@@ -209,6 +212,7 @@ const RedPointEditor = forwardRef((props, ref) => {
       <Modal title="修改可见性"
              visible={isVisibleModalVisible}
              onOk={() => {
+               redPoint.isNecessary = tempNecessity
                redPoint.visible = tempVisible
                updatePoint()
                setIsVisibleModalVisible(false)
@@ -222,7 +226,7 @@ const RedPointEditor = forwardRef((props, ref) => {
                 unCheckedChildren="隐藏"
                 onChange={v => {
                   if (!v) {
-                    redPoint.isNecessary = false
+                    setTempNecessity(false)
                   }
                   setTempVisible(v)
                 }}/>
@@ -363,6 +367,8 @@ const RedPointEditor = forwardRef((props, ref) => {
              visible={isNecessaryModalVisible}
              onOk={() => {
                redPoint.isNecessary = tempNecessity
+               redPoint.defaultValue = tempDefaultValue
+               redPoint.visible = tempVisible
                updatePoint()
                setIsNecessaryModalVisible(false)
              }}
@@ -375,8 +381,8 @@ const RedPointEditor = forwardRef((props, ref) => {
                 unCheckedChildren="非必填"
                 onChange={v => {
                   if (v) {
-                    redPoint.visible = true
-                    redPoint.defaultValue = ""
+                    setTempVisible(true)
+                    setTempDefaultValue("")
                   }
                   setTempNecessity(v)
                 }}/>
