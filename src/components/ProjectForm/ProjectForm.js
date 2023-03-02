@@ -68,7 +68,7 @@ function TypeOfImage(props) {
     <div className="m-pf-editor-image">
       <div className="u-point">{props.point.id}</div>
       <div>
-        <div>{(point.label?.length > 0 ? point.label : "请设置备注")}{point.isNecessary ?
+        <div>{(point.label?.length > 0 ? point.label : "请设置备注 ")}{point.isNecessary ?
           <ExclamationCircleTwoTone twoToneColor="red"/> : ''}<br/>
           <HintButton
             type={emptyHint[point.id] ? buttonStatus.ERROR : buttonStatus.DEFAULT}

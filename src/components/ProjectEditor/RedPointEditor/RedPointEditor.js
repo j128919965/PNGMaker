@@ -9,12 +9,11 @@ import {
   FontColorsOutlined,
   FunctionOutlined
 } from "@ant-design/icons";
-import {Button, Input, Menu, message, Modal, Select, Switch, Tooltip} from "antd";
+import {Button, Input, Menu, message, Modal, Select, Switch} from "antd";
 
 import {FontPattern, PicturePattern, RedPoint} from "../../../data/ProjectMetadata";
 
 import './RedPointEditor.css'
-import formula from "../../../utils/formula";
 import {FormulaEditor} from "../../FomulaEditor/FormulaEditor";
 
 const {Option} = Select
@@ -47,6 +46,7 @@ const RedPointEditor = forwardRef((props, ref) => {
 
   const items = [
     getItem('格式', 'pe-sub1', <FontColorsOutlined/>, undefined, () => {
+
       if (redPoint.type === 1) {
         // 这个地方要进行一次深copy，否则会污染
         setTempFont(redPoint.pattern.clone())
@@ -56,6 +56,9 @@ const RedPointEditor = forwardRef((props, ref) => {
         setTempPicture(redPoint.pattern.clone())
         setIsPictureModalVisible(true)
       }
+      setTempVisible(redPoint.visible)
+      setTempDefaultValue(redPoint.defaultValue)
+      setTempNecessity(redPoint.isNecessary)
     }),
 
     {
@@ -82,20 +85,7 @@ const RedPointEditor = forwardRef((props, ref) => {
       setTempLabel(redPoint.label)
       setIsLabelModalVisible(true)
     }),
-    getItem('可见性', 'pe-sub4', <EyeOutlined/>, undefined, () => {
-      setTempVisible(redPoint.visible)
-      setIsVisibleModalVisible(true)
-    }),
-    getItem('默认值', 'pe-sub5', <FunctionOutlined/>, undefined, () => {
-      setTempNecessity(redPoint.isNecessary)
-      if (tempNecessity || redPoint.isNecessary) {
-        message.error(`必填项不可设置默认值`)
-      } else {
-        setIsDefaultModalVisible(true)
-      }
-    })
-    ,
-    getItem('删除', 'pe-sub6', <CloseCircleOutlined/>, undefined, async () => {
+    getItem('删除', 'pe-sub4', <CloseCircleOutlined/>, undefined, async () => {
       Modal.confirm({
         title: `删除项目`,
         content: <>确认删除 {redPoint.id} 吗？<br/>注意，已保存的云端数据可能会解析出错。</>,
@@ -104,11 +94,6 @@ const RedPointEditor = forwardRef((props, ref) => {
         cancelText: '取消',
         onOk: () => props.onDelete(redPoint.id)
       })
-    }),
-    getItem('是否必填', 'pe-sub7', <ExclamationCircleOutlined/>, undefined, async () => {
-      setTempDefaultValue(redPoint.defaultValue)
-      setTempNecessity(redPoint.isNecessary)
-      setIsNecessaryModalVisible(true)
     })
   ]
 
@@ -148,8 +133,6 @@ const RedPointEditor = forwardRef((props, ref) => {
 
   const [isLabelModalVisible, setIsLabelModalVisible] = useState(false);
 
-  const [isVisibleModalVisible, setIsVisibleModalVisible] = useState(false);
-
   const [isDefaultModalVisible, setIsDefaultModalVisible] = useState(false);
 
   const [tempFont, setTempFont] = useState(FontPattern.default())
@@ -159,8 +142,6 @@ const RedPointEditor = forwardRef((props, ref) => {
   const [tempPicture, setTempPicture] = useState(PicturePattern.default())
 
   const [isPictureModalVisible, setIsPictureModalVisible] = useState(false)
-
-  const [isNecessaryModalVisible, setIsNecessaryModalVisible] = useState(false)
 
   return (
     <>
@@ -198,44 +179,24 @@ const RedPointEditor = forwardRef((props, ref) => {
         isDefaultModalVisible &&
         <FormulaEditor project={props.project}
                        redPoint={redPoint}
-                       defaultValue={redPoint.defaultValue}
+                       defaultValue={tempDefaultValue}
                        onSuccess={tmp => {
-                         redPoint.defaultValue = tmp
-                         updatePoint()
+                         setTempDefaultValue(tmp)
                          setIsDefaultModalVisible(false)
                        }}
-                       close={() => setIsDefaultModalVisible(false)}
+                       close={() => {
+                         setIsDefaultModalVisible(false)
+                       }}
         />
 
       }
 
-      <Modal title="修改可见性"
-             visible={isVisibleModalVisible}
+      <Modal title="设置文字红点格式"
+             visible={isFontModalVisible}
              onOk={() => {
                redPoint.isNecessary = tempNecessity
                redPoint.visible = tempVisible
-               updatePoint()
-               setIsVisibleModalVisible(false)
-             }}
-             onCancel={() => setIsVisibleModalVisible(false)}
-             okText="确定"
-             cancelText="取消"
-      >
-        <Switch checked={tempVisible}
-                checkedChildren="可见"
-                unCheckedChildren="隐藏"
-                onChange={v => {
-                  if (!v) {
-                    setTempNecessity(false)
-                  }
-                  setTempVisible(v)
-                }}/>
-      </Modal>
-
-
-      <Modal title="设置字体"
-             visible={isFontModalVisible}
-             onOk={() => {
+               redPoint.defaultValue = tempDefaultValue
                redPoint.pattern = tempFont
                updatePoint()
                setIsFontModalVisible(false)
@@ -307,12 +268,57 @@ const RedPointEditor = forwardRef((props, ref) => {
               <Option value={5}>以小红点中心为输入右下角</Option>
             </Select>
           </div>
+          <div className="m-re-pt-block medium">
+            可见性
+            <Switch checked={tempVisible}
+                    style={{width: 56}}
+                    checkedChildren="可见"
+                    unCheckedChildren="隐藏"
+                    onChange={v => {
+                      if (!v) {
+                        setTempNecessity(false)
+                      }
+                      setTempVisible(v)
+                    }}/>
+          </div>
+          <div className="m-re-pt-block medium">
+            是否必填
+            <Switch checked={tempNecessity}
+                    style={{width: 56}}
+                    checkedChildren="必填"
+                    unCheckedChildren="可空"
+                    onChange={v => {
+                      if (v) {
+                        setTempVisible(true)
+                        setTempDefaultValue("")
+                      }
+                      setTempNecessity(v)
+                    }}/>
+          </div>
+          <div className="m-re-pt-block large">
+            默认值
+            <div style={{fontSize: 12}}>
+              当前默认值为：{tempDefaultValue?.trim()?.length < 1 ? "无默认值" : tempDefaultValue}
+            </div>
+            <Button style={{width: 120}}
+                    disabled={tempNecessity}
+                    onClick={() => {
+                      if (tempNecessity) {
+                        message.error(`必填项不可设置默认值`)
+                      } else {
+                        setIsDefaultModalVisible(true)
+                      }
+                    }}>设置默认值</Button>
+          </div>
         </div>
       </Modal>
 
-      <Modal title="设置图片格式"
+      <Modal title="设置图片红点格式"
              visible={isPictureModalVisible}
              onOk={() => {
+               redPoint.isNecessary = tempNecessity
+               redPoint.visible = tempVisible
+               redPoint.defaultValue = tempDefaultValue
                redPoint.pattern = tempPicture
                updatePoint()
                setIsPictureModalVisible(false)
@@ -360,37 +366,51 @@ const RedPointEditor = forwardRef((props, ref) => {
               <Option value={5}>以小红点中心为输入右下角</Option>
             </Select>
           </div>
+          <div className="m-re-pt-block medium">
+            可见性
+            <Switch checked={tempVisible}
+                    style={{width: 56}}
+                    checkedChildren="可见"
+                    unCheckedChildren="隐藏"
+                    onChange={v => {
+                      if (!v) {
+                        setTempNecessity(false)
+                      }
+                      setTempVisible(v)
+                    }}/>
+          </div>
+          <div className="m-re-pt-block medium">
+            是否必填
+            <Switch checked={tempNecessity}
+                    style={{width: 56}}
+                    checkedChildren="必填"
+                    unCheckedChildren="可空"
+                    onChange={v => {
+                      if (v) {
+                        setTempVisible(true)
+                        setTempDefaultValue("")
+                      }
+                      setTempNecessity(v)
+                    }}/>
+          </div>
+          <div className="m-re-pt-block large">
+            默认值
+            <div style={{fontSize: 12}}>
+              当前默认值为：{tempDefaultValue?.trim()?.length < 1 ? "无默认值" : tempDefaultValue}
+            </div>
+            <Button style={{width: 120}}
+                    disabled={tempNecessity}
+                    onClick={() => {
+                      if (tempNecessity) {
+                        message.error(`必填项不可设置默认值`)
+                      } else {
+                        setIsDefaultModalVisible(true)
+                      }
+                    }}>设置默认值</Button>
+          </div>
         </div>
       </Modal>
-
-      <Modal title="是否必填"
-             visible={isNecessaryModalVisible}
-             onOk={() => {
-               redPoint.isNecessary = tempNecessity
-               redPoint.defaultValue = tempDefaultValue
-               redPoint.visible = tempVisible
-               updatePoint()
-               setIsNecessaryModalVisible(false)
-             }}
-             onCancel={() => setIsNecessaryModalVisible(false)}
-             okText="确定"
-             cancelText="取消"
-      >
-        <Switch checked={tempNecessity}
-                checkedChildren="必填"
-                unCheckedChildren="非必填"
-                onChange={v => {
-                  if (v) {
-                    setTempVisible(true)
-                    setTempDefaultValue("")
-                  }
-                  setTempNecessity(v)
-                }}/>
-      </Modal>
-
     </>
-
-
   )
 })
 
