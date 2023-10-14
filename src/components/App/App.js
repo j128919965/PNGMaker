@@ -1,5 +1,5 @@
 import EdiText from "react-editext";
-import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined, UserOutlined} from "@ant-design/icons";
+import {EditOutlined, ExclamationCircleOutlined, ProjectOutlined, ToolOutlined, UserOutlined, ControlOutlined} from "@ant-design/icons";
 import {Button, Menu, message, Modal, Popover, Select} from "antd";
 
 import {useEffect, useRef, useState} from "react";
@@ -148,9 +148,9 @@ const App = () => {
         ]
       },
       {
-        key: "tool",
-        label: '工  具',
-        icon: <ToolOutlined/>,
+        key:"config",
+        label: "配  置",
+        icon:<ControlOutlined />,
         disabled: !project,
         children: [
           {
@@ -177,24 +177,7 @@ const App = () => {
                 }
               }
             ]
-          },
-          {
-            key: "tool-excel",
-            label: '批量生成',
-            disabled: role < 1,
-            onClick: () => {
-              setBatchModalVisible(true)
-            }
-          },
-          {
-            key: "tool-cloud",
-            label: '云端数据',
-            disabled: role < 1,
-            onClick: async () => {
-              setCloudDataVisible(true)
-            }
-          },
-          {
+          },{
             key: "tool-output",
             label: '导出配置',
             disabled: role < 1,
@@ -210,6 +193,31 @@ const App = () => {
               setAntiShakeVisible(true)
             }
           }
+        ]
+      },
+      {
+        key: "tool",
+        label: '工  具',
+        icon: <ToolOutlined/>,
+        disabled: !project,
+        children: [
+          {
+            key: "tool-excel",
+            label: '批量生成',
+            disabled: role < 1,
+            onClick: () => {
+              setBatchModalVisible(true)
+            }
+          },
+          {
+            key: "tool-cloud",
+            label: '云端数据',
+            disabled: role < 1,
+            onClick: async () => {
+              setCloudDataVisible(true)
+            }
+          }
+
         ],
       },
       {
