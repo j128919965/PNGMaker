@@ -117,6 +117,10 @@ export class RedPoint {
     this.position = pos
   }
 
+  clone(){
+    return RedPoint.fromObj(this)
+  }
+
   /**
    * 创建默认小红点，必须传入ID
    * @param id
@@ -243,9 +247,16 @@ export class FontPattern extends Pattern {
 
 }
 
+const ShapeType = {
+  Rect : 0,
+  Circle : 1
+}
+
 export class PicturePattern extends Pattern {
+  shapeType
   width
   height
+  radius
 
   static default() {
     return PicturePattern.fromObj(null)
@@ -260,8 +271,10 @@ export class PicturePattern extends Pattern {
     let pattern = new PicturePattern()
     Pattern.checkAlign(obj?.align)
     pattern.align = parseInt(obj?.align ?? 1)
+    pattern.shapeType = obj?.shapeType ?? 0
     pattern.height = obj?.height ?? 100
     pattern.width = obj?.width ?? 100
+    pattern.radius = obj?.radius ?? 50
     return pattern
   }
 

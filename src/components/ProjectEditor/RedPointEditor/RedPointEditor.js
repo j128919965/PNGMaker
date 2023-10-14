@@ -13,6 +13,7 @@ import {FontPattern, PicturePattern, RedPoint} from "../../../data/ProjectMetada
 
 import './RedPointEditor.css'
 import {FormulaEditor} from "../../FomulaEditor/FormulaEditor";
+import {PicturePatternEditor} from "../PicturePatternEditor/PicturePatternEditor";
 
 const {Option} = Select
 
@@ -141,6 +142,10 @@ const RedPointEditor = forwardRef((props, ref) => {
 
   const [isPictureModalVisible, setIsPictureModalVisible] = useState(false)
 
+  const [shapeEditorVisible, setShapeEditorVisible] = useState(false)
+
+  const [tempPosition, setTempPosition] = useState(redPoint.position)
+
   return (
     <>
       <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
@@ -186,9 +191,7 @@ const RedPointEditor = forwardRef((props, ref) => {
                          setIsDefaultModalVisible(false)
                        }}
         />
-
       }
-
       <Modal title="设置文字红点格式"
              visible={isFontModalVisible}
              onOk={() => {
@@ -311,6 +314,20 @@ const RedPointEditor = forwardRef((props, ref) => {
         </div>
       </Modal>
 
+      {
+        shapeEditorVisible &&
+        <PicturePatternEditor project={props.project}
+                              redPoint={redPoint}
+                              close={() => setShapeEditorVisible(false)}
+                              onSuccess={(p) => {
+                                setTempPicture(p.pattern)
+                                setTempPosition(p.position)
+                              }
+                              }
+        />
+      }
+
+
       <Modal title="设置图片红点格式"
              visible={isPictureModalVisible}
              onOk={() => {
@@ -318,6 +335,7 @@ const RedPointEditor = forwardRef((props, ref) => {
                redPoint.visible = tempVisible
                redPoint.defaultValue = tempDefaultValue
                redPoint.pattern = tempPicture
+               redPoint.position = tempPosition
                updatePoint()
                setIsPictureModalVisible(false)
              }}
@@ -329,40 +347,12 @@ const RedPointEditor = forwardRef((props, ref) => {
              destroyOnClose={true}
       >
         <div className="m-re-pt-container">
-          <div className="m-re-pt-block">
-            高度（像素）
-            <Input type="number"
-                   defaultValue={tempPicture.height}
-                   style={{width: 120}}
-                   onChange={(v) => {
-                     tempPicture.height = v.target.value
-                     setTempPicture(tempPicture)
-                   }}
-            />
-          </div>
-          <div className="m-re-pt-block">
-            宽度（像素）
-            <Input type="number"
-                   defaultValue={tempPicture.width}
-                   style={{width: 120}}
-                   onChange={(v) => {
-                     tempPicture.width = v.target.value
-                     setTempPicture(tempPicture)
-                   }}
-            />
-          </div>
-          <div className="m-re-pt-block" style={{width: '100%'}}>
-            对齐方式
-            <Select defaultValue={tempPicture.align} style={{width: 300}} onChange={(v) => {
-              tempPicture.align = v;
-              setTempPicture(tempPicture)
+          <div className="m-re-pt-block large">
+            <Button onClick={() => {
+              setShapeEditorVisible(true)
             }}>
-              <Option value={1}>以小红点左上角为输入左上角</Option>
-              <Option value={2}>以小红点中心为输入左上角</Option>
-              <Option value={3}>以小红点中心为输入中心</Option>
-              <Option value={4}>以小红点右下角为输入右下角</Option>
-              <Option value={5}>以小红点中心为输入右下角</Option>
-            </Select>
+              配置图片形状大小
+            </Button>
           </div>
           <div className="m-re-pt-block medium">
             可见性
