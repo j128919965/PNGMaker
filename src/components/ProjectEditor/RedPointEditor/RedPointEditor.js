@@ -38,9 +38,9 @@ const RedPointEditor = forwardRef((props, ref) => {
     }
   }))
 
-  const updatePoint = () => {
-    setRedPoint(redPoint)
-    props.onUpdate(redPoint)
+  const updatePoint = (p) => {
+    setRedPoint(p ?? redPoint)
+    props.onUpdate(p ?? redPoint)
   }
 
   const items = [
@@ -51,8 +51,6 @@ const RedPointEditor = forwardRef((props, ref) => {
         setTempFont(redPoint.pattern.clone())
         setIsFontModalVisible(true)
       } else {
-        // 这个地方要进行一次深copy，否则会污染
-        setTempPicture(redPoint.pattern.clone())
         setIsPictureModalVisible(true)
       }
       setTempVisible(redPoint.visible)
@@ -138,13 +136,7 @@ const RedPointEditor = forwardRef((props, ref) => {
 
   const [isFontModalVisible, setIsFontModalVisible] = useState(false)
 
-  const [tempPicture, setTempPicture] = useState(PicturePattern.default())
-
   const [isPictureModalVisible, setIsPictureModalVisible] = useState(false)
-
-  const [shapeEditorVisible, setShapeEditorVisible] = useState(false)
-
-  const [tempPosition, setTempPosition] = useState(redPoint.position)
 
   return (
     <>
@@ -270,7 +262,7 @@ const RedPointEditor = forwardRef((props, ref) => {
             </Select>
           </div>
           <div className="m-re-pt-block medium">
-            可见性
+            是否展示
             <Switch checked={tempVisible}
                     style={{width: 56}}
                     checkedChildren="可见"
@@ -315,89 +307,17 @@ const RedPointEditor = forwardRef((props, ref) => {
       </Modal>
 
       {
-        shapeEditorVisible &&
+        isPictureModalVisible &&
         <PicturePatternEditor project={props.project}
                               redPoint={redPoint}
-                              close={() => setShapeEditorVisible(false)}
+                              close={() => setIsPictureModalVisible(false)}
                               onSuccess={(p) => {
-                                setTempPicture(p.pattern)
-                                setTempPosition(p.position)
-                              }
-                              }
+                                updatePoint(p)
+                                setIsPictureModalVisible(false)
+                              }}
         />
       }
 
-
-      <Modal title="设置图片红点格式"
-             visible={isPictureModalVisible}
-             onOk={() => {
-               redPoint.isNecessary = tempNecessity
-               redPoint.visible = tempVisible
-               redPoint.defaultValue = tempDefaultValue
-               redPoint.pattern = tempPicture
-               redPoint.position = tempPosition
-               updatePoint()
-               setIsPictureModalVisible(false)
-             }}
-             onCancel={() => {
-               setIsPictureModalVisible(false)
-             }}
-             okText="确定"
-             cancelText="取消"
-             destroyOnClose={true}
-      >
-        <div className="m-re-pt-container">
-          <div className="m-re-pt-block large">
-            <Button onClick={() => {
-              setShapeEditorVisible(true)
-            }}>
-              配置图片形状大小
-            </Button>
-          </div>
-          <div className="m-re-pt-block medium">
-            可见性
-            <Switch checked={tempVisible}
-                    style={{width: 56}}
-                    checkedChildren="可见"
-                    unCheckedChildren="隐藏"
-                    onChange={v => {
-                      if (!v) {
-                        setTempNecessity(false)
-                      }
-                      setTempVisible(v)
-                    }}/>
-          </div>
-          <div className="m-re-pt-block medium">
-            是否必填
-            <Switch checked={tempNecessity}
-                    style={{width: 56}}
-                    checkedChildren="必填"
-                    unCheckedChildren="可空"
-                    onChange={v => {
-                      if (v) {
-                        setTempVisible(true)
-                        setTempDefaultValue("")
-                      }
-                      setTempNecessity(v)
-                    }}/>
-          </div>
-          <div className="m-re-pt-block large">
-            默认值
-            <div style={{fontSize: 12}}>
-              当前默认值为：{tempDefaultValue?.trim()?.length < 1 ? "无默认值" : tempDefaultValue}
-            </div>
-            <Button style={{width: 120}}
-                    disabled={tempNecessity}
-                    onClick={() => {
-                      if (tempNecessity) {
-                        message.error(`必填项不可设置默认值`)
-                      } else {
-                        setIsDefaultModalVisible(true)
-                      }
-                    }}>设置默认值</Button>
-          </div>
-        </div>
-      </Modal>
     </>
   )
 })

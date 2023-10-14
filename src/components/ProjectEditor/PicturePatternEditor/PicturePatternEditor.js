@@ -1,10 +1,11 @@
-import {Input, Modal, Select} from "antd";
+import {Button, Input, message, Modal, Select, Switch} from "antd";
 import {EditorHeight, EditorWidth, RedPointSize} from "../../../data/constants";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import ImageLoader from "../../../utils/imageLoader";
 import {Position} from "../../../data/ProjectMetadata";
 
 import './PicturePatternEditor.css'
+import {FormulaEditor} from "../../FomulaEditor/FormulaEditor";
 
 const {Option} = Select
 
@@ -49,11 +50,20 @@ const getLeftTopPosition = (w, h, p) => {
 }
 
 export const PicturePatternEditor = (props) => {
-  const {project, close,onSuccess} = props
+  const {project, close,onSuccess,openDefaultModal} = props
+
   /**
    * @type {RedPoint}
    */
   const p = props.redPoint.clone()
+
+  const [tempVisible, setTempVisible] = useState(p.visible);
+
+  const [tempNecessity, setTempNecessity] = useState(p.isNecessary)
+
+  const [tempDefaultValue, setTempDefaultValue] = useState(p.defaultValue)
+
+    const [isDefaultModalVisible, setIsDefaultModalVisible] = useState(false);
 
   const init = async () => {
     /**
@@ -88,11 +98,29 @@ export const PicturePatternEditor = (props) => {
   }, [])
 
   return <>
-    <Modal title="图片格式"
+      {
+          isDefaultModalVisible &&
+          <FormulaEditor project={props.project}
+                         redPoint={p}
+                         defaultValue={tempDefaultValue}
+                         onSuccess={tmp => {
+                             setTempDefaultValue(tmp)
+                             setIsDefaultModalVisible(false)
+                         }}
+                         close={() => {
+                             setIsDefaultModalVisible(false)
+                         }}
+          />
+      }
+
+    <Modal title="设置图片输入格式"
            visible={true}
            width={EditorWidth + 380}
            onCancel={() => close()}
            onOk={()=>{
+             p.isNecessary = tempNecessity
+             p.visible = tempVisible
+             p.defaultValue = tempDefaultValue
              onSuccess(p)
              close()
            }}
@@ -184,6 +212,54 @@ export const PicturePatternEditor = (props) => {
                        init()
                      }}
               />
+            </div>
+          </div>
+
+            <div className="m-ppe-title margin-top">
+                可见性及默认值
+            </div>
+          <div className="m-re-pt-container">
+            <div className="m-re-pt-block medium">
+              是否展示
+              <Switch checked={tempVisible}
+                      style={{width: 56}}
+                      checkedChildren="展示"
+                      unCheckedChildren="隐藏"
+                      onChange={v => {
+                        if (!v) {
+                          setTempNecessity(false)
+                        }
+                        setTempVisible(v)
+                      }}/>
+            </div>
+            <div className="m-re-pt-block medium">
+              是否必填
+              <Switch checked={tempNecessity}
+                      style={{width: 56}}
+                      checkedChildren="必填"
+                      unCheckedChildren="可空"
+                      onChange={v => {
+                        if (v) {
+                          setTempVisible(true)
+                          setTempDefaultValue("")
+                        }
+                        setTempNecessity(v)
+                      }}/>
+            </div>
+            <div className="m-re-pt-block large">
+              默认值
+              <div style={{fontSize: 12}}>
+                当前默认值为：{tempDefaultValue?.trim()?.length < 1 ? "无默认值" : tempDefaultValue}
+              </div>
+              <Button style={{width: 120}}
+                      disabled={tempNecessity}
+                      onClick={() => {
+                        if (tempNecessity) {
+                          message.error(`必填项不可设置默认值`)
+                        } else {
+                          setIsDefaultModalVisible(true)
+                        }
+                      }}>设置默认值</Button>
             </div>
           </div>
         </div>
