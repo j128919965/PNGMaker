@@ -8,6 +8,7 @@
     "@testing-library/react": "^13.1.1",
     "@testing-library/user-event": "^13.5.0",
     "antd": "^4.20.1",
+    "antd-img-crop": "^4.13.0",
     "axios": "^0.27.2",
     "exceljs": "^4.3.0",
     "node-sass": "^7.0.1",

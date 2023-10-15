@@ -1,7 +1,7 @@
 import React from "react";
 
 import "./ProjectForm.css"
-import {Button, Empty, Input, message, Modal} from "antd";
+import {Button, Empty, Input, message, Modal, Upload} from "antd";
 import {ExclamationCircleTwoTone, UploadOutlined} from '@ant-design/icons';
 
 import {buttonStatus, EditorHeight, EditorWidth} from '../../data/constants'
@@ -9,6 +9,7 @@ import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {InputDataLoadResult} from "../../data/InputData";
 import InputDataStore from "../../data/InputDataStore";
+import ImgCrop from "antd-img-crop";
 
 /**
  *
@@ -31,35 +32,6 @@ function TypeOfText(props) {
       </label>
     </div>
   </div>
-
-}
-
-/* 提示按钮，通过变红提示用户需要点击 */
-function HintButton(props) {
-  const {value, type, clickHandler} = props
-
-  if (type === buttonStatus.DEFAULT) {
-    return (
-      <Button
-        className='u-pf-editor-upload-default'
-        icon={<UploadOutlined/>}
-        onClick={clickHandler}
-      >
-        {value}
-      </Button>
-    )
-  } else if (type === buttonStatus.ERROR) {
-    return (
-      <Button
-        className='u-pf-editor-upload-error'
-        icon={<UploadOutlined/>}
-        onClick={clickHandler}
-      >
-        {value}
-      </Button>
-    )
-  }
-
 }
 
 function TypeOfImage(props) {
@@ -70,12 +42,30 @@ function TypeOfImage(props) {
       <div>
         <div>{(point.label?.length > 0 ? point.label : "请设置备注 ")}{point.isNecessary ?
           <ExclamationCircleTwoTone twoToneColor="red"/> : ''}<br/>
-          <HintButton
-            type={emptyHint[point.id] ? buttonStatus.ERROR : buttonStatus.DEFAULT}
-            clickHandler={onclick}
-            value={"上传图片"}/>
-          <br/>
-          {data[point.id] ? data[point.id].substring(data[point.id].indexOf("/file/") + 6) : '未选择文件'}
+          <ImgCrop
+            rotationSlider={true}
+            aspect={point.pattern.width / point.pattern.height}
+          >
+            <Upload
+              customRequest={async (opts)=>{
+                let resp = await files.uploadImage(opts.file)
+                if (resp.success) {
+                  let url = resp.url;
+                  onclick(url)
+                  opts.onSuccess()
+                }else {
+                  message.error("上传图片失败")
+                  opts.onError(resp.message)
+                }
+              }}
+              listType="picture-card"
+              onRemove={()=>{
+                console.log("drop")
+                onclick('')}}
+            >
+              {data[point.id] ? null : '打开图片'}
+            </Upload>
+          </ImgCrop>
         </div>
       </div>
     </div>
@@ -187,13 +177,13 @@ export default class ProjectForm extends React.Component {
         list.push(
           <TypeOfImage key={point.id}
                        point={point}
-                       onclick={async () => {
-                         let imageData = await files.readFile(undefined)
-                         this.updateStateData(imageData, point.id)
+                       onclick={ (url) => {
+                         this.updateStateData(url, point.id)
                        }}
                        data={this.state.data}
                        emptyHint={this.state.emptyCheckFlag}
           />)
+        list.push( )
       }
     }
     return list

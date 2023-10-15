@@ -6,7 +6,6 @@ import {message} from "antd";
 const ProjectStore = {
     async getAll() {
         const resp = await httpx2.get(urls.projects.getAll)
-        console.log(resp)
         return resp.d
     },
     async getById(id) {
@@ -29,6 +28,8 @@ const ProjectStore = {
         proj.id = resp.id
         proj.name = resp.name
         proj = ProjectMetadata.fromObj(proj)
+        // 默认先管理员可见，防止影响到提交者，看到半成品状态的项目
+        proj.role = 2
         this.save(proj)
         return proj
     },
