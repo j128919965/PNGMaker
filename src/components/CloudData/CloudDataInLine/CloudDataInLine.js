@@ -1,6 +1,8 @@
 import {CheckOutlined, ExclamationOutlined} from "@ant-design/icons";
-import {Button} from "antd";
+import {Button, Modal} from "antd";
 import React from "react";
+
+const {confirm} = Modal
 
 /**
  *
@@ -23,11 +25,11 @@ const getDataLine = (result, project) => {
     }).join("，")
 }
 
-export const CloudDataInLine=(props)=>{
+export const CloudDataInLine = (props) => {
 
   const {index, result, project} = props
 
-  const {setCurrentResult,setPreviewVisible, setCloudDataFormVisible, render, removeResult,reload} = props
+  const {setCurrentResult, setPreviewVisible, setCloudDataFormVisible, render, removeResult, reload} = props
 
   return (
     <div className="m-bl-line" key={index}>
@@ -62,7 +64,7 @@ export const CloudDataInLine=(props)=>{
             }}>
               <span style={{fontSize: "small"}}>查看预览</span>
             </Button>
-            <Button size={"small"} onClick={ async () => {
+            <Button size={"small"} onClick={async () => {
               await render(result, index + 1)
               reload()
             }}>
@@ -70,8 +72,13 @@ export const CloudDataInLine=(props)=>{
             </Button>
           </>
         }
-        <Button size={"small"} onClick={() => {
-          removeResult(result)
+        <Button size={"small"} onClick={async () => {
+          confirm({
+            title:"是否要删除数据",
+            onOk:()=>{
+              removeResult(result)
+            }
+          })
         }}>
           <span style={{fontSize: "small"}}>删除数据</span>
         </Button>
