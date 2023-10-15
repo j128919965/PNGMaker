@@ -17,6 +17,7 @@ import {ProjectMetadata} from "../../data/ProjectMetadata";
 import {RoleManage} from "../RoleManage/RoleManage";
 import {FormulaEditor} from "../FomulaEditor/FormulaEditor";
 import {AntiShakeSetter} from "../AntiShakeSetter/AntiShakeSetter";
+import messagex from "../../utils/messagex";
 
 
 
@@ -70,8 +71,7 @@ const App = () => {
     }
 
     const openProjectById = async (id) => {
-      message.info("正在加载项目，请稍候")
-      let proj = await ProjectStore.getById(id)
+      let proj = await messagex.load('正在加载项目，请稍候', () => ProjectStore.getById(id))
       updateProject(proj)
       setOpenProjectVisible(false)
     }
