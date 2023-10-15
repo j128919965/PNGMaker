@@ -83,7 +83,9 @@ export default class ImageRenderer {
     let set = {}
     this.project.points.filter(p => p.type === 1).map(p => p.pattern.fontType)
       .filter(font => !fontx.supportFont(font)).forEach(font => set[font] = 1)
+    if (Object.keys(set).length > 0) {
       message.warn(`本机未安装字体 ${Object.keys(set).join(',')}，出图将无法使用该字体`)
+    }
 
     // 注意point位置的等比例缩放
     let trulyPos = {}

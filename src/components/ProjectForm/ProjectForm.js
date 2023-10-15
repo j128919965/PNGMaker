@@ -4,7 +4,7 @@ import "./ProjectForm.css"
 import {Button, Empty, Input, message, Modal, Upload} from "antd";
 import {ExclamationCircleTwoTone, UploadOutlined} from '@ant-design/icons';
 
-import {buttonStatus, EditorHeight, EditorWidth} from '../../data/constants'
+import {A4Height, A4Width, buttonStatus, EditorHeight, EditorWidth} from '../../data/constants'
 import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {InputDataLoadResult} from "../../data/InputData";
@@ -44,7 +44,7 @@ function TypeOfImage(props) {
           <ExclamationCircleTwoTone twoToneColor="red"/> : ''}<br/>
           <ImgCrop
             rotationSlider={true}
-            aspect={point.pattern.width / point.pattern.height}
+            aspect={(point.pattern.width / point.pattern.height) / ((EditorWidth / EditorHeight) / (A4Width / A4Height))}
           >
             <Upload
               customRequest={async (opts)=>{

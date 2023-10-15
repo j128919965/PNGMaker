@@ -13,7 +13,8 @@ import {FontPattern, PicturePattern, RedPoint} from "../../../data/ProjectMetada
 
 import './RedPointEditor.css'
 import {FormulaEditor} from "../../FomulaEditor/FormulaEditor";
-import {PicturePatternEditor} from "../PicturePatternEditor/PicturePatternEditor";
+import {PicturePatternEditor} from "./PicturePatternEditor/PicturePatternEditor";
+import {WordPatternEditor} from "./WordPatternEditor/WordPatternEditor";
 
 const {Option} = Select
 
@@ -47,15 +48,10 @@ const RedPointEditor = forwardRef((props, ref) => {
     getItem('格式', 'pe-sub1', <FontColorsOutlined/>, undefined, () => {
 
       if (redPoint.type === 1) {
-        // 这个地方要进行一次深copy，否则会污染
-        setTempFont(redPoint.pattern.clone())
         setIsFontModalVisible(true)
       } else {
         setIsPictureModalVisible(true)
       }
-      setTempVisible(redPoint.visible)
-      setTempDefaultValue(redPoint.defaultValue)
-      setTempNecessity(redPoint.isNecessary)
     }),
 
     {
@@ -122,17 +118,7 @@ const RedPointEditor = forwardRef((props, ref) => {
 
   const [tempLabel, setTempLabel] = useState(redPoint.label);
 
-  const [tempVisible, setTempVisible] = useState(redPoint.visible);
-
-  const [tempNecessity, setTempNecessity] = useState(redPoint.isNecessary)
-
-  const [tempDefaultValue, setTempDefaultValue] = useState(redPoint.defaultValue)
-
   const [isLabelModalVisible, setIsLabelModalVisible] = useState(false);
-
-  const [isDefaultModalVisible, setIsDefaultModalVisible] = useState(false);
-
-  const [tempFont, setTempFont] = useState(FontPattern.default())
 
   const [isFontModalVisible, setIsFontModalVisible] = useState(false)
 
@@ -169,142 +155,17 @@ const RedPointEditor = forwardRef((props, ref) => {
         }}/>
       </Modal>
 
-
       {
-        isDefaultModalVisible &&
-        <FormulaEditor project={props.project}
-                       redPoint={redPoint}
-                       defaultValue={tempDefaultValue}
-                       onSuccess={tmp => {
-                         setTempDefaultValue(tmp)
-                         setIsDefaultModalVisible(false)
-                       }}
-                       close={() => {
-                         setIsDefaultModalVisible(false)
-                       }}
-        />
+          isFontModalVisible &&
+          <WordPatternEditor project={props.project}
+                                redPoint={redPoint}
+                                close={() => setIsFontModalVisible(false)}
+                                onSuccess={(p) => {
+                                  updatePoint(p)
+                                  setIsFontModalVisible(false)
+                                }}
+          />
       }
-      <Modal title="设置文字红点格式"
-             visible={isFontModalVisible}
-             onOk={() => {
-               redPoint.isNecessary = tempNecessity
-               redPoint.visible = tempVisible
-               redPoint.defaultValue = tempDefaultValue
-               redPoint.pattern = tempFont
-               updatePoint()
-               setIsFontModalVisible(false)
-             }}
-             onCancel={() => {
-               setIsFontModalVisible(false)
-             }}
-             okText="确定"
-             cancelText="取消"
-             destroyOnClose={true}
-      >
-        <div className="m-re-pt-container">
-          <div className="m-re-pt-block">
-            字体类型
-            <Select defaultValue={tempFont.fontType} style={{width: 120}} onChange={(v) => {
-              tempFont.fontType = v;
-              setTempFont(tempFont)
-            }}>
-              <Option value="宋体">宋体</Option>
-              <Option value="楷体">楷体</Option>
-              <Option value="黑体">黑体</Option>
-              <Option value="华文新魏">华文新魏</Option>
-            </Select>
-          </div>
-          <div className="m-re-pt-block">
-            字体大小
-            <Input type="number"
-                   defaultValue={tempFont.fontSize}
-                   style={{width: 120}}
-                   onChange={(v) => {
-                     tempFont.fontSize = v.target.value
-                     setTempFont(tempFont)
-                   }}
-            />
-          </div>
-          <div className="m-re-pt-block small">
-            加粗
-            <Switch defaultChecked={tempFont.bold}
-                    style={{width: 40}}
-                    onChange={(checked) => {
-                      tempFont.bold = checked
-                      setTempFont(tempFont)
-                    }}/>
-          </div>
-          <div className="m-re-pt-block small">
-            斜体
-            <Switch defaultChecked={tempFont.italic}
-                    style={{width: 40}}
-                    onChange={(checked) => {
-                      tempFont.italic = checked
-                      setTempFont(tempFont)
-                    }}/>
-          </div>
-          <div className="m-re-pt-block small">
-            字体颜色
-            <Input type='color' defaultValue={tempFont.color} style={{width: "42px"}}
-                   onChange={v => tempFont.color = v.target.value}/>
-          </div>
-          <div className="m-re-pt-block" style={{width: '100%'}}>
-            对齐方式
-            <Select defaultValue={tempFont.align} style={{width: 300}} onChange={(v) => {
-              tempFont.align = v;
-              setTempFont(tempFont)
-            }}>
-              <Option value={1}>以小红点左上角为输入左上角</Option>
-              <Option value={2}>以小红点中心为输入左上角</Option>
-              <Option value={3}>以小红点中心为输入中心</Option>
-              <Option value={4}>以小红点右下角为输入右下角</Option>
-              <Option value={5}>以小红点中心为输入右下角</Option>
-            </Select>
-          </div>
-          <div className="m-re-pt-block medium">
-            是否展示
-            <Switch checked={tempVisible}
-                    style={{width: 56}}
-                    checkedChildren="可见"
-                    unCheckedChildren="隐藏"
-                    onChange={v => {
-                      if (!v) {
-                        setTempNecessity(false)
-                      }
-                      setTempVisible(v)
-                    }}/>
-          </div>
-          <div className="m-re-pt-block medium">
-            是否必填
-            <Switch checked={tempNecessity}
-                    style={{width: 56}}
-                    checkedChildren="必填"
-                    unCheckedChildren="可空"
-                    onChange={v => {
-                      if (v) {
-                        setTempVisible(true)
-                        setTempDefaultValue("")
-                      }
-                      setTempNecessity(v)
-                    }}/>
-          </div>
-          <div className="m-re-pt-block large">
-            默认值
-            <div style={{fontSize: 12}}>
-              当前默认值为：{tempDefaultValue?.trim()?.length < 1 ? "无默认值" : tempDefaultValue}
-            </div>
-            <Button style={{width: 120}}
-                    disabled={tempNecessity}
-                    onClick={() => {
-                      if (tempNecessity) {
-                        message.error(`必填项不可设置默认值`)
-                      } else {
-                        setIsDefaultModalVisible(true)
-                      }
-                    }}>设置默认值</Button>
-          </div>
-        </div>
-      </Modal>
 
       {
         isPictureModalVisible &&

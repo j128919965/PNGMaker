@@ -1,61 +1,21 @@
 import {Button, Input, message, Modal, Select, Switch} from "antd";
-import {EditorHeight, EditorWidth, RedPointSize} from "../../../data/constants";
+import {EditorHeight, EditorWidth} from "../../../../data/constants";
 import React, {useEffect, useState} from "react";
-import ImageLoader from "../../../utils/imageLoader";
-import {Position} from "../../../data/ProjectMetadata";
+import ImageLoader from "../../../../utils/imageLoader";
+import {getLeftTopPosition} from "../utils"
 
 import './PicturePatternEditor.css'
-import {FormulaEditor} from "../../FomulaEditor/FormulaEditor";
+import {FormulaEditor} from "../../../FomulaEditor/FormulaEditor";
 
 const {Option} = Select
 
-const getLeftTopPosition = (w, h, p) => {
-  const scaleW = w / EditorWidth
-  const scaleH = h / EditorHeight
-
-  let pattern = p.pattern;
-  let pw = pattern.width
-  let ph = pattern.height
-
-  let position
-  let x = p.position.x;
-  let y = p.position.y;
-  switch (p.pattern.align) {
-    case 1:
-      position = new Position(x - RedPointSize, y - RedPointSize)
-      break
-    case 2:
-      position = new Position(x, y)
-      break
-    case 3:
-      position = new Position(x - (pw / 2), y - (ph / 2))
-      break
-    case 4:
-      position = new Position(x + RedPointSize - pw, y + RedPointSize - ph)
-      break
-    case 5:
-      position = new Position(x - pw, y - ph)
-      break
-    default:
-      throw new Error("小红点的对其方式不对")
-  }
-  position.x *= scaleW
-  position.y *= scaleH
-
-  return {
-    leftTopPosition: position,
-    pw: pw * scaleW,
-    ph: ph * scaleH
-  }
-}
-
 export const PicturePatternEditor = (props) => {
-  const {project, close,onSuccess,openDefaultModal} = props
+  const {project, close, onSuccess, openDefaultModal} = props
 
-  /**
-   * @type {RedPoint}
-   */
-  const p = props.redPoint.clone()
+    /**
+     * @type {RedPoint}
+     */
+    const [p,setP] = useState(props.redPoint.clone())
 
   const [tempVisible, setTempVisible] = useState(p.visible);
 
@@ -63,7 +23,7 @@ export const PicturePatternEditor = (props) => {
 
   const [tempDefaultValue, setTempDefaultValue] = useState(p.defaultValue)
 
-    const [isDefaultModalVisible, setIsDefaultModalVisible] = useState(false);
+  const [isDefaultModalVisible, setIsDefaultModalVisible] = useState(false);
 
   const init = async () => {
     /**
@@ -95,29 +55,29 @@ export const PicturePatternEditor = (props) => {
   }
   useEffect(() => {
     init()
-  }, [])
+  }, [p])
 
   return <>
-      {
-          isDefaultModalVisible &&
-          <FormulaEditor project={props.project}
-                         redPoint={p}
-                         defaultValue={tempDefaultValue}
-                         onSuccess={tmp => {
-                             setTempDefaultValue(tmp)
-                             setIsDefaultModalVisible(false)
-                         }}
-                         close={() => {
-                             setIsDefaultModalVisible(false)
-                         }}
-          />
-      }
+    {
+      isDefaultModalVisible &&
+      <FormulaEditor project={props.project}
+                     redPoint={p}
+                     defaultValue={tempDefaultValue}
+                     onSuccess={tmp => {
+                       setTempDefaultValue(tmp)
+                       setIsDefaultModalVisible(false)
+                     }}
+                     close={() => {
+                       setIsDefaultModalVisible(false)
+                     }}
+      />
+    }
 
     <Modal title="设置图片输入格式"
            visible={true}
            width={EditorWidth + 380}
            onCancel={() => close()}
-           onOk={()=>{
+           onOk={() => {
              p.isNecessary = tempNecessity
              p.visible = tempVisible
              p.defaultValue = tempDefaultValue
@@ -145,7 +105,7 @@ export const PicturePatternEditor = (props) => {
             请更换浏览器！推荐使用Google Chrome
           </canvas>
         </div>
-        <div>
+        <div style={{width:'300px'}}>
           <div className="m-ppe-title">
             位置调整
           </div>
@@ -153,7 +113,7 @@ export const PicturePatternEditor = (props) => {
             对齐方式
             <Select defaultValue={p.pattern.align} style={{width: 300}} onChange={(v) => {
               p.pattern.align = v;
-              init()
+              setP(p.clone())
             }}>
               <Option value={1}>以小红点左上角为输入左上角</Option>
               <Option value={2}>以小红点中心为输入左上角</Option>
@@ -170,7 +130,7 @@ export const PicturePatternEditor = (props) => {
                      style={{width: 120}}
                      onChange={(v) => {
                        p.position.x = v.target.value
-                       init()
+                       setP(p.clone())
                      }}
               />
             </div>
@@ -181,7 +141,7 @@ export const PicturePatternEditor = (props) => {
                      style={{width: 120}}
                      onChange={(v) => {
                        p.position.y = v.target.value
-                       init()
+                       setP(p.clone())
                      }}
               />
             </div>
@@ -198,7 +158,7 @@ export const PicturePatternEditor = (props) => {
                      style={{width: 120}}
                      onChange={(v) => {
                        p.pattern.height = v.target.value
-                       init()
+                       setP(p.clone())
                      }}
               />
             </div>
@@ -209,15 +169,15 @@ export const PicturePatternEditor = (props) => {
                      style={{width: 120}}
                      onChange={(v) => {
                        p.pattern.width = v.target.value
-                       init()
+                       setP(p.clone())
                      }}
               />
             </div>
           </div>
 
-            <div className="m-ppe-title margin-top">
-                可见性及默认值
-            </div>
+          <div className="m-ppe-title margin-top">
+            可见性及默认值
+          </div>
           <div className="m-re-pt-container">
             <div className="m-re-pt-block medium">
               是否展示
