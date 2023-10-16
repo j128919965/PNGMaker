@@ -178,7 +178,7 @@ const RedPointEditor = forwardRef((props, ref) => {
                               }}
         />
       }
-      <div style={{fontFamily:'华文新魏',position:'absolute',top:'-1000px'}}>s</div>
+
 
     </>
   )

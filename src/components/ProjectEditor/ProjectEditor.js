@@ -1,4 +1,4 @@
-import {Component, createRef} from "react";
+import React, {Component, createRef} from "react";
 
 import "./ProjectEditor.css"
 import ImageLoader from "../../utils/imageLoader";
@@ -211,6 +211,8 @@ export default class ProjectEditor extends Component {
                             onDelete={this.onRedPointEditorDeleteProject.bind(this)}/>
           </div>
         }
+        {/*提前加载一下字体，防止没有字体*/}
+        <div style={{fontFamily:'华文新魏',position:'absolute',top:'-1000px'}}>.</div>
       </div>
     );
   }
