@@ -3,6 +3,8 @@ import ImageLoader from "../../utils/imageLoader";
 import {Position} from "../../data/ProjectMetadata";
 import {message} from "antd";
 import formula from "../../utils/formula";
+import fontx from "../../utils/fontx";
+import messagex from "../../utils/messagex";
 
 const LargerRedPointSize = RedPointSize * A4Width / EditorWidth;
 
@@ -50,7 +52,7 @@ export default class ImageRenderer {
 
     // 先渲染
     try {
-      await this.render(inputDataLoadResult.data)
+      await messagex.load('渲染中，请稍后',()=>this.render(inputDataLoadResult.data))
     } catch (e) {
       message.error(e)
       throw e
@@ -68,7 +70,7 @@ export default class ImageRenderer {
    * @param data {InputData[]}
    */
   async render(data) {
-    message.info("正在加载，请稍候")
+    // message.info("图片资源加载中，请稍候")
     const getData = (id) => {
       for (let datum of data) {
         if (datum.pointId === id) {
@@ -76,6 +78,13 @@ export default class ImageRenderer {
         }
       }
       console.error(`ID为${id}的输入项为空！`)
+    }
+
+    let set = {}
+    this.project.points.filter(p => p.type === 1).map(p => p.pattern.fontType)
+      .filter(font => !fontx.supportFont(font)).forEach(font => set[font] = 1)
+    if (Object.keys(set).length > 0) {
+      message.warn(`本机未安装字体 ${Object.keys(set).join(',')}，出图将无法使用该字体`)
     }
 
     // 注意point位置的等比例缩放

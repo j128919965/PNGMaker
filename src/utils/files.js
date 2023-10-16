@@ -2,23 +2,6 @@ import urls from "../data/urls";
 import Compress from "./Compress";
 
 
-const imageCompress = (file) => {
-  let data = ""//保存地址
-  const reader = new FileReader()
-  // 读取文件并将文件以URL的形式保存在resulr属性中 base64格式
-  reader.readAsDataURL(file)
-  // 文件读取完成时触发
-  reader.onload = async e => {
-    const image = new Image()
-    if (typeof e.target.result === 'object') {
-      // 把Array Buffer转化为blob 如果是base64不需要
-      data = window.URL.createObjectURL(new Blob([e.target.result]))
-    } else {
-      data = e.target.result//base64格式图片地址
-    }
-  }
-}
-
 const uploadImage = async (file) => {
   let form = new FormData();
   // form.append('file', file)

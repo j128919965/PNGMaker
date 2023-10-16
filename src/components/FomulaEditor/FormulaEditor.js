@@ -1,4 +1,4 @@
-import {Button, Input, Modal, Tooltip} from "antd";
+import {Button, Input, message, Modal, Tooltip} from "antd";
 import {useState} from "react";
 import formula from "../../utils/formula";
 
@@ -8,11 +8,15 @@ export const FormulaEditor = props => {
   const [tempDefault, setTempDefault] = useState(defaultValue)
 
   const calcFormula = () => {
-    const resp = formula.exec(tempDefault, redPoint, project)
+    const resp = formula.exec(tempDefault, redPoint, project,null)
     if (resp.s) {
       return <span>{resp.d}</span>
     }
     return <span style={{color: "red"}}>{resp.m}</span>
+  }
+
+  const validateFormula = f => {
+    return formula.exec(tempDefault, redPoint, project,null);
   }
 
   return <>
@@ -21,10 +25,16 @@ export const FormulaEditor = props => {
       <Tooltip placement="topRight" title={() => calcFormula()} mouseLeaveDelay={10}>
         <Button size={"small"} style={{marginLeft: '10px'}}>预览</Button>
       </Tooltip>
-
     </>}
            visible={true}
-           onOk={() => onSuccess(tempDefault)}
+           onOk={() => {
+             let validateResult = validateFormula(tempDefault);
+             if (validateResult.s) {
+               onSuccess(tempDefault)
+             } else {
+               message.warn(`公式有错，请检查 : ${validateResult.m}`)
+             }
+           }}
            onCancel={close}
            okText="确定"
            cancelText="取消"
@@ -44,17 +54,17 @@ export const FormulaEditor = props => {
           <li>{'${now.month}'} ：当前月</li>
           <li>{'${now.day}'} ：当前日</li>
           {
-            redPoint != null && <li>{'${point.label}'} ：当前输入项的备注</li>
+              redPoint != null && <li>{'${point.label}'} ：当前输入项的备注</li>
           }
 
           <li>{'${project.name}'} ：当前项目名</li>
           <li>{'${project.id}'} ：当前项目ID</li>
           {
-            containsData &&
-            <>
-              <li>{'${points[n].label}'} : 序号为 n 的输入项的备注</li>
-              <li>{'${points[n].value}'} : 序号为 n 的输入项的值</li>
-            </>
+              containsData &&
+              <>
+                <li>{'${points[n].label}'} : 序号为 n 的输入项的备注</li>
+                <li>{'${points[n].value}'} : 序号为 n 的输入项的值</li>
+              </>
           }
         </ul>
         <h4>函数</h4>
