@@ -48,16 +48,12 @@ const getLeftTopPosition = (w, h, p, text, context) => {
     position.x *= scaleW
     position.y *= scaleH
 
-    return {
-        leftTopPosition: position,
-        pw: pw * scaleW,
-        ph: ph * scaleH
-    }
+    return position
 }
 
 
 export const WordPatternEditor = (props) => {
-    const {project, close, onSuccess, openDefaultModal} = props
+    const {project, close, onSuccess} = props
 
     /**
      * @type {RedPoint}
@@ -69,8 +65,6 @@ export const WordPatternEditor = (props) => {
     const [tempVisible, setTempVisible] = useState(p.visible);
 
     const [tempNecessity, setTempNecessity] = useState(p.isNecessary)
-
-    const [tempDefaultValue, setTempDefaultValue] = useState(p.defaultValue)
 
     const [testWord,setTestWord] =  useState("测试字符串");
 
@@ -95,7 +89,7 @@ export const WordPatternEditor = (props) => {
         }
 
         console.log(p)
-        const {leftTopPosition, pw, ph} = getLeftTopPosition(canvasW, canvasH, p, testWord, context)
+        const leftTopPosition = getLeftTopPosition(canvasW, canvasH, p, testWord, context)
         context.fillStyle = p.pattern.color
         let fontSize = (p.pattern.fontSize * 3) * canvasW / A4Width;
         context.font = (p.pattern.italic ? "italic " : "normal ") +
@@ -105,7 +99,6 @@ export const WordPatternEditor = (props) => {
         context.fillText(testWord, leftTopPosition.x, leftTopPosition.y)
     }
     useEffect(() => {
-        console.log("?")
         init()
     }, [p])
 
@@ -133,7 +126,6 @@ export const WordPatternEditor = (props) => {
                onOk={() => {
                    p.visible = tempVisible
                    p.isNecessary = tempNecessity
-                   p.defaultValue = tempDefaultValue
                    onSuccess(p)
                    close()
                }}
@@ -305,7 +297,7 @@ export const WordPatternEditor = (props) => {
                         <div className="m-re-pt-block large">
                             默认值
                             <div style={{fontSize: 12}}>
-                                当前默认值为：{tempDefaultValue?.trim()?.length < 1 ? "无默认值" : tempDefaultValue}
+                                当前默认值为：{p.defaultValue?.trim()?.length > 0 ? p.defaultValue : "无默认值" }
                             </div>
                             <Button style={{width: 120}}
                                     disabled={tempNecessity}

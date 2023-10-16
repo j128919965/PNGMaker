@@ -1,4 +1,4 @@
-import {forwardRef, useImperativeHandle, useState} from "react";
+import React, {forwardRef, useImperativeHandle, useState} from "react";
 import {
   BlockOutlined,
   CheckOutlined,
@@ -178,6 +178,7 @@ const RedPointEditor = forwardRef((props, ref) => {
                               }}
         />
       }
+      <div style={{fontFamily:'华文新魏',position:'absolute',top:'-1000px'}}>s</div>
 
     </>
   )
