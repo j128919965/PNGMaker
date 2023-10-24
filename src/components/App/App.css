@@ -1,3 +1,7 @@
+@font-face {
+    font-family: '华文新魏';
+    src: url("../../huawenxinwei.ttf");
+}
 * {
     margin: 0;
     padding: 0;
