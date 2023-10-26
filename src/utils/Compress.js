@@ -19,7 +19,6 @@ class Compress {
       if (!this.isLimitSize(rawImage)) {
         // 需压缩
         let imageFile = await this.readImage(rawImage)
-        console.log('imageFile', imageFile)
         resolve(imageFile.file)
         console.log('压缩后上传')
       } else {
@@ -96,12 +95,6 @@ class Compress {
         u8arr[n] = bstr.charCodeAt(n)
       }
       const miniFile = new File([u8arr], `${filename}.${suffix}`, {type: mime})
-      console.log({
-        file: miniFile,
-        origin: file,
-        beforeKB: Number((file.size / 1024).toFixed(2)),
-        afterKB: Number((miniFile.size / 1024).toFixed(2)),
-      })
       resolve({
         file: miniFile,
         origin: file,
@@ -119,10 +112,6 @@ class Compress {
   // 判断图片是否过大
   isLimitSize(image) {
     const isLimitSize = this.targetSize < (image.size / 1024 / 128)
-    console.log('size', image.size)
-    console.log('isLimitSize', isLimitSize)
-    console.log('targetSize', this.targetSize)
-    console.log(image)
     if (!isLimitSize) {
       return true
     } else {

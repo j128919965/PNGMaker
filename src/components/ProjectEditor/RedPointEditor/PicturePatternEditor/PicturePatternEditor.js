@@ -200,7 +200,6 @@ export const PicturePatternEditor = (props) => {
                       unCheckedChildren="可空"
                       onChange={v => {
                         if (v) {
-                          console.log(setTempDefaultValue())
                           setTempVisible(true)
                           setTempDefaultValue("")
                         }

@@ -81,7 +81,6 @@ export class InputDataLoadResult {
     const data = Object.keys(map).map(key => new InputData(parseInt(key), map[key]))
     project.points.filter(p => p.defaultValue?.length > 0).forEach(p => {
       const value = formula.exec(p.defaultValue, p, project).d
-      console.log("add invisible input , value = " + value)
       if (map[p.id.toString()] == null) {
         data.push(new InputData(p.id, value))
       } else if (map[p.id.toString()].length < 1) {
