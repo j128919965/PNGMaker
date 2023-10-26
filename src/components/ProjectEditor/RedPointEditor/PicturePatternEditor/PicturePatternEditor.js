@@ -10,7 +10,7 @@ import {FormulaEditor} from "../../../FomulaEditor/FormulaEditor";
 const {Option} = Select
 
 export const PicturePatternEditor = (props) => {
-  const {project, close, onSuccess, openDefaultModal} = props
+  const {project, close, onSuccess} = props
 
     /**
      * @type {RedPoint}
@@ -200,6 +200,7 @@ export const PicturePatternEditor = (props) => {
                       unCheckedChildren="可空"
                       onChange={v => {
                         if (v) {
+                          console.log(setTempDefaultValue())
                           setTempVisible(true)
                           setTempDefaultValue("")
                         }

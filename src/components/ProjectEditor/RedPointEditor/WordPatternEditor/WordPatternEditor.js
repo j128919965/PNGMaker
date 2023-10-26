@@ -70,6 +70,8 @@ export const WordPatternEditor = (props) => {
 
     const [tempNecessity, setTempNecessity] = useState(p.isNecessary)
 
+    const [tempDefaultValue, setTempDefaultValue] = useState(p.defaultValue)
+
     const [testWord,setTestWord] =  useState("测试字符串");
 
     const init = async () => {
