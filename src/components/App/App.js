@@ -246,7 +246,6 @@ const App = () => {
       let r = localStorage.getItem("role")
       if (r) {
         setRole(parseInt(r))
-        console.log("setup - set role", r)
       }
     }, [setIsLogin, setRole])
 

@@ -17,8 +17,6 @@ const getLeftTopPosition = (w, h, p, text, context) => {
     let position
     let pw = textMetrics.width
 
-    console.log(pw)
-
     let x = p.position.x;
     let y = p.position.y;
     switch (p.pattern.align) {
@@ -35,12 +33,10 @@ const getLeftTopPosition = (w, h, p, text, context) => {
             position = new Position(x - (pw / 2), y)
             break
         case 4:
-            console.log('case 4')
             context.textBaseline = "bottom"
             position = new Position(x + RedPointSize - pw, y + RedPointSize)
             break
         case 5:
-            console.log('case 5')
             context.textBaseline = "bottom"
             position = new Position(x - pw, y)
             break
@@ -49,8 +45,6 @@ const getLeftTopPosition = (w, h, p, text, context) => {
     }
     position.x *= scaleW
     position.y *= scaleH
-
-    console.log(position)
 
     return position
 }
@@ -92,7 +86,6 @@ export const WordPatternEditor = (props) => {
             backContext.drawImage(backgroundPicture, 0, 0, canvasW, canvasH)
         }
 
-        console.log(p)
         context.fillStyle = p.pattern.color
         let fontSize = (p.pattern.fontSize * 3) * canvasW / A4Width;
         context.font = (p.pattern.italic ? "italic " : "normal ") +
@@ -294,7 +287,7 @@ export const WordPatternEditor = (props) => {
                                     onChange={v => {
                                         if (v) {
                                             setTempVisible(true)
-                                            setTempDefaultValue("")
+                                            p.defaultValue = ""
                                         }
                                         setTempNecessity(v)
                                     }}/>

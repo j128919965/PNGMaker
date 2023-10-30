@@ -23,9 +23,6 @@ export const Login = (props) => {
       return;
     }
     setErr(null)
-    console.log({
-      username, password
-    })
     let resp = await httpx2.post(urls.users.login, {username, password})
     if (!resp.s) {
       message.error(resp.m)

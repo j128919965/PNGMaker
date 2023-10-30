@@ -10,7 +10,7 @@ import {FormulaEditor} from "../../../FomulaEditor/FormulaEditor";
 const {Option} = Select
 
 export const PicturePatternEditor = (props) => {
-  const {project, close, onSuccess, openDefaultModal} = props
+  const {project, close, onSuccess} = props
 
     /**
      * @type {RedPoint}
@@ -62,10 +62,11 @@ export const PicturePatternEditor = (props) => {
       isDefaultModalVisible &&
       <FormulaEditor project={props.project}
                      redPoint={p}
-                     defaultValue={tempDefaultValue}
+                     defaultValue={p.defaultValue}
                      onSuccess={tmp => {
-                       setTempDefaultValue(tmp)
+                       p.defaultValue = tmp
                        setIsDefaultModalVisible(false)
+                       setP(p.clone())
                      }}
                      close={() => {
                        setIsDefaultModalVisible(false)
@@ -80,7 +81,6 @@ export const PicturePatternEditor = (props) => {
            onOk={() => {
              p.isNecessary = tempNecessity
              p.visible = tempVisible
-             p.defaultValue = tempDefaultValue
              onSuccess(p)
              close()
            }}
@@ -201,7 +201,7 @@ export const PicturePatternEditor = (props) => {
                       onChange={v => {
                         if (v) {
                           setTempVisible(true)
-                          setTempDefaultValue("")
+                          p.defaultValue = ""
                         }
                         setTempNecessity(v)
                       }}/>
@@ -209,7 +209,7 @@ export const PicturePatternEditor = (props) => {
             <div className="m-re-pt-block large">
               默认值
               <div style={{fontSize: 12}}>
-                当前默认值为：{tempDefaultValue?.trim()?.length < 1 ? "无默认值" : tempDefaultValue}
+                当前默认值为：{p.defaultValue?.trim()?.length < 1 ? "无默认值" : p.defaultValue}
               </div>
               <Button style={{width: 120}}
                       disabled={tempNecessity}

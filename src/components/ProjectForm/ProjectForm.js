@@ -2,9 +2,8 @@ import React from "react";
 
 import "./ProjectForm.css"
 import {Button, Empty, Input, message, Modal, Upload} from "antd";
-import {ExclamationCircleTwoTone, UploadOutlined} from '@ant-design/icons';
 
-import {A4Height, A4Width, buttonStatus, EditorHeight, EditorWidth} from '../../data/constants'
+import {A4Height, A4Width, EditorHeight, EditorWidth} from '../../data/constants'
 import files from "../../utils/files";
 import ImageRenderer from "../ImageRenderer/ImageRenderer";
 import {InputDataLoadResult} from "../../data/InputData";
@@ -22,8 +21,10 @@ function TypeOfText(props) {
   return <div className="m-pf-editor-text">
     <div className="u-point">{point.id}</div>
     <div>
-      <label>{point.label?.length > 0 ? point.label + ' ' : "请设置备注 "}{point.isNecessary ?
-        <ExclamationCircleTwoTone twoToneColor="red"/> : ''}<br/>
+      <label>
+        {point.isNecessary ? <span style={{color: "red"}}>*</span> : ''}
+        {point.label?.length > 0 ? point.label + ' ' : "请设置备注 "}
+        <br/>
         <Input type="text"
                status={emptyHint[point.id] ? "error" : ""}
                placeholder={point.defaultValue}
@@ -35,13 +36,15 @@ function TypeOfText(props) {
 }
 
 function TypeOfImage(props) {
-  const {point, onclick, data, emptyHint} = props
+  const {point, onclick, data} = props
   return (
     <div className="m-pf-editor-image">
       <div className="u-point">{props.point.id}</div>
       <div>
-        <div>{(point.label?.length > 0 ? point.label : "请设置备注 ")}{point.isNecessary ?
-          <ExclamationCircleTwoTone twoToneColor="red"/> : ''}<br/>
+        <div>
+          {point.isNecessary ? <span style={{color: "red"}}>*</span> : ''}
+          {point.label?.length > 0 ? point.label + ' ' : "请设置备注 "}
+          <br/>
           <ImgCrop
             rotationSlider={true}
             aspect={(point.pattern.width / point.pattern.height) / ((EditorWidth / EditorHeight) / (A4Width / A4Height))}
@@ -276,13 +279,15 @@ export default class ProjectForm extends React.Component {
                     this.props.role > 0 &&
                     <Button type="primary" className="u-pf-btn" id="u-pf-btn-preview"
                             onClick={() => {
-                              this.setState({isModalVisible: true}, async () => {
-                                let pfImageRenderer = new ImageRenderer()
-                                pfImageRenderer.load(project)
-                                let pfReviewCanvas = document.getElementById('pfPreviewCanvas')
-                                pfReviewCanvas.getContext('2d').clearRect(0, 0, pfReviewCanvas.width, pfReviewCanvas.height)
-                                await pfImageRenderer.showPreview(pfReviewCanvas, InputDataLoadResult.fromMap(this.state.data, project))
-                              })
+                              if (this.checkNecessity()){
+                                this.setState({isModalVisible: true}, async () => {
+                                  let pfImageRenderer = new ImageRenderer()
+                                  pfImageRenderer.load(project)
+                                  let pfReviewCanvas = document.getElementById('pfPreviewCanvas')
+                                  pfReviewCanvas.getContext('2d').clearRect(0, 0, pfReviewCanvas.width, pfReviewCanvas.height)
+                                  await pfImageRenderer.showPreview(pfReviewCanvas, InputDataLoadResult.fromMap(this.state.data, project))
+                                })
+                              }
                             }}
                     >
                       预 览
@@ -300,18 +305,18 @@ export default class ProjectForm extends React.Component {
                   }
                   <Button type="primary" className="u-pf-btn" disabled={this.state.countDown !== 0}
                           onClick={() => {
-                            const {antiShakeTime} = this.props.project
-                            this.setState({countDown: antiShakeTime}, () => {
-                              let t = setInterval(() => {
-                                const newTime = this.state.countDown - 1
-                                this.setState({countDown: newTime}, () => {
-                                  if (this.state.countDown <= 0) {
-                                    clearInterval(t)
-                                  }
-                                })
-                              }, 1000)
-                            })
                             if (this.checkNecessity()) {
+                              const {antiShakeTime} = this.props.project
+                              this.setState({countDown: antiShakeTime}, () => {
+                                let t = setInterval(() => {
+                                  const newTime = this.state.countDown - 1
+                                  this.setState({countDown: newTime}, () => {
+                                    if (this.state.countDown <= 0) {
+                                      clearInterval(t)
+                                    }
+                                  })
+                                }, 1000)
+                              })
                               this.saveInputDataResult()
                             }
                           }}
