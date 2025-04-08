@@ -1,5 +1,6 @@
 // const Server = 'http://localhost:8080/agapi'
-const Server = 'https://award.ssacgn.online/agapi'
+const Server = '/agapi'
+// const Server = 'https://award.ssacgn.online/agapi'
 
 const urls = {
   projects: {

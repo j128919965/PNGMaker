@@ -202,7 +202,7 @@ export default class ProjectEditor extends Component {
           <div className="m-pe-gray">
             <div className="m-pe-gray-left" onClick={() => {
               this.setState({editing: false})
-            }}>>
+            }}>
 
             </div>
             <RedPointEditor className="m-pe-gray-right" ref={this.rpEditor}
