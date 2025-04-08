@@ -1,5 +1,10 @@
+// 后端本地启动时，用这个
 // const Server = 'http://localhost:8080/agapi'
+
+// 服务器部署用这个
 const Server = '/agapi'
+
+// 本地启动前端，但不启动后端时，用这个
 // const Server = 'https://award.ssacgn.online/agapi'
 
 const urls = {
